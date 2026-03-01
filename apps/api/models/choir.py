@@ -15,6 +15,7 @@ class Choir(Base):
 
     name = Column(String, nullable=False)
     description = Column(String)
+    max_users = Column(Integer, default=50) # New quota field
     
     # Relationships
     memberships = relationship("Membership", back_populates="choir")

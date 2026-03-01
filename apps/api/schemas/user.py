@@ -12,6 +12,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     email: EmailStr
     password: str
+    invite_code: Optional[str] = None
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
