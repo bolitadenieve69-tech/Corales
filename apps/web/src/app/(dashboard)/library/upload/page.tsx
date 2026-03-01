@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ShieldAlert, Upload, Loader2, ArrowLeft, FileMusic, Sparkles } from 'lucide-react';
@@ -18,8 +18,17 @@ export default function UploadPrivateWorkPage() {
     const [rightsConfirmed, setRightsConfirmed] = useState(false);
     const [error, setError] = useState('');
     const [pipelineStarted, setPipelineStarted] = useState(false);
+    const [choir, setChoir] = useState<any>(null);
 
     const isMusicXML = assetType === 'musicxml';
+
+    useEffect(() => {
+        fetchApi('/choirs/me')
+            .then(data => {
+                if (data) setChoir(data);
+            })
+            .catch(err => console.error("Error fetching choir for upload", err));
+    }, []);
 
     const getAcceptedExtensions = () => {
         switch (assetType) {
@@ -43,6 +52,9 @@ export default function UploadPrivateWorkPage() {
         setError('');
 
         try {
+            if (!choir) {
+                throw new Error("No se ha encontrado un coro asociado a tu cuenta. Ve a 'Mi Coro' primero.");
+            }
             const token = getAuthToken();
             const headers: Record<string, string> = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -50,7 +62,7 @@ export default function UploadPrivateWorkPage() {
             // 1. Create Work
             const work = await fetchApi('/works/', {
                 method: 'POST',
-                body: JSON.stringify({ title, composer, voice_format: format })
+                body: JSON.stringify({ title, composer, voice_format: format, choir_id: choir.id })
             });
 
             // 2. Create Edition
