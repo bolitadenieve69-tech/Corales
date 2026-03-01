@@ -7,8 +7,7 @@ import Link from 'next/link';
 import { ArrowLeft, Music, FileText, FileAudio, PlayCircle, Download, BookOpen, Clock, Settings2, Loader2, Upload } from 'lucide-react';
 import ProgressControls from './progress-controls';
 import PipelineStatus from './pipeline-status';
-
-const API_URL = 'http://127.0.0.1:8000/api/v1';
+import { fetchApi, API_URL } from '@/lib/api';
 
 export default function WorkDetailPage() {
     const params = useParams();
@@ -20,13 +19,11 @@ export default function WorkDetailPage() {
 
     useEffect(() => {
         if (!id) return;
-        const token = localStorage.getItem('token');
-        fetch(`${API_URL}/works/${id}`, {
-            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-        })
-            .then(res => res.json())
+        fetchApi(`/works/${id}`)
             .then(data => {
-                setWork(data);
+                if (data) {
+                    setWork(data);
+                }
                 setLoading(false);
             })
             .catch(err => {

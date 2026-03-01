@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ShieldAlert, Upload, Loader2, ArrowLeft, FileMusic, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-
-const API_URL = 'http://127.0.0.1:8000/api/v1';
+import { fetchApi, API_URL, getAuthToken } from '@/lib/api';
 
 export default function UploadPrivateWorkPage() {
     const router = useRouter();
@@ -44,23 +43,19 @@ export default function UploadPrivateWorkPage() {
         setError('');
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getAuthToken();
             const headers: Record<string, string> = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
             // 1. Create Work
-            const workRes = await fetch(`${API_URL}/works/`, {
+            const work = await fetchApi('/works/', {
                 method: 'POST',
-                headers: { ...headers, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title, composer, voice_format: format })
             });
-            if (!workRes.ok) throw new Error("Error creando la obra");
-            const work = await workRes.json();
 
             // 2. Create Edition
-            const editionRes = await fetch(`${API_URL}/editions/`, {
+            const edition = await fetchApi('/editions/', {
                 method: 'POST',
-                headers: { ...headers, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     work_id: work.id,
                     publishing_house: "Biblioteca Privada",
@@ -68,8 +63,6 @@ export default function UploadPrivateWorkPage() {
                     language: "Varios"
                 })
             });
-            if (!editionRes.ok) throw new Error("Error creando la edición");
-            const edition = await editionRes.json();
 
             // 3. Upload File
             const formData = new FormData();
@@ -90,7 +83,7 @@ export default function UploadPrivateWorkPage() {
                 const asset = await uploadRes.json();
                 setPipelineStarted(true);
 
-                // Wait a moment then redirect to work detail (where pipeline status is shown)
+                // Wait a moment then redirect to work detail
                 setTimeout(() => {
                     router.push(`/library/${work.id}`);
                     router.refresh();
