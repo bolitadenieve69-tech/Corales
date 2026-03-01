@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Music, ArrowRight, Loader2, AlertCircle } from "lucide-react"
+import { Music, ArrowRight, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -16,10 +17,15 @@ export default function LoginPage() {
         setError("")
 
         // Simulate API call for presentation
-        setTimeout(() => {
+        if (email === "director@coro.com" && password === "Corales2026!") {
+            setTimeout(() => {
+                setLoading(false)
+                window.location.href = "/projects"
+            }, 1000)
+        } else {
             setLoading(false)
-            window.location.href = "/projects" // Assuming Director goes to projects or catalog
-        }, 1500)
+            setError("Email o contraseña incorrectos (Prueba con director@coro.com / Corales2026!)")
+        }
     }
 
     return (
@@ -74,14 +80,23 @@ export default function LoginPage() {
                             <label className="text-sm font-medium text-slate-300">Contraseña</label>
                             <a href="#" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">¿Olvidaste tu contraseña?</a>
                         </div>
-                        <input
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                            placeholder="••••••••"
-                        />
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all pr-12"
+                                placeholder="••••••••"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+                            >
+                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                        </div>
                     </div>
 
                     <button
