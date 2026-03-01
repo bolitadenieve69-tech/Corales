@@ -37,10 +37,12 @@ export default function ProjectsPage() {
                     <h1 className="text-3xl font-bold tracking-tight">Proyectos</h1>
                     <p className="text-slate-400 mt-1">Gestiona los próximos conciertos y repertorios.</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)]">
-                    <Plus size={18} />
-                    Nuevo Proyecto
-                </button>
+                <Link href="/projects/new">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)]">
+                        <Plus size={18} />
+                        Nuevo Proyecto
+                    </button>
+                </Link>
             </div>
 
             {/* Grid */}
