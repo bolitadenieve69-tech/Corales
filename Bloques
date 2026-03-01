@@ -1,0 +1,460 @@
+🔵 FASE 0 — Infraestructura base
+Tarea 0.1 — Crear monorepo
+
+Output:
+
+/apps/web (Next.js)
+
+/apps/api (FastAPI)
+
+/infra/docker-compose.yml
+
+Postgres funcionando en local
+
+Tarea 0.2 — Configurar FastAPI + SQLAlchemy + Alembic
+
+Output:
+
+Conexión a Postgres
+
+Migraciones funcionando
+
+Endpoint de prueba /health
+
+Tarea 0.3 — Configurar autenticación JWT
+
+Output:
+
+Login básico
+
+Middleware de protección por rol
+
+🔵 FASE 1 — Modelo de datos base
+Tarea 1.1 — Crear tablas principales
+
+users
+
+choirs
+
+memberships
+
+invites
+
+Output:
+
+Migración aplicada
+
+CRUD básico de coro
+
+Tarea 1.2 — Implementar invitación por código
+
+Backend
+
+POST /invites
+
+POST /invites/redeem
+
+Frontend
+
+Página /join
+
+Selección de cuerda
+
+Output:
+
+Coralista entra con código y queda asociado al coro
+
+👉 Aquí ya puedes invitar a tu propio coro.
+
+🔵 FASE 2 — Temporadas y Proyectos
+Tarea 2.1 — Crear tablas
+
+seasons
+
+projects
+
+project_repertoire
+
+Tarea 2.2 — CRUD de proyectos
+
+Backend
+
+Crear proyecto
+
+Añadir obra
+
+Publicar proyecto
+
+Frontend
+
+Director crea proyecto
+
+Lista ordenada de repertorio
+
+Output:
+
+Director puede montar un concierto real
+
+🔵 FASE 3 — Catálogo de obras
+Tarea 3.1 — Crear tablas
+
+works
+
+editions
+
+assets
+
+Tarea 3.2 — Implementar búsqueda básica
+
+Filtros:
+
+plantilla
+
+dificultad
+
+idioma
+
+acompañamiento
+
+Tarea 3.3 — Script de importación
+
+Leer Excel v2
+
+Insertar works + editions
+
+Output:
+
+282 obras disponibles
+
+🔵 FASE 4 — Assets y audio por cuerdas (CLAVE)
+Tarea 4.1 — Sistema de subida de archivos
+
+Subir PDF
+
+Subir audio S/A/T/B
+
+Guardar en S3 o local
+
+Tarea 4.2 — Endpoint de streaming seguro
+
+URL firmada o stream directo
+
+Control por visibilidad
+
+Tarea 4.3 — Reproductor en Next.js
+
+Play “mi cuerda”
+
+Play “tutti”
+
+Mostrar PDF
+
+Output:
+
+Coralista puede estudiar desde el móvil
+
+👉 Aquí empieza la magia real en ensayo.
+
+🔵 FASE 5 — Progreso de estudio
+Tarea 5.1 — Crear tabla practice_progress
+Tarea 5.2 — Endpoint update progreso
+
+Guardar minutos
+
+Guardar estado (nueva / en progreso / dominada)
+
+Tarea 5.3 — Dashboard director
+
+% dominada por obra
+
+Indicador por cuerda
+
+Output:
+
+El director sabe qué repasar antes del ensayo
+
+🔵 FASE 6 — Subida privada del coro
+Tarea 6.1 — Crear edición privada
+
+origen = SUBIDA_CORO
+
+visibilidad = PRIVADA_CORO
+
+confirmación derechos obligatoria
+
+Tarea 6.2 — Control de acceso
+
+Solo miembros del coro pueden acceder
+
+Validación backend estricta
+
+Output:
+
+Cada coro puede subir sus propias obras autorizadas
+
+🔵 FASE 7 — Mejora de experiencia
+Tarea 7.1 — Filtros avanzados
+
+Duración
+
+Época
+
+Tags
+
+Tarea 7.2 — Velocidad de reproducción
+
+0.75x / 1.0x
+
+Tarea 7.3 — Indicador visual de progreso
+
+Barra de avance
+
+Estado coloreado
+
+🔵 FASE 8 — Preparación para escalado
+Tarea 8.1 — Auditoría
+
+Tabla audit_log
+
+Registrar:
+
+subida archivos
+
+confirmación derechos
+
+creación proyectos
+
+Tarea 8.2 — Roles ampliados
+
+Subdirector
+
+Administrador del coro
+
+Tarea 8.3 — Reglas de recomendación (no IA todavía)
+
+Si plantilla SATB + nivel 2 + navidad → sugerencias
+✅ Tarea 11 — Reintentos + idempotencia (pipeline “a prueba de bombas”)
+Objetivo
+
+Hacer que el pipeline sea robusto ante fallos y reinicios:
+
+Si un job falla, reintenta automáticamente con backoff.
+
+Si un job se ejecuta dos veces (por retry, timeout, o duplicado), NO duplica assets.
+
+Si ya existe un resultado idéntico, se reutiliza.
+
+Mantener trazabilidad clara (auditoría y logs).
+
+Alcance
+
+Aplicar a todos los jobs del pipeline:
+
+process_musicxml(asset_id)
+
+generate_midis(edition_id)
+
+render_audio(edition_id)
+
+Requisitos funcionales
+11.1 Estados consistentes
+
+En assets (y/o en tabla jobs si existe) mantener:
+
+processing_status: PENDING | RUNNING | OK | NEEDS_MAPPING | ERROR
+
+processing_error: texto breve
+
+metadata: JSON con:
+
+job_id
+
+attempt
+
+started_at, finished_at
+
+pipeline_version
+
+inputs (asset_id origen, edition_id, mapping, etc.)
+
+Criterio
+
+Un fallo deja el estado en ERROR con motivo claro.
+
+Un retry no “ensucia” estados: se actualiza attempt y timestamps.
+
+11.2 Idempotencia por checksum (no duplicar)
+
+Añadir (si no está) a tabla assets:
+
+checksum (SHA-256 del contenido del archivo)
+
+storage_key (ruta en MinIO)
+
+size_bytes (opcional)
+
+Crear un índice único (Postgres) para evitar duplicados:
+
+UNIQUE(edition_id, type, checksum)
+
+Regla
+Antes de guardar un asset generado:
+
+Calcular SHA-256 del archivo generado.
+
+Consultar si existe ya un asset con:
+
+mismo edition_id
+
+mismo type
+
+mismo checksum
+
+Si existe:
+
+NO subir de nuevo a MinIO
+
+reutilizar ese asset (o marcar el existente como resultado)
+
+Si no existe:
+
+subir a MinIO
+
+insertar asset
+
+Criterio
+
+Repetir el mismo job 2 veces no crea dos AUDIO_S distintos.
+
+11.3 Idempotencia por “job lock” (evitar procesos simultáneos)
+
+Evitar que dos workers generen lo mismo a la vez.
+
+Implementar un lock en Redis por etapa:
+
+clave ejemplo:
+
+lock:process_musicxml:{asset_id}
+
+lock:generate_midis:{edition_id}
+
+lock:render_audio:{edition_id}
+
+TTL: 10–30 min según etapa
+
+Regla
+
+Si existe lock → el job sale sin hacer nada (o reprograma).
+
+Si no existe lock → lo crea y procesa.
+
+Al terminar → libera lock.
+
+Criterio
+
+Dos ejecuciones simultáneas no pisan archivos ni generan duplicados.
+
+11.4 Política de reintentos (RQ)
+
+Implementar retries con backoff (por ejemplo):
+
+1º retry: 30s
+
+2º retry: 2m
+
+3º retry: 10m
+
+Máximo 3–5 intentos
+
+Errores reintentables
+
+fallos temporales de MinIO
+
+timeouts puntuales
+
+errores de red
+
+fallos de render (fluidsynth/ffmpeg) por recursos
+
+Errores NO reintentables
+
+MusicXML corrupto (marcar ERROR)
+
+mapping inexistente (marcar NEEDS_MAPPING)
+
+formato no soportado
+
+Criterio
+
+Los errores “temporales” se resuelven solos sin intervención.
+
+Los errores “de usuario” piden acción del director (mapping o re-subida).
+
+11.5 “Pipeline versioning”
+
+Añadir un campo global PIPELINE_VERSION en el worker (ej: 1.0.0).
+
+Guardar en metadata.pipeline_version de cada asset generado.
+
+Uso
+Cuando actualices el pipeline (mejor soundfont, mejor mapping, etc.):
+
+Si el asset fue generado con versión anterior, puedes reprocesar bajo demanda.
+
+Criterio
+
+Se puede saber con qué versión se generó cada audio/MIDI.
+
+11.6 Limpieza segura de temporales
+
+En el worker:
+
+usar directorios temporales por job: /tmp/pipeline/{job_id}/
+
+limpiar al final (incluso en error con finally)
+
+Criterio
+
+No crecen los temporales infinito en el contenedor.
+
+11.7 Auditoría mínima (muy recomendable)
+
+Registrar en audit_log:
+
+job_started, job_succeeded, job_failed
+
+asset_generated (tipo + checksum)
+
+mapping_updated
+
+Criterio
+
+Puedes depurar qué pasó sin mirar mil logs.
+
+Criterios de aceptación (test)
+
+Subes un MusicXML → genera audio/MIDI OK.
+
+Re-lanzas manualmente el job → no se duplican assets.
+
+Simulas fallo de MinIO → job reintenta y termina OK al restaurar.
+
+Dos workers reciben el mismo job → el lock evita doble generación.
+
+MusicXML malo → queda ERROR sin reintentos infinitos.
+
+Mapping ambiguo → queda NEEDS_MAPPING sin reintentos.
+
+Entregables
+
+Migración DB (índice único y columnas checksum/metadata si faltan)
+
+Implementación locks Redis
+
+Implementación checksum SHA-256
+
+Política de reintentos con backoff en RQ
+
+Logs + audit_log básicos
+
+Tests mínimos (unit o integración) para idempotencia

@@ -1,0 +1,244 @@
+Instrucciones base para Antigravity (MVP escalable)
+Contexto
+
+Construye una aplicación para coros con dos perfiles:
+
+Director: usa web en portátil/PC para preparar ensayos y conciertos.
+
+Coralista: usa móvil/tablet (responsive) para estudiar y ensayar.
+
+El objetivo inicial es un MVP útil y bien organizado, testeable durante meses en un coro real, con arquitectura preparada para escalar a plataforma nacional.
+
+Stack obligatorio
+
+Frontend: Next.js (App Router) + TypeScript
+
+Backend: FastAPI (Python) + SQLAlchemy + Alembic
+
+DB: PostgreSQL
+
+Almacenamiento de archivos: S3-compatible (MinIO en dev). Si no, almacenamiento local en dev con interfaz compatible.
+
+Auth: JWT + cookies httpOnly (o equivalente seguro)
+
+API: REST versionada /v1 con OpenAPI
+
+Reglas de producto (no negociables)
+
+Acceso por invitación: los coralistas entran con un código generado por el director. No hay registro libre.
+
+Organización doble: el director organiza por Temporadas y por Proyectos (un proyecto puede pertenecer a una temporada).
+
+Estudio principal por audio:
+
+Cada obra debe poder tener audio por cuerdas: S, A, T, B, y Tutti.
+
+La partitura PDF debe estar disponible para quien lee música.
+
+Sin grabaciones: el MVP NO incluye grabar audio ni enviar audios al director.
+
+Legalidad:
+
+El sistema tendrá un fondo “público” solo para contenido legalmente alojable (dominio público o licencias compatibles).
+
+Cada coro tendrá una biblioteca privada donde puede subir PDFs/audios/MIDI de obras que ya tiene autorizadas.
+
+Subir archivos privados requiere marcar un checkbox obligatorio: “Confirmo que tengo derechos/permiso de uso”.
+
+Backend potente: toda la lógica de permisos y visibilidad se valida en backend (no confiar en el frontend).
+
+MVP primero: nada de IA, nada de red social, nada de monetización en esta fase.
+
+Entidades mínimas (DB)
+
+Implementar estas tablas (mínimas y normalizadas):
+
+users (roles: DIRECTOR, CORALISTA, ADMIN)
+
+choirs
+
+memberships (relación user–choir + cuerda)
+
+invites (código, expira, usos)
+
+works (obra conceptual)
+
+editions (edición/version concreta con licencia y visibilidad)
+
+assets (PDF/MIDI/MusicXML/audios)
+
+seasons
+
+projects
+
+project_repertoire (lista ordenada de ediciones en un proyecto)
+
+practice_progress (estado y minutos de estudio por coralista/obra)
+
+Flujos funcionales obligatorios (MVP)
+Flujo 1 — Director crea coro y genera invitación
+
+Director crea coro
+
+Director genera código de invitación para coralistas
+
+Puede limitar usos y caducidad (opcional)
+
+Flujo 2 — Coralista entra con código
+
+Introduce código
+
+Elige cuerda (S/A/T/B)
+
+Accede a los proyectos publicados de su coro
+
+Flujo 3 — Director crea proyecto y repertorio
+
+Director crea temporada (opcional)
+
+Director crea proyecto (p. ej., “Navidad 2026”)
+
+Añade obras/ediciones al repertorio del proyecto y las ordena
+
+Publica proyecto
+
+Flujo 4 — Coralista estudia
+
+Ve el proyecto publicado
+
+Abre una obra
+
+Reproduce audio de su cuerda y/o tutti
+
+Abre PDF
+
+Marca estado (Nueva / En progreso / Dominada)
+
+Se registran minutos de estudio
+
+Flujo 5 — Director ve progreso
+
+Panel con progreso agregado por obra (porcentaje dominada, cuerdas con más dificultad)
+
+Flujo 6 — Biblioteca privada del coro
+
+Director crea una edición privada (SUBIDA_CORO)
+
+Sube PDF y/o audios y/o MIDI
+
+Marca confirmación de derechos
+
+Solo el coro puede acceder
+
+Pantallas mínimas (Next.js)
+Coralista (responsive)
+
+/join (introducir código + elegir cuerda)
+
+/projects (lista proyectos publicados)
+
+/projects/[id] (lista de obras)
+
+/piece/[project_rep_id] (reproductor + PDF + estado)
+
+Director (web)
+
+/dashboard (resumen)
+
+/choir (miembros + generar códigos)
+
+/catalog (buscar/filtrar obras)
+
+/projects + /projects/[id] (gestión repertorio + publicar)
+
+/library (subidas privadas)
+
+API mínima (FastAPI)
+
+Implementar endpoints /v1:
+
+Invitaciones
+
+POST /invites (director)
+
+POST /invites/redeem (coralista)
+
+Coro
+
+GET /choirs/me
+
+GET /choirs/{id}/members
+
+Catálogo
+
+GET /works (filtros)
+
+GET /works/{id}
+
+POST /editions (privadas)
+
+POST /assets (upload)
+
+GET /assets/{id} (stream o URL firmada)
+
+Proyectos
+
+POST /projects
+
+GET /projects
+
+POST /projects/{id}/repertoire
+
+PATCH /project-repertoire/{id} (orden/estado)
+
+POST /projects/{id}/publish
+
+Progreso
+
+POST /progress (update estado/minutos)
+
+GET /progress?project_id=... (agregados para director)
+
+Permisos (críticos)
+
+Coralista solo accede a assets:
+
+de proyectos publicados de su coro
+
+o de ediciones privadas de su coro
+
+Director solo gestiona su coro
+
+El backend valida siempre choir_id del usuario
+
+Criterios de calidad (para Antigravity)
+
+El MVP debe ser usable con datos de prueba sin configuración manual.
+
+Debe incluir docker-compose para levantar todo.
+
+Debe incluir migraciones Alembic.
+
+Debe incluir seeds de ejemplo (1 coro, 1 director, 2 coralistas, 1 proyecto, 2 obras).
+
+UI simple, clara, sin florituras.
+
+Errores bien gestionados (mensajes amigables).
+
+Seguridad básica: rate-limit en redeem invite, cookies seguras.
+
+Definición de “terminado” (MVP)
+
+Se considera terminado cuando:
+
+Un director crea un coro y genera un código.
+
+Un coralista entra con el código y ve un proyecto publicado.
+
+El coralista reproduce audio por cuerda y ve la partitura.
+
+El coralista marca estado y se registran minutos.
+
+El director ve progreso agregado.
+
+El director sube una obra privada con confirmación de derechos y el coro la puede usar.

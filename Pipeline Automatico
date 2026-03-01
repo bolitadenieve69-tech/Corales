@@ -1,0 +1,287 @@
+Objetivo del pipeline
+
+A partir de MusicXML (ideal) o MIDI (si existe), generar automáticamente:
+
+MIDI_TUTTI.mid
+
+MIDI_S.mid, MIDI_A.mid, MIDI_T.mid, MIDI_B.mid (si es SATB)
+
+AUDIO_TUTTI.mp3
+
+AUDIO_S.mp3, AUDIO_A.mp3, AUDIO_T.mp3, AUDIO_B.mp3
+
+Versiones opcionales: *_slow.mp3 (0.75x o tempo reducido)
+
+Y dejar todo registrado como assets asociados a una edition.
+
+Arquitectura por bloques (pipeline)
+
+1) Ingesta (entrada)
+Entradas aceptadas
+
+MusicXML (prioritario)
+
+MIDI (si no hay XML)
+
+PDF (solo como referencia; no se procesa)
+
+Dónde ocurre
+
+Director sube un MusicXML en una edición (pública o privada).
+
+La subida crea un asset en DB y dispara un job de procesado.
+
+1) Cola de trabajos (job queue)
+
+Esto es imprescindible si el backend debe ser “potente”: audio y conversiones no pueden ejecutarse en la request web.
+
+Recomendación sencilla (tú solo):
+
+FastAPI + RQ (Redis Queue) o Celery
+
+Redis como broker
+
+Servicios docker típicos:
+
+api
+
+worker
+
+postgres
+
+redis
+
+minio (S3 dev) + nginx opcional
+
+1) Normalización de la partitura (MusicXML → representación interna)
+Herramientas Python recomendadas
+
+music21 para parsear MusicXML y manipular partes/voices (muy útil).
+
+Alternativa más “pro”: partitura (lib orientada a MusicXML/MIDI).
+
+Qué se hace aquí
+
+Validar el XML
+
+Extraer:
+
+Partes
+
+Compases
+
+Tempo
+
+Armadura / tonalidad
+
+Compás
+
+Letras (si vienen)
+
+Determinar si es:
+
+SATB / SSAATTBB / SAB / etc.
+
+1) Mapeo de partes a cuerdas (SATB)
+
+Este es el “infierno” si no lo diseñas bien, porque los XML vienen con nombres raros.
+
+Estrategia práctica (dos capas)
+
+Capa A: automática (por heurísticas)
+
+Si el nombre de la parte contiene:
+
+Soprano / Sop / S → S
+
+Alto / A → A
+
+Tenor / T → T
+
+Bass / B / Bajo → B
+
+Si no hay nombres claros:
+
+Clasificar por rango medio (pitch):
+
+más agudo → S
+
+siguiente → A
+
+siguiente → T
+
+más grave → B
+
+Capa B: corrección manual (UI de director)
+Si la detección no es fiable, el director ve una pantalla:
+
+“Parte 1: ‘Voce 1’ → ¿S/A/T/B?”
+
+“Parte 2: ‘Voce 2’ → ¿S/A/T/B?”
+y guarda esa asignación en DB.
+
+✅ Esto evita el 90% de errores “raros” de MusicXML.
+
+1) Generación de MIDI
+
+Una vez asignadas partes:
+
+Generas un MIDI tutti con todas las partes.
+
+Generas un MIDI por cuerda silenciando o excluyendo el resto.
+
+Detalles importantes
+
+Normaliza:
+
+tempo
+
+velocity (dinámicas razonables)
+
+canalización (un canal por cuerda)
+
+Si es SSAATTBB, puedes generar:
+
+S1, S2, A1, A2, etc. (fase 2)
+
+En MVP: mezclar por cuerda (S total, A total…)
+
+1) Render de audio (MIDI → MP3/WAV)
+
+Necesitas un sintetizador.
+
+Opción robusta y rápida (recomendada)
+
+FluidSynth + un SoundFont coral/piano/strings (según acompañamiento)
+
+Render a WAV y luego a MP3/OGG con ffmpeg
+
+Pipeline típico:
+
+fluidsynth → WAV
+
+ffmpeg → MP3 (y opcional OGG para web)
+
+“Audio por cuerdas” usable para coralistas
+
+Para que el coralista realmente estudie:
+
+En el audio de su cuerda:
+
+su cuerda más alta (o más destacada)
+
+resto muy suave (o incluso sin resto)
+Dos modos:
+
+Solo (solo la cuerda)
+
+Guía (cuerda fuerte + tutti bajo)
+
+Esto es oro.
+
+1) Variantes de tempo (“slow practice”)
+
+Dos opciones:
+
+Reducir tempo en MIDI antes de renderizar
+
+O aplicar atempo en ffmpeg (ojo, limita rangos)
+
+En MVP:
+
+genera solo normal
+
+y opcional: slow 0.8 (no te compliques más al inicio)
+
+1) Almacenamiento y publicación de assets
+Dónde van los ficheros
+
+S3 compatible (MinIO en dev; S3/Backblaze en prod)
+
+En DB guardas:
+
+tipo de asset (AUDIO_S, MIDI_S, etc.)
+
+url storage
+
+duración y tamaño
+
+checksum
+
+Control de acceso
+
+Backend valida siempre:
+
+si es público
+
+o si es privado del coro del usuario
+
+Nada de “oculto en frontend”.
+
+Modelo de datos mínimo para el pipeline (ampliación)
+
+Añade a assets:
+
+processing_status: PENDING | RUNNING | OK | ERROR
+
+processing_error (texto)
+
+metadata JSON (tempo, partes detectadas, mapping SATB, etc.)
+
+Añade tabla opcional:
+
+edition_part_mapping
+
+edition_id
+
+part_name
+
+assigned_to (S/A/T/B/Other)
+
+Pantallas necesarias (Next.js) para que el pipeline sea controlable
+
+1) Director: “Subir MusicXML”
+
+botón subir
+
+muestra status del proceso
+
+si falla: ver motivo
+
+1) Director: “Asignar partes a cuerdas” (solo si hace falta)
+
+lista de partes detectadas
+
+dropdown S/A/T/B
+
+guardar → relanza job
+
+1) Coralista: reproductor
+
+play “mi cuerda”
+
+play “tutti”
+
+(fase 2: play “guía”)
+
+Orden de implementación (para que te salga a la primera)
+
+Subida de MusicXML → asset (PENDING)
+
+Worker: parse XML → detectar partes → si claro: OK, si no: NEEDS_MAPPING
+
+UI mapping manual + relanzar
+
+Worker: generar MIDI tutti + MIDI cuerdas
+
+Worker: render audio tutti + audio cuerdas
+
+Publicar al proyecto → coralistas escuchan
+
+Decisión clave (te la dejo ya tomada por practicidad)
+
+Formato de audio recomendado para web móvil:
+
+MP3 128–192 kbps (suficiente y ligero)
+
+(OGG opcional)
