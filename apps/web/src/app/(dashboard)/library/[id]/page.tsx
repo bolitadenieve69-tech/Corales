@@ -38,7 +38,7 @@ export default function WorkDetailPage() {
     };
 
     const getAssetLabel = (asset: any) => {
-        // Friendly labels for pipeline-generated assets
+        // Friendly labels for pipeline-generated assets and user uploads
         const typeLabels: Record<string, string> = {
             'AUDIO_TUTTI': '🎵 Tutti (todas las voces)',
             'AUDIO_SOPRANO': '🎤 Soprano',
@@ -50,6 +50,11 @@ export default function WorkDetailPage() {
             'MIDI_ALTO': '🎹 MIDI Alto',
             'MIDI_TENOR': '🎹 MIDI Tenor',
             'MIDI_BASS': '🎹 MIDI Bajo',
+            'midi': '🎹 MIDI (Estudio)',
+            'sheet_music': '📄 Partitura',
+            'pdf': '📄 Partitura (PDF)',
+            'learning_track': '🎵 Pista de Estudio',
+            'reference_recording': '🎤 Grabación de Referencia',
         };
         return typeLabels[asset.asset_type] || asset.original_filename || asset.asset_type;
     };
@@ -77,9 +82,9 @@ export default function WorkDetailPage() {
         if (!assets) return { musicxml: [], pdfs: [], audios: [], midis: [] };
         return {
             musicxml: assets.filter((a: any) => a.asset_type === 'MUSICXML'),
-            pdfs: assets.filter((a: any) => a.asset_type === 'pdf' || a.asset_type === 'sheet_music'),
+            pdfs: assets.filter((a: any) => ['pdf', 'sheet_music', 'PDF'].includes(a.asset_type)),
             audios: assets.filter((a: any) => a.asset_type?.startsWith('AUDIO_') || ['learning_track', 'reference_recording'].includes(a.asset_type)),
-            midis: assets.filter((a: any) => a.asset_type?.startsWith('MIDI_')),
+            midis: assets.filter((a: any) => a.asset_type?.startsWith('MIDI_') || a.asset_type === 'midi' || a.asset_type === 'MIDI'),
         };
     };
 
@@ -170,7 +175,7 @@ export default function WorkDetailPage() {
                                     <div className="space-y-3 flex-1 overflow-y-auto">
                                         {categories.pdfs.map((asset: any) => (
                                             <a href={`${API_URL}/assets/${asset.id}/stream`} target="_blank" rel="noreferrer" key={asset.id} className="group p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-amber-500/30 transition-all cursor-pointer flex items-center justify-between">
-                                                <span className="font-medium text-slate-300 group-hover:text-amber-100 transition-colors line-clamp-1">{asset.original_filename || 'Partitura'}</span>
+                                                <span className="font-medium text-slate-300 group-hover:text-amber-100 transition-colors line-clamp-1">{getAssetLabel(asset)}</span>
                                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button title="Descargar" className="p-1.5 bg-amber-500/20 text-amber-400 rounded-md hover:bg-amber-500/40 transition-colors">
                                                         <Download size={16} />
@@ -184,8 +189,30 @@ export default function WorkDetailPage() {
                                     </div>
                                 </div>
 
+                                {/* MIDI Section */}
+                                <div className="col-span-1 lg:col-span-1 bg-[#0a0a1a] rounded-2xl border border-white/10 p-6 shadow-lg shadow-black/40 flex flex-col h-full">
+                                    <h3 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+                                        <Music className="text-indigo-400" size={20} /> MIDIs de Estudio
+                                    </h3>
+                                    <div className="space-y-3 flex-1 overflow-y-auto">
+                                        {categories.midis.map((asset: any) => (
+                                            <a href={`${API_URL}/assets/${asset.id}/stream`} target="_blank" rel="noreferrer" key={asset.id} className="group p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-indigo-500/30 transition-all cursor-pointer flex items-center justify-between">
+                                                <span className="font-medium text-slate-300 group-hover:text-indigo-100 transition-colors line-clamp-1">{getAssetLabel(asset)}</span>
+                                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button title="Descargar" className="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-md hover:bg-indigo-500/40 transition-colors">
+                                                        <Download size={16} />
+                                                    </button>
+                                                </div>
+                                            </a>
+                                        ))}
+                                        {categories.midis.length === 0 && (
+                                            <p className="text-sm text-slate-500 italic">No hay MIDIs vinculados.</p>
+                                        )}
+                                    </div>
+                                </div>
+
                                 {/* Audio Player Section */}
-                                <div className="col-span-1 lg:col-span-2 bg-[#0a0a1a] rounded-2xl border border-white/10 p-6 shadow-lg shadow-black/40 relative overflow-hidden flex flex-col h-full">
+                                <div className="col-span-1 lg:col-span-1 bg-[#0a0a1a] rounded-2xl border border-white/10 p-6 shadow-lg shadow-black/40 relative overflow-hidden flex flex-col h-full">
                                     <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 to-indigo-900/10 pointer-events-none" />
 
                                     <h3 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2 relative z-10">

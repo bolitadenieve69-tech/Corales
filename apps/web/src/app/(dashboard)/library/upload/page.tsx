@@ -34,6 +34,7 @@ export default function UploadPrivateWorkPage() {
         switch (assetType) {
             case 'musicxml': return '.musicxml,.xml,.mxl';
             case 'sheet_music': return '.pdf';
+            case 'midi': return '.mid,.midi';
             default: return 'audio/*';
         }
     };
@@ -103,7 +104,7 @@ export default function UploadPrivateWorkPage() {
             } else {
                 // Regular upload
                 formData.append('asset_type', assetType);
-                formData.append('rights_confirmed', 'true');
+                formData.append('rights_confirmed', rightsConfirmed.toString());
 
                 const uploadRes = await fetch(`${API_URL}/assets/upload`, {
                     method: 'POST',
@@ -212,6 +213,7 @@ export default function UploadPrivateWorkPage() {
                             >
                                 <option value="musicxml">🎼 MusicXML (genera audios automáticamente)</option>
                                 <option value="sheet_music">📄 Partitura (PDF)</option>
+                                <option value="midi">🎹 Archivo MIDI (.mid)</option>
                                 <option value="learning_track">🎵 Pista de Estudio (Audio)</option>
                                 <option value="reference_recording">🎤 Grabación de Referencia (Audio)</option>
                             </select>
