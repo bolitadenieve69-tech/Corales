@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { Music, CalendarDays, Users, Settings, LogOut } from 'lucide-react';
+import { logout } from '@/lib/api';
 
 export default function DashboardLayout({
     children,
@@ -51,7 +54,10 @@ export default function DashboardLayout({
                         <Settings size={18} />
                         <span>Ajustes</span>
                     </Link>
-                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors">
+                    <button
+                        onClick={logout}
+                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors"
+                    >
                         <LogOut size={18} />
                         <span>Cerrar sesión</span>
                     </button>

@@ -14,6 +14,13 @@ export function getAuthToken(): string | null {
     return null;
 }
 
+export function logout(): void {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+    }
+}
+
 /**
  * Wrapper around native fetch that automatically adds the Authorization header
  * and prepends the base API URL.
