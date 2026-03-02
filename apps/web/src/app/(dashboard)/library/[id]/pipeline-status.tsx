@@ -4,12 +4,26 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, CheckCircle, AlertTriangle, XCircle, RefreshCw, Sparkles } from 'lucide-react';
 
-const API_URL = 'http://127.0.0.1:8000/api/v1';
+import { API_URL, fetchApi } from '@/lib/api';
 
 interface PipelineStatusProps {
     assetId: string;
     editionId: string;
     onStatusChange?: (status: string) => void;
+}
+
+interface PipelineStatusData {
+    processing_status: string;
+    processing_error?: string;
+    metadata?: {
+        mapping?: Record<string, string>;
+        parsed?: {
+            parts?: Array<{ name: string }>;
+            tempo?: number;
+            key_signature?: string;
+            time_signature?: string;
+        };
+    };
 }
 
 const VOICE_LABELS: Record<string, string> = {
@@ -30,15 +44,15 @@ const STATUS_CONFIG: Record<string, {
 }> = {
     'PENDING': {
         icon: Loader2,
-        color: 'text-blue-400',
-        bg: 'bg-blue-500/10',
-        border: 'border-blue-500/20',
+        color: 'text-primary-300',
+        bg: 'bg-primary-500/10',
+        border: 'border-primary-500/20',
         label: 'En cola de procesado...',
         animating: true,
     },
     'RUNNING': {
         icon: Loader2,
-        color: 'text-indigo-400',
+        color: 'text-primary-300',
         bg: 'bg-indigo-500/10',
         border: 'border-indigo-500/20',
         label: 'Procesando MusicXML...',
@@ -53,8 +67,8 @@ const STATUS_CONFIG: Record<string, {
     },
     'NEEDS_MAPPING': {
         icon: AlertTriangle,
-        color: 'text-amber-400',
-        bg: 'bg-amber-500/10',
+        color: 'text-accent-300',
+        bg: 'bg-accent-500/10',
         border: 'border-amber-500/20',
         label: 'Asignación manual requerida',
     },
@@ -68,7 +82,7 @@ const STATUS_CONFIG: Record<string, {
 };
 
 export default function PipelineStatus({ assetId, editionId, onStatusChange }: PipelineStatusProps) {
-    const [status, setStatus] = useState<any>(null);
+    const [status, setStatus] = useState<PipelineStatusData | null>(null);
     const [loading, setLoading] = useState(true);
     const [retrying, setRetrying] = useState(false);
     const [mappings, setMappings] = useState<Array<{ part_name: string; assigned_to: string }>>([]);
@@ -76,12 +90,8 @@ export default function PipelineStatus({ assetId, editionId, onStatusChange }: P
 
     const fetchStatus = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${API_URL}/pipeline/status/${assetId}`, {
-                headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-            });
-            if (res.ok) {
-                const data = await res.json();
+            const data = await fetchApi(`/pipeline/status/${assetId}`);
+            if (data) {
                 setStatus(data);
                 onStatusChange?.(data.processing_status);
 
@@ -118,14 +128,10 @@ export default function PipelineStatus({ assetId, editionId, onStatusChange }: P
     const handleRetry = async () => {
         setRetrying(true);
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${API_URL}/pipeline/retry/${assetId}`, {
+            await fetchApi(`/pipeline/retry/${assetId}`, {
                 method: 'POST',
-                headers: token ? { 'Authorization': `Bearer ${token}` } : {},
             });
-            if (res.ok) {
-                fetchStatus();
-            }
+            fetchStatus();
         } catch (err) {
             console.error('Error retrying', err);
         }
@@ -139,18 +145,11 @@ export default function PipelineStatus({ assetId, editionId, onStatusChange }: P
         }
         setSavingMapping(true);
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${API_URL}/pipeline/mapping/${editionId}`, {
+            await fetchApi(`/pipeline/mapping/${editionId}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-                },
                 body: JSON.stringify({ mappings }),
             });
-            if (res.ok) {
-                setTimeout(fetchStatus, 1000);
-            }
+            setTimeout(fetchStatus, 1000);
         } catch (err) {
             console.error('Error saving mapping', err);
         }
@@ -226,14 +225,14 @@ export default function PipelineStatus({ assetId, editionId, onStatusChange }: P
             {/* NEEDS_MAPPING: Manual mapping form */}
             {status.processing_status === 'NEEDS_MAPPING' && (
                 <div className="space-y-3">
-                    <p className="text-sm text-amber-400/80">
+                    <p className="text-sm text-accent-300/80">
                         No se pudo auto-detectar la asignación de voces. Asigna cada parte manualmente:
                     </p>
                     <div className="space-y-2">
                         {mappings.map((mapping, i) => (
                             <div key={i} className="flex items-center gap-3">
                                 <span className="text-sm text-amber-300 font-medium min-w-[120px]">{mapping.part_name}</span>
-                                <span className="text-amber-400/50">→</span>
+                                <span className="text-accent-300/50">→</span>
                                 <select
                                     value={mapping.assigned_to}
                                     onChange={e => {
@@ -241,7 +240,7 @@ export default function PipelineStatus({ assetId, editionId, onStatusChange }: P
                                         updated[i].assigned_to = e.target.value;
                                         setMappings(updated);
                                     }}
-                                    className="flex-1 px-3 py-1.5 bg-black/40 border border-amber-500/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                                    className="flex-1 px-3 py-1.5 bg-black/40 border border-amber-500/20 rounded-lg text-white text-sm focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-amber-500/50"
                                 >
                                     <option value="">Seleccionar voz...</option>
                                     <option value="S">Soprano</option>
@@ -256,7 +255,7 @@ export default function PipelineStatus({ assetId, editionId, onStatusChange }: P
                     <button
                         onClick={handleSaveMapping}
                         disabled={savingMapping || mappings.some(m => !m.assigned_to)}
-                        className="flex items-center gap-2 px-4 py-2 bg-amber-500/20 text-amber-300 rounded-lg text-sm font-medium hover:bg-amber-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                        className="flex items-center gap-2 px-4 py-2 bg-accent-500/20 text-amber-300 rounded-lg text-sm font-medium hover:bg-accent-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                     >
                         {savingMapping ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                         {savingMapping ? 'Guardando...' : 'Guardar y Reprocesar'}
