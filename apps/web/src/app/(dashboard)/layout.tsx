@@ -2,6 +2,8 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { Music, CalendarDays, Users, Settings, LogOut, GraduationCap, UserCircle } from 'lucide-react';
 import { logout } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
