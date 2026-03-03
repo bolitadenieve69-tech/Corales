@@ -57,8 +57,10 @@ try:
     from api.v1.api import api_router
     app.include_router(api_router, prefix="/api/v1")
     logger.info(">>> ROUTER: API v1 included successfully")
-except Exception as e:
-    logger.error(f">>> ERROR ROUTER: {e}")
+except Exception:
+    import traceback
+    logger.error(">>> ERROR ROUTER: Failed to include API v1")
+    logger.error(traceback.format_exc())
 
 # Add a direct debug endpoint just in case
 @app.get("/api/v1/auth-check")

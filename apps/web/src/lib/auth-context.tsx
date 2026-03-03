@@ -8,6 +8,7 @@ interface User {
     email: string;
     full_name: string;
     role: 'CORALISTA' | 'DIRECTOR' | 'ADMIN';
+    avatar_url?: string;
 }
 
 interface AuthContextType {
