@@ -19,6 +19,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.5.0",
+    "@radix-ui/react-toast": "^1.2.1",
+    "zustand": "^5.0.1",
     "tailwindcss-animate": "^1.0.7",
     "tone": "^15.0.4"
   },
