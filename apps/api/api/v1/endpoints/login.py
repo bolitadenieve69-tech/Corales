@@ -38,8 +38,8 @@ def login_access_token(
 def health_check():
     return {"status": "ok", "version": "1.0.0"}
 
-@router.get("/debug-auth")
-def debug_auth(db: Session = Depends(get_db)):
+@router.get("/auth-check")
+def auth_check(db: Session = Depends(get_db)):
     """
     Endpoint temporal de diagnóstico.
     """
@@ -58,5 +58,6 @@ def debug_auth(db: Session = Depends(get_db)):
     return {
         "admin_found": admin is not None,
         "password_ok": password_ok,
-        "users_count": db.query(User).count()
+        "users_count": db.query(User).count(),
+        "tag": "v3.0.0_final"
     }

@@ -43,4 +43,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(api_router, prefix=settings.API_V1_STR)
+@app.get("/")
+def read_root():
+    return {"status": "CoralApp API is Running", "build_tag": "v3.0.0_final"}
+
+app.include_router(api_router, prefix="/api/v1")
