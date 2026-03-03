@@ -1,14 +1,12 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "pip install -r requirements.txt"
 
 [deploy]
-# Solo arrancamos uvicorn. Las migraciones y el seeding se manejan dentro de la app (lifespan).
+# Standard uvicorn call on $PORT
 startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/health"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 5
 
 [env]
 ENVIRONMENT = "production"
