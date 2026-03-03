@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import { Music, CalendarDays, Users, Settings, LogOut, GraduationCap, UserCircle } from 'lucide-react';
 import { logout } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -14,6 +13,25 @@ export default function DashboardLayout({
 }) {
     const { user, loading } = useAuth();
     const pathname = usePathname();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login');
+        }
+    }, [user, loading, router]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-primary-900">
+                <Music className="w-12 h-12 text-accent-500 animate-bounce" />
+            </div>
+        );
+    }
+
+    if (!user) {
+        return null; // Will redirect via useEffect
+    }
 
     const getInitials = (name: string) => {
         return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
