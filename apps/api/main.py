@@ -12,26 +12,26 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Execute on startup
-    logger.info("Iniciando aplicación Corales API...")
+    # Execute on startup - Create admin user
+    logger.info(">>> ARRANQUE: Iniciando aplicación Corales API (v3.1.0)")
     try:
         from create_admin import seed_admin
         seed_admin()
+        logger.info(">>> SEEDING: Proceso de administrador completado.")
     except Exception as e:
-        logger.error(f"Fallo en el seeding inicial: {e}")
+        logger.error(f">>> ERROR: Fallo en el seeding inicial: {e}")
     yield
-    logger.info("Apagando aplicación Corales API...")
+    logger.info(">>> APAGADO: Finalizando aplicación...")
 
 app = FastAPI(
     title="Corales API",
-    description="API para la gestión de coros y progreso de estudio",
     version="1.0.0",
     lifespan=lifespan
 )
 
-# CORS configuration
+# CORS config
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-allow_origins = [FRONTEND_URL]
+allow_origins = [FRONTEND_URL, "https://corales-omega.vercel.app"]
 if settings.ENVIRONMENT in ["development", "local"]:
     allow_origins.append("*")
 
@@ -43,8 +43,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- ENDPOINTS DE SALUD (Críticos para Railway Health Check) ---
 @app.get("/")
 def read_root():
-    return {"status": "CoralApp API is Running", "build_tag": "v3.0.0_final"}
+    return {"status": "CoralApp API Active", "version": "3.1.0"}
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "version": "3.1.0"}
+
+# API Routes
 app.include_router(api_router, prefix="/api/v1")
