@@ -26,7 +26,12 @@ def seed_admin():
             db.commit()
             logger.info("¡Usuario administrador creado exitosamente!")
         else:
-            logger.info(f"El usuario administrador {email} ya existe en la base de datos.")
+            # FORCE UPDATE password to ensure consistency
+            logger.info(f"Actualizando/Verificando contraseña para: {email}")
+            user.hashed_password = get_password_hash(password)
+            user.role = UserRole.ADMIN # Ensure role is also correct
+            db.commit()
+            logger.info("Datos de administrador actualizados correctamente.")
     except Exception as e:
         logger.error(f"ERROR CRÍTICO EN SEED_ADMIN: {e}")
     finally:
