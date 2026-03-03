@@ -8,6 +8,9 @@ logger = logging.getLogger(__name__)
 def seed_admin():
     db = SessionLocal()
     try:
+        from core.config import settings
+        logger.info(f"Iniciando seeding de admin. Base de datos: {settings.DATABASE_URL.split('://')[0]}")
+        
         email = "admin@corales.com"
         password = "password123"
         user = db.query(User).filter(User.email == email).first()
@@ -21,12 +24,11 @@ def seed_admin():
             )
             db.add(user)
             db.commit()
-            logger.info("Usuario administrador creado exitosamente.")
+            logger.info("¡Usuario administrador creado exitosamente!")
         else:
-            # Silence update if already exists with correct hash
-            logger.info(f"El usuario administrador {email} ya existe.")
+            logger.info(f"El usuario administrador {email} ya existe en la base de datos.")
     except Exception as e:
-        logger.error(f"Error crítico al crear admin inicial: {e}")
+        logger.error(f"ERROR CRÍTICO EN SEED_ADMIN: {e}")
     finally:
         db.close()
 

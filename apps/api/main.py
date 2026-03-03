@@ -52,4 +52,35 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "version": "1.0.0"}
+    return {"status": "ok", "version": "1.0.0", "environment": settings.ENVIRONMENT}
+
+@app.get("/debug-auth")
+def debug_auth():
+    """
+    Endpoint temporal para forzar la creación del admin y verificar el estado de la BD.
+    SOPORTE TÉCNICO: Solo usar si el login falla tras el despliegue.
+    """
+    from create_admin import seed_admin
+    from core.database import SessionLocal
+    from models.user import User
+    
+    db = SessionLocal()
+    try:
+        # 1. Intentar forzar seeding
+        seed_admin()
+        
+        # 2. Verificar estado actual
+        users_count = db.query(User).count()
+        admin_exists = db.query(User).filter(User.email == "admin@corales.com").first() is not None
+        
+        return {
+            "status": "diagnostic_complete",
+            "users_in_db": users_count,
+            "admin_ready": admin_exists,
+            "db_url_redacted": settings.DATABASE_URL.split("@")[-1] if "@" in settings.DATABASE_URL else "local_sqlite"
+        }
+    except Exception as e:
+        logger.error(f"Fallo en diagnóstico: {e}")
+        return {"error": str(e)}
+    finally:
+        db.close()
