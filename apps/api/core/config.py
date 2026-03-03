@@ -38,10 +38,19 @@ class Settings(BaseSettings):
 
     @property
     def DATABASE_URL(self) -> str:
-        # Use SQLite for local development
+        # 1. First priority: Explicit DATABASE_URL from env (Railway/Heroku/etc.)
+        env_url = os.getenv("DATABASE_URL")
+        if env_url:
+            # SQLAlchemy 1.4+ requires 'postgresql://' instead of 'postgres://'
+            if env_url.startswith("postgres://"):
+                return env_url.replace("postgres://", "postgresql://", 1)
+            return env_url
+
+        # 2. Second priority: Local SQLite for dev
         if self.ENVIRONMENT in ["development", "local", "test"]:
             return "sqlite:///./corales.db"
-        # Use Postgres in Production (e.g. Railway)
+        
+        # 3. Third priority: Construct from components
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
 settings = Settings()
