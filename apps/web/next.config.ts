@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: '*.railway.app',
+        pathname: '/api/v1/assets/**',
+      },
+      {
+        protocol: 'https',
         hostname: '**', // Allow external avatars (GitHub, etc.)
       },
     ],
