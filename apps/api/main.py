@@ -13,6 +13,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+router_error = "No error recorded yet"
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Safe startup: log version and env
@@ -57,12 +59,14 @@ try:
     from api.v1.api import api_router
     app.include_router(api_router, prefix="/api/v1")
     logger.info(">>> ROUTER: API v1 included successfully")
+    router_error = "NONE: API v1 included successfully"
 except Exception:
     import traceback
+    router_error = traceback.format_exc()
     logger.error(">>> ERROR ROUTER: Failed to include API v1")
-    logger.error(traceback.format_exc())
+    logger.error(router_error)
 
 # Add a direct debug endpoint just in case
 @app.get("/api/v1/auth-check")
 def auth_check():
-    return {"status": "present", "version": "7.1.0"}
+    return {"status": "present", "version": "7.1.7", "router_error": router_error}
