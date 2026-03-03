@@ -21,6 +21,31 @@ export function logout(): void {
     }
 }
 
+export async function login(email: string, password: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+
+    const response = await fetch(`${API_URL}/login/access-token`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Error al iniciar sesión');
+    }
+
+    const data = await response.json();
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('token', data.access_token);
+    }
+    return data;
+}
+
 /**
  * Wrapper around native fetch that automatically adds the Authorization header
  * and prepends the base API URL.
@@ -28,10 +53,14 @@ export function logout(): void {
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     const token = getAuthToken();
 
+    const isFormData = options.body instanceof FormData;
     const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
         ...options.headers as Record<string, string>,
     };
+
+    if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+    }
 
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;

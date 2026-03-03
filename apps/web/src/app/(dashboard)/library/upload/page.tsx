@@ -128,12 +128,12 @@ export default function UploadPrivateWorkPage() {
     return (
         <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-500">
             <div className="flex items-center gap-4">
-                <Link href="/library" className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                <Link href="/library" className="p-2 text-neutral-300 hover:text-white hover:bg-white/10 rounded-full transition-colors">
                     <ArrowLeft size={24} />
                 </Link>
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Subir Obra Privada</h1>
-                    <p className="text-slate-400">Añade partituras, audios o MusicXML para tu coro.</p>
+                    <p className="text-neutral-300">Añade partituras, audios o MusicXML para tu coro.</p>
                 </div>
             </div>
 
@@ -154,7 +154,7 @@ export default function UploadPrivateWorkPage() {
                 </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="bg-[#0a0a1a] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl shadow-black/50">
+            <form onSubmit={handleSubmit} className="bg-primary-800 border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl shadow-black/50">
                 {error && (
                     <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
                         {error}
@@ -165,31 +165,31 @@ export default function UploadPrivateWorkPage() {
                     <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2">Datos de la Obra</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-slate-300">Título de la Obra <span className="text-red-400">*</span></label>
+                            <label className="text-sm font-medium text-neutral-300">Título de la Obra <span className="text-red-400">*</span></label>
                             <input
                                 required
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500"
                                 placeholder="Ej: Ave Verum Corpus"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-slate-300">Compositor <span className="text-red-400">*</span></label>
+                            <label className="text-sm font-medium text-neutral-300">Compositor <span className="text-red-400">*</span></label>
                             <input
                                 required
                                 value={composer}
                                 onChange={e => setComposer(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500"
                                 placeholder="Ej: W.A. Mozart"
                             />
                         </div>
                         <div className="space-y-1.5 sm:col-span-2">
-                            <label className="text-sm font-medium text-slate-300">Formato / Voces</label>
+                            <label className="text-sm font-medium text-neutral-300">Formato / Voces</label>
                             <select
                                 value={format}
                                 onChange={e => setFormat(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500"
                             >
                                 <option value="SATB">SATB</option>
                                 <option value="SSA">SSA</option>
@@ -205,11 +205,11 @@ export default function UploadPrivateWorkPage() {
                     <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2">Archivo</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-slate-300">Tipo de Archivo</label>
+                            <label className="text-sm font-medium text-neutral-300">Tipo de Archivo</label>
                             <select
                                 value={assetType}
                                 onChange={e => setAssetType(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500"
                             >
                                 <option value="musicxml">🎼 MusicXML (genera audios automáticamente)</option>
                                 <option value="sheet_music">📄 Partitura (PDF)</option>
@@ -219,14 +219,14 @@ export default function UploadPrivateWorkPage() {
                             </select>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-slate-300">Seleccionar Archivo <span className="text-red-400">*</span></label>
+                            <label className="text-sm font-medium text-neutral-300">Seleccionar Archivo <span className="text-red-400">*</span></label>
                             <div className="w-full px-4 py-2 bg-black/50 border border-white/10 rounded-xl text-white flex items-center justify-between">
                                 <input
                                     required
                                     type="file"
                                     accept={getAcceptedExtensions()}
                                     onChange={e => setFile(e.target.files?.[0] || null)}
-                                    className="w-full text-sm text-slate-400 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20"
+                                    className="w-full text-sm text-neutral-300 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-500/10 file:text-primary-300 hover:file:bg-primary-500/20"
                                 />
                             </div>
                         </div>
@@ -240,10 +240,10 @@ export default function UploadPrivateWorkPage() {
                         animate={{ opacity: 1, height: 'auto' }}
                         className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 flex gap-4"
                     >
-                        <FileMusic className="text-indigo-400 shrink-0 mt-1" size={24} />
+                        <FileMusic className="text-primary-300 shrink-0 mt-1" size={24} />
                         <div>
-                            <h4 className="font-medium text-indigo-300 mb-1">Pipeline Automático</h4>
-                            <p className="text-sm text-indigo-400/80">
+                            <h4 className="font-medium text-primary-100 mb-1">Pipeline Automático</h4>
+                            <p className="text-sm text-primary-300/80">
                                 Al subir un MusicXML, Corales analizará automáticamente las partes,
                                 intentará asignar las voces SATB y generará los audios de estudio
                                 para cada cuerda. Si no puede identificar las voces, te pedirá que
@@ -253,11 +253,11 @@ export default function UploadPrivateWorkPage() {
                     </motion.div>
                 )}
 
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex gap-4 mt-6">
-                    <ShieldAlert className="text-amber-500 shrink-0 mt-1" size={24} />
+                <div className="bg-accent-500/10 border border-amber-500/20 rounded-xl p-4 flex gap-4 mt-6">
+                    <ShieldAlert className="text-accent-500 shrink-0 mt-1" size={24} />
                     <div className="space-y-2">
-                        <h4 className="font-medium text-amber-500">Confirmación de Derechos y Copyright</h4>
-                        <p className="text-sm text-amber-500/80">
+                        <h4 className="font-medium text-accent-500">Confirmación de Derechos y Copyright</h4>
+                        <p className="text-sm text-accent-500/80">
                             Como director o administrador, es tu responsabilidad asegurar que las obras subidas a Corales cuentan con los permisos de distribución necesarios o se encuentran en dominio público.
                         </p>
                         <label className="flex items-start gap-3 mt-3 cursor-pointer group">
@@ -265,9 +265,9 @@ export default function UploadPrivateWorkPage() {
                                 type="checkbox"
                                 checked={rightsConfirmed}
                                 onChange={e => setRightsConfirmed(e.target.checked)}
-                                className="mt-1 w-4 h-4 rounded border-amber-500/30 bg-black/50 text-amber-600 focus:ring-amber-500 focus:ring-offset-gray-900"
+                                className="mt-1 w-4 h-4 rounded border-accent-500/30 bg-black/50 text-amber-600 focus:ring-amber-500 focus:ring-offset-gray-900"
                             />
-                            <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
+                            <span className="text-sm text-neutral-300 group-hover:text-white transition-colors">
                                 Confirmo que tengo el derecho legal o permiso expreso para compartir y distribuir este material a los miembros de mi coro.
                             </span>
                         </label>
@@ -277,14 +277,14 @@ export default function UploadPrivateWorkPage() {
                 <div className="pt-4 flex justify-end gap-3">
                     <Link
                         href="/library"
-                        className="px-6 py-2.5 rounded-xl font-medium text-slate-300 hover:bg-white/5 transition-colors"
+                        className="px-6 py-2.5 rounded-xl font-medium text-neutral-300 hover:bg-white/5 transition-colors"
                     >
                         Cancelar
                     </Link>
                     <button
                         type="submit"
                         disabled={loading || !rightsConfirmed || !file}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-accent-500 hover:bg-accent-300 text-primary-900 border-none transition-all shadow-glow-accent text-white rounded-xl font-medium transition-all shadow-lg shadow-glow-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
                         {loading ? (isMusicXML ? 'Procesando...' : 'Subiendo...') : (isMusicXML ? 'Subir y Procesar' : 'Subir Archivo')}

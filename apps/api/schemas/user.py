@@ -7,6 +7,9 @@ class UserBase(BaseModel):
     email: Optional[EmailStr] = None
     full_name: Optional[str] = None
     role: Optional[UserRole] = UserRole.CORALISTA
+    avatar_url: Optional[str] = None
+    bio: Optional[str] = None
+    favorite_voice: Optional[str] = None
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):

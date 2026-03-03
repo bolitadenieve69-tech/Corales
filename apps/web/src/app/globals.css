@@ -1,11 +1,84 @@
 @import "tailwindcss";
 
+@theme {
+  /* Colors - Primary */
+  --color-primary-900: #0D1B2A;
+  --color-primary-800: #1A2E44;
+  --color-primary-700: #1F4068;
+  --color-primary-500: #2E75B6;
+  --color-primary-300: #6DAAD9;
+  --color-primary-100: #D6E9F8;
+
+  /* Colors - Accent */
+  --color-accent-500: #F0A500;
+  --color-accent-300: #F7CB6E;
+  --color-accent-100: #FEF3D7;
+
+  /* Colors - Neutral */
+  --color-neutral-900: #0F0F0F;
+  --color-neutral-800: #1C1C1E;
+  --color-neutral-600: #4A4A5A;
+  --color-neutral-300: #C8C8D6;
+  --color-neutral-100: #F4F5F9;
+  --color-neutral-000: #FFFFFF;
+
+  /* Colors - Voices */
+  --color-voice-soprano: #E8A0BF;
+  --color-voice-alto: #F0A500;
+  --color-voice-tenor: #4EA8DE;
+  --color-voice-bajo: #6C5CE7;
+
+  /* Colors - Semantics */
+  --color-success: #27AE60;
+  --color-warning: #E67E22;
+  --color-error: #E74C3C;
+  --color-info: #2980B9;
+
+  /* Fonts */
+  --font-display: 'Cormorant Garamond', serif;
+  --font-ui: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, .10);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, .12);
+  --shadow-glow-accent: 0 0 20px rgba(240, 165, 0, 0.35);
+  --shadow-glow-primary: 0 0 20px rgba(46, 117, 182, 0.30);
+}
+
 :root {
-  --background: #050511;
-  --foreground: #f8fafc;
+  --background: var(--color-primary-900);
+  --foreground: var(--color-neutral-000);
+}
+
+/* Light mode overrides (si se aplica en el futuro) */
+:root[data-theme="light"] {
+  --background: var(--color-neutral-100);
+  --foreground: var(--color-neutral-900);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  font-family: var(--font-ui), sans-serif;
 }

@@ -1,29 +1,37 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
+from datetime import date
 
-# Shared properties
-class ChoirBase(BaseModel):
+# Season Schemas
+class SeasonBase(BaseModel):
     name: str
-    description: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
 
-# Properties to receive via API on creation
-class ChoirCreate(ChoirBase):
-    pass
-
-# Properties to receive via API on update
-class ChoirUpdate(ChoirBase):
-    name: Optional[str] = None
-
-class ChoirSchema(ChoirBase):
-    id: str
-
-    class Config:
-        from_attributes = True
-
-class MembershipSchema(BaseModel):
-    user_id: str
+class SeasonCreate(SeasonBase):
     choir_id: str
-    voice_part: str
+
+class SeasonUpdate(BaseModel):
+    name: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+
+class Season(SeasonBase):
+    id: str
+    choir_id: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
+# Member/Management Schemas
+class ChoirMemberDetail(BaseModel):
+    id: str
+    user_id: str
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    role: str
+    voice_part: str
+    avatar_url: Optional[str] = None
+    
+    class Config:
+        orm_mode = True

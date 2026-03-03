@@ -24,6 +24,15 @@ class Settings(BaseSettings):
     # Pipeline
     PIPELINE_VERSION: str = "1.0.0"
     
+    # Storage Configuration
+    STORAGE_MODE: str = os.getenv("STORAGE_MODE", "local") # "local" or "s3"
+    S3_BUCKET: str = os.getenv("S3_BUCKET", "corales-assets")
+    S3_ACCESS_KEY: str = os.getenv("S3_ACCESS_KEY", "")
+    S3_SECRET_KEY: str = os.getenv("S3_SECRET_KEY", "")
+    S3_ENDPOINT_URL: str = os.getenv("S3_ENDPOINT_URL", "") # e.g. for R2
+    S3_REGION: str = os.getenv("S3_REGION", "auto")
+    S3_PUBLIC_URL_OVERRIDE: str = os.getenv("S3_PUBLIC_URL_OVERRIDE", "") # e.g. CDN URL
+
     # Environment mode (e.g. "development", "production")
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
 

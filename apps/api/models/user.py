@@ -14,3 +14,6 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     full_name = Column(String)
     role = Column(Enum(UserRole), default=UserRole.CORALISTA, nullable=False)
+    avatar_url = Column(String, nullable=True)
+    bio = Column(String, nullable=True)
+    favorite_voice = Column(String, nullable=True) # e.g. 'soprano', 'alto'...

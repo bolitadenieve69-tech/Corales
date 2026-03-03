@@ -4,14 +4,17 @@ from typing import Optional
 class ProjectRepertoireBase(BaseModel):
     project_id: str
     work_title: str
+    work_id: Optional[str] = None
     order: int = 0
 
 class ProjectRepertoireCreate(BaseModel):
     work_title: str
+    work_id: Optional[str] = None
     order: Optional[int] = 0
 
 class ProjectRepertoireUpdate(BaseModel):
     work_title: Optional[str] = None
+    work_id: Optional[str] = None
     order: Optional[int] = None
 
 class ProjectRepertoireSchema(ProjectRepertoireBase):

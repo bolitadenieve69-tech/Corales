@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 from core.config import settings
 from core.database import SessionLocal
 from models.asset import Asset
+from services.storage import storage_service
 from .locks import PipelineLock
 from .idempotency import find_or_create_asset
 from .retry import is_retryable, MappingRequired
@@ -111,14 +112,10 @@ def process_musicxml(asset_id: str, attempt: int = 1):
         if not asset:
             raise ValueError(f"Asset {asset_id} not found")
 
-        # 1. Copy MusicXML to temp dir
-        source_path = asset.file_url
-        if not os.path.exists(source_path):
-            raise ValueError(f"MusicXML file not found: {source_path}")
-        
-        import shutil as _shutil
-        local_path = os.path.join(job_dir, os.path.basename(source_path))
-        _shutil.copy2(source_path, local_path)
+        # 1. Download MusicXML to temp dir
+        remote_path = asset.file_url
+        local_path = os.path.join(job_dir, os.path.basename(remote_path))
+        storage_service.download_file(remote_path, local_path)
 
         # 2. Parse with music21
         from .musicxml_parser import parse_musicxml, auto_map_satb
@@ -252,30 +249,28 @@ def generate_midis(edition_id: str, attempt: int = 1):
 
         mapping_dict = {m.part_name: m.assigned_to for m in mappings}
 
-        # 3. Copy MusicXML to job dir and generate MIDIs
-        import shutil as _shutil
-        local_xml = os.path.join(job_dir, os.path.basename(musicxml_asset.file_url))
-        _shutil.copy2(musicxml_asset.file_url, local_xml)
+        # 3. Download MusicXML to job dir and generate MIDIs
+        remote_xml_path = musicxml_asset.file_url
+        local_xml = os.path.join(job_dir, os.path.basename(remote_xml_path))
+        storage_service.download_file(remote_xml_path, local_xml)
 
         from .midi_generator import generate_all_midis
         midi_dir = os.path.join(job_dir, "midis")
         generated_midis = generate_all_midis(local_xml, midi_dir, mapping_dict)
 
         # 4. Save each generated MIDI using idempotent asset creation
-        UPLOAD_DIR = "data/uploads"
-        os.makedirs(UPLOAD_DIR, exist_ok=True)
-
         for asset_type, midi_path in generated_midis.items():
-            # Copy to permanent storage
             dest_filename = f"{edition_id}_{asset_type}.mid"
-            dest_path = os.path.join(UPLOAD_DIR, dest_filename)
-            _shutil.copy2(midi_path, dest_path)
+            remote_path = f"editions/{edition_id}/{dest_filename}"
+            
+            # Upload to storage
+            storage_path = storage_service.upload_file(midi_path, remote_path)
 
             asset, created = find_or_create_asset(
                 db, edition_id, asset_type,
-                dest_path,
-                f"editions/{edition_id}/{dest_filename}",
-                dest_path,
+                midi_path, # local path for checksum
+                remote_path, # storage_key
+                storage_path, # file_url/path stored in DB
             )
             if created:
                 log_event(db, "ASSET_GENERATED", "asset", asset.id, {
@@ -360,30 +355,31 @@ def render_audio(edition_id: str, attempt: int = 1):
         if not midi_assets:
             raise ValueError(f"No MIDI assets found for edition {edition_id}")
 
-        UPLOAD_DIR = "data/uploads"
-        os.makedirs(UPLOAD_DIR, exist_ok=True)
         audio_count = 0
 
         # 2. Render each MIDI to MP3
         for midi_asset in midi_assets:
+            # Download MIDI first
+            local_midi = os.path.join(job_dir, os.path.basename(midi_asset.file_url))
+            storage_service.download_file(midi_asset.file_url, local_midi)
+
             # Map MIDI type to AUDIO type
             audio_type = midi_asset.asset_type.replace("MIDI_", "AUDIO_")
             
             mp3_filename = f"{edition_id}_{audio_type}.mp3"
             mp3_job_path = os.path.join(job_dir, mp3_filename)
 
-            render_midi_to_mp3(midi_asset.file_url, mp3_job_path)
+            render_midi_to_mp3(local_midi, mp3_job_path)
 
-            # Copy to permanent storage
-            dest_path = os.path.join(UPLOAD_DIR, mp3_filename)
-            import shutil as _shutil
-            _shutil.copy2(mp3_job_path, dest_path)
+            # Upload to storage
+            remote_path = f"editions/{edition_id}/{mp3_filename}"
+            storage_path = storage_service.upload_file(mp3_job_path, remote_path)
 
             asset, created = find_or_create_asset(
                 db, edition_id, audio_type,
-                dest_path,
-                f"editions/{edition_id}/{mp3_filename}",
-                dest_path,
+                mp3_job_path, # local path for checksum
+                remote_path, # storage_key
+                storage_path, # file_url/path stored in DB
             )
             if created:
                 log_event(db, "ASSET_GENERATED", "asset", asset.id, {

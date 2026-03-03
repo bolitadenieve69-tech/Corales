@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Music, ArrowRight, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react"
+import { login } from "@/lib/api"
 
 export default function LoginPage() {
     const [email, setEmail] = useState("")
@@ -16,15 +17,12 @@ export default function LoginPage() {
         setLoading(true)
         setError("")
 
-        // Simulate API call for presentation
-        if (email === "director@coro.com" && password === "Corales2026!") {
-            setTimeout(() => {
-                setLoading(false)
-                window.location.href = "/projects"
-            }, 1000)
-        } else {
-            setLoading(false)
-            setError("Email o contraseña incorrectos (Prueba con director@coro.com / Corales2026!)")
+        try {
+            await login(email, password);
+            window.location.href = "/";
+        } catch (err: any) {
+            setLoading(false);
+            setError(err.message || "Email o contraseña incorrectos");
         }
     }
 
@@ -33,7 +31,7 @@ export default function LoginPage() {
 
             {/* Abstract Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
                 <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-indigo-600/10 rounded-full blur-3xl opacity-50" />
             </div>
 
@@ -48,7 +46,7 @@ export default function LoginPage() {
                         <Music className="text-white w-8 h-8" />
                     </div>
                     <h1 className="text-3xl font-bold text-white tracking-tight">Acceso Coral</h1>
-                    <p className="text-slate-400 mt-2 text-sm">Gestiona e interpreta tu repertorio</p>
+                    <p className="text-neutral-300 mt-2 text-sm">Gestiona e interpreta tu repertorio</p>
                 </div>
 
                 {error && (
@@ -64,21 +62,21 @@ export default function LoginPage() {
 
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div className="space-y-1.5">
-                        <label className="text-sm font-medium text-slate-300 pl-1">Correo Electrónico</label>
+                        <label className="text-sm font-medium text-neutral-300 pl-1">Correo Electrónico</label>
                         <input
                             type="email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-neutral-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500 focus:border-primary-500/50 transition-all"
                             placeholder="director@coro.com"
                         />
                     </div>
 
                     <div className="space-y-1.5">
                         <div className="flex justify-between items-center pl-1 pr-1">
-                            <label className="text-sm font-medium text-slate-300">Contraseña</label>
-                            <a href="#" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">¿Olvidaste tu contraseña?</a>
+                            <label className="text-sm font-medium text-neutral-300">Contraseña</label>
+                            <a href="#" className="text-xs text-primary-300 hover:text-primary-100 transition-colors">¿Olvidaste tu contraseña?</a>
                         </div>
                         <div className="relative">
                             <input
@@ -86,13 +84,13 @@ export default function LoginPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all pr-12"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-neutral-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500 focus:border-primary-500/50 transition-all pr-12"
                                 placeholder="••••••••"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-neutral-300 transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2"
                             >
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
@@ -116,8 +114,8 @@ export default function LoginPage() {
                 </form>
 
                 <div className="mt-8 pt-6 border-t border-white/5 text-center">
-                    <p className="text-sm text-slate-400">
-                        ¿Eres coralista? <a href="/join" className="text-white hover:text-blue-400 font-medium transition-colors">Usa tu código de invitación</a>
+                    <p className="text-sm text-neutral-300">
+                        ¿Eres coralista? <a href="/join" className="text-white hover:text-primary-300 font-medium transition-colors">Usa tu código de invitación</a>
                     </p>
                 </div>
             </motion.div>

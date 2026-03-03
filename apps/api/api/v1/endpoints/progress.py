@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
-from api.deps import get_db, get_current_user
+from api import deps
+from api.deps import get_db
 from models.user import User
 from models.practice_progress import PracticeProgress, PracticeStatus
 from models.project import Project
@@ -19,34 +20,27 @@ def create_or_update_progress(
     *,
     db: Session = Depends(get_db),
     progress_in: PracticeProgressCreate,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
     """
     Log or update practice progress (status and/or minutes) for a specific work.
     """
-    # Check if the work exists
     work = db.query(Work).filter(Work.id == progress_in.work_id).first()
     if not work:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Work not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Work not found")
         
-    # See if there's already an entry for this user and work
     progress = db.query(PracticeProgress).filter(
         PracticeProgress.user_id == current_user.id,
         PracticeProgress.work_id == progress_in.work_id
     ).first()
     
     if progress:
-        # Update existing
         if progress_in.status:
             progress.status = progress_in.status
         if progress_in.minutes_practiced:
             progress.minutes_practiced += progress_in.minutes_practiced
         db.add(progress)
     else:
-        # Create new
         progress = PracticeProgress(
             user_id=current_user.id,
             work_id=progress_in.work_id,
@@ -62,80 +56,98 @@ def create_or_update_progress(
 @router.get("/", response_model=List[PracticeProgressSchema])
 def get_my_progress(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
     """
     Get all practice progress entries for the current user.
     """
-    progress_entries = db.query(PracticeProgress).filter(
+    return db.query(PracticeProgress).filter(PracticeProgress.user_id == current_user.id).all()
+
+@router.get("/stats/me")
+def get_my_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_active_user)
+) -> Any:
+    """
+    Get personal practice statistics for the current user.
+    """
+    total_minutes = db.query(func.sum(PracticeProgress.minutes_practiced)).filter(
         PracticeProgress.user_id == current_user.id
-    ).all()
+    ).scalar() or 0
     
-    return progress_entries
+    works_studied = db.query(func.count(PracticeProgress.id)).filter(
+        PracticeProgress.user_id == current_user.id
+    ).scalar() or 0
+    
+    most_practiced = db.query(
+        Work.title, 
+        PracticeProgress.minutes_practiced
+    ).join(Work).filter(
+        PracticeProgress.user_id == current_user.id
+    ).order_by(PracticeProgress.minutes_practiced.desc()).first()
+    
+    return {
+        "total_minutes": total_minutes,
+        "works_studied": works_studied,
+        "most_practiced_work": most_practiced[0] if most_practiced else None,
+        "most_practiced_minutes": most_practiced[1] if most_practiced else 0
+    }
 
 @router.get("/project/{project_id}")
 def get_project_progress(
-    project_id: int,
+    project_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
     """
-    Get aggregated progress for a specific project.
-    Only accessible by the director of the project's choir.
+    Get aggregated progress for a specific project with status counts.
     """
+    from models.membership import Membership
+    
     project = db.query(Project).filter(Project.id == project_id).first()
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
         
-    # Check authorization (Director of the choir)
-    # This is a bit simplified; ideally check memberships table for DIRECTOR role in this specific choir
-    
-    # 1. Get all repertoire items for this project
-    repertoire = db.query(ProjectRepertoire).filter(
-        ProjectRepertoire.project_id == project_id
-    ).all()
-    
-    # Collect work IDs for this project
-    work_ids = []
-    for item in repertoire:
-        if item.edition and item.edition.work_id:
-            work_ids.append(item.edition.work_id)
-            
-    # Remove duplicates
-    work_ids = list(set(work_ids))
-    
-    # 2. Query progress for these works across all users in the choir
-    # Aggregate by work_id to show stats (e.g. how many people at what status, total minutes)
+    repertoire = db.query(ProjectRepertoire).filter(ProjectRepertoire.project_id == project_id).all()
+    # Get all members of the choir to calculate "NUEVA" status (those with no entry)
+    members = db.query(Membership).filter(Membership.choir_id == project.choir_id).all()
+    total_members_count = len(members)
+    member_ids = [m.user_id for m in members]
     
     results = []
-    for wid in work_ids:
-        work = db.query(Work).filter(Work.id == wid).first()
-        if not work:
+    for item in repertoire:
+        work_id = item.work_id
+        if not work_id:
             continue
             
         progress_entries = db.query(PracticeProgress).filter(
-            PracticeProgress.work_id == wid
+            PracticeProgress.work_id == work_id,
+            PracticeProgress.user_id.in_(member_ids)
         ).all()
         
-        status_counts = {"NUEVA": 0, "EN_PROGRESO": 0, "DOMINADA": 0}
-        total_minutes = 0
+        # Initialize counts
+        status_counts = {
+            "NUEVA": 0,
+            "EN_PROGRESO": 0,
+            "DOMINADA": 0
+        }
         
+        # Count entries
+        users_with_progress = set()
         for p in progress_entries:
-            # En la vida real aquí filtraríamos para contar solo a los coralistas 
-            # que ESTÁN en este coro, pero en el MVP es aceptable contarlos todos si la base es el proyecto
-            status_counts[p.status.value] += 1
-            total_minutes += p.minutes_practiced
+            status_counts[p.status] += 1
+            users_with_progress.add(p.user_id)
             
+        # Users in the choir but without a progress entry for this work are "NUEVA"
+        status_counts["NUEVA"] += (total_members_count - len(users_with_progress))
+        
         results.append({
-            "work_id": wid,
-            "work_title": work.title,
-            "total_practicing_users": len(progress_entries),
-            "status_distribution": status_counts,
-            "total_minutes": total_minutes
+            "work_id": str(work_id),
+            "work_title": item.work_title,
+            "total_users": total_members_count,
+            "nueva": status_counts["NUEVA"],
+            "en_progreso": status_counts["EN_PROGRESO"],
+            "dominada": status_counts["DOMINADA"]
         })
         
-    return {
-        "project_id": project_id,
-        "project_name": project.name,
-        "progress_by_work": results
-    }
+    return results

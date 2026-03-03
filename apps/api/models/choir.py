@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey, Enum
+from sqlalchemy import Column, String, ForeignKey, Enum, Integer
 from sqlalchemy.orm import relationship
 from .base import Base
 import enum
@@ -9,6 +9,7 @@ class VoicePart(str, enum.Enum):
     TENOR = "TENOR"
     BASS = "BASS"
     DIRECTOR = "DIRECTOR"
+    SUBDIRECTOR = "SUBDIRECTOR"
 
 class Choir(Base):
     __tablename__ = "choirs"

@@ -33,10 +33,9 @@ def create_season(
     *,
     db: Session = Depends(deps.get_db),
     season_in: SeasonCreate,
-    current_user: User = Depends(deps.get_current_active_user)
+    current_user: User = Depends(deps.get_current_active_director)
 ) -> Any:
-    if current_user.role != UserRole.DIRECTOR:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    # get_current_active_director already checks for DIRECTOR or ADMIN
         
     season = Season(
         id=str(uuid.uuid4()),
@@ -56,10 +55,9 @@ def update_season(
     db: Session = Depends(deps.get_db),
     id: str,
     season_in: SeasonUpdate,
-    current_user: User = Depends(deps.get_current_active_user)
+    current_user: User = Depends(deps.get_current_active_director)
 ) -> Any:
-    if current_user.role != UserRole.DIRECTOR:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    # get_current_active_director already checks for DIRECTOR or ADMIN
         
     season = db.query(Season).filter(Season.id == id).first()
     if not season:
@@ -79,10 +77,9 @@ def delete_season(
     *,
     db: Session = Depends(deps.get_db),
     id: str,
-    current_user: User = Depends(deps.get_current_active_user)
+    current_user: User = Depends(deps.get_current_active_director)
 ) -> Any:
-    if current_user.role != UserRole.DIRECTOR:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    # get_current_active_director already checks for DIRECTOR or ADMIN
         
     season = db.query(Season).filter(Season.id == id).first()
     if not season:

@@ -1,0 +1,1922 @@
+INFO:     Will watch for changes in these directories: ['/Users/angelguerraiglesias/Documents/AI_Corales/apps/api']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [8147] using WatchFiles
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [8155]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:53347 - "POST /api/v1/login/access-token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53350 - "GET /api/v1/choirs/me HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/middleware/cors.py", line 83, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/fastapi/routing.py", line 296, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/fastapi/routing.py", line 155, in serialize_response
+    raise ResponseValidationError(
+        errors=_normalize_errors(errors), body=response_content
+    )
+fastapi.exceptions.ResponseValidationError: 1 validation errors:
+  {'type': 'int_type', 'loc': ('response', 'max_users'), 'msg': 'Input should be a valid integer', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/int_type'}
+
+WARNING:  WatchFiles detected changes in 'schemas/choir.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8155]
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [8166]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:53363 - "POST /api/v1/login/access-token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53365 - "GET /api/v1/choirs/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54122 - "OPTIONS /api/v1/choirs/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54122 - "GET /api/v1/choirs/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54521 - "GET /api/v1/academy/dashboard HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54523 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54526 - "GET /api/v1/academy/dashboard HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54528 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54545 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54547 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54550 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54552 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54563 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54562 - "GET /api/v1/works/test-work-1 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54587 - "OPTIONS /api/v1/academy/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54587 - "GET /api/v1/academy/dashboard HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54587 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54587 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54590 - "OPTIONS /api/v1/academy/dashboard HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54590 - "GET /api/v1/academy/dashboard HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54590 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54590 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54698 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54698 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54698 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54698 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54703 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54703 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54703 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54703 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54732 - "OPTIONS /api/v1/works/test-work-1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54732 - "GET /api/v1/works/test-work-1 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54732 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54732 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54786 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54789 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54805 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54807 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54817 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54830 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54830 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54839 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54839 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54848 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54848 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54848 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54848 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54937 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54937 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54958 - "OPTIONS /api/v1/choirs/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54960 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54960 - "GET /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54958 - "GET /api/v1/choirs/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55012 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55014 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55029 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55029 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55039 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55053 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55053 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55062 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55062 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55078 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55078 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55078 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55078 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55133 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55133 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55199 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55201 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55216 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55218 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55227 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55245 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55245 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55254 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55254 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55264 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55265 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55264 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55265 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55299 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55299 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55305 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55305 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55355 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55358 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55383 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55385 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55389 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55391 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55402 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55402 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55414 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55414 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55438 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55438 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55438 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55438 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55459 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55459 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55493 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55516 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55519 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55534 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55536 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55545 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55547 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55575 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55575 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55590 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55591 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55590 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55590 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55668 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55668 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55777 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55779 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55781 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55781 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55797 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55799 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55802 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55804 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55818 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55820 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55829 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55829 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55829 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55829 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55843 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55843 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55852 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55852 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55889 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55889 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55889 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55889 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55935 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55935 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55938 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55997 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56000 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56027 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56029 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56040 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56040 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56042 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56042 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56076 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56077 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56076 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56076 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56096 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56096 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56096 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56096 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56108 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56108 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56110 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56189 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56191 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56212 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56214 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56217 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56219 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56235 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56235 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56239 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56239 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56271 - "OPTIONS /api/v1/works/?skip=0&limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56272 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56271 - "GET /api/v1/works/?skip=0&limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56271 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56288 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56288 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56309 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56339 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56342 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56352 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56354 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56377 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56377 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56380 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56380 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56473 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56473 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56475 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56519 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56523 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56532 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56536 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56548 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56548 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56552 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56552 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56602 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56602 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56609 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56711 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56714 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56726 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56728 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56738 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56738 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56744 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56744 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56766 - "OPTIONS /api/v1/users/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56766 - "GET /api/v1/users/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56769 - "GET /api/v1/assets/1/stream HTTP/1.1" 404 Not Found
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/projects.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8166]
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [25449]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'core/config.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [25449]
+WARNING:  WatchFiles detected changes in 'services/storage.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [26665]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/assets.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [26701]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/assets.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [26701]
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-7:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import login, users, invites, seasons, projects, works, editions, assets, progress, pipeline, choirs, academy
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 69, in <module>
+    file: UploadFile = File(...),
+                       ^^^^
+NameError: name 'File' is not defined. Did you mean: 'False'?
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/assets.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-8:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import login, users, invites, seasons, projects, works, editions, assets, progress, pipeline, choirs, academy
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 9, in <module>
+    router = APIRouter(tags=["assets"])
+             ^^^^^^^^^
+NameError: name 'APIRouter' is not defined
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/assets.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/assets.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [26745]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'services/storage.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [26745]
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [26750]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'services/pipeline/jobs.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [26750]
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-12:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import login, users, invites, seasons, projects, works, editions, assets, progress, pipeline, choirs, academy
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/pipeline.py", line 17, in <module>
+    from services.pipeline.enqueue import enqueue_process_musicxml
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/services/pipeline/enqueue.py", line 13, in <module>
+    from services.pipeline.jobs import RETRY_DELAYS, MAX_RETRIES
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/services/pipeline/jobs.py", line 30
+    remote_path = asset.file_url
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'services/pipeline/jobs.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [26787]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'schemas/project_repertoire.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [26787]
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/projects.py'. Reloading...
+INFO:     Started server process [27953]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [27966]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:61206 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61229 - "POST /api/v1/login/access-token HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:61237 - "POST /api/v1/login/access-token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61239 - "GET /api/v1/choirs/me HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61244 - "POST /api/v1/login/access-token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61246 - "GET /api/v1/choirs/me HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61253 - "POST /api/v1/login/access-token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61255 - "GET /api/v1/choirs/me HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61257 - "GET /api/v1/choirs/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61259 - "GET /api/v1/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61261 - "POST /api/v1/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61263 - "POST /api/v1/works/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61265 - "POST /api/v1/editions/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61267 - "POST /api/v1/assets/upload-musicxml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61271 - "POST /api/v1/projects/2c9021d5-86b1-4fde-bf5c-0705c1036669/repertoire HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/middleware/cors.py", line 83, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 758, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 778, in app
+    await route.handle(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 299, in handle
+    await self.app(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 79, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/routing.py", line 74, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/fastapi/routing.py", line 278, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        dependant=dependant, values=values, is_coroutine=is_coroutine
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/fastapi/routing.py", line 193, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/starlette/concurrency.py", line 42, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/anyio/to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        func, args, abandon_on_cancel=abandon_on_cancel, limiter=limiter
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py", line 2502, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/projects.py", line 133, in add_repertoire_to_project
+    rep = ProjectRepertoire(
+        id=str(uuid.uuid4()),
+    ...<3 lines>...
+        order=repertoire_in.order
+    )
+  File "<string>", line 4, in __init__
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/sqlalchemy/orm/state.py", line 596, in _initialize_instance
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 121, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/sqlalchemy/orm/state.py", line 594, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/sqlalchemy/orm/decl_base.py", line 2179, in _declarative_constructor
+    raise TypeError(
+        "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+    )
+TypeError: 'work_id' is an invalid keyword argument for ProjectRepertoire
+WARNING:  WatchFiles detected changes in 'models/project_repertoire.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [27966]
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [30762]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:61284 - "POST /api/v1/login/access-token HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61287 - "GET /api/v1/choirs/me HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61289 - "GET /api/v1/choirs/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61291 - "GET /api/v1/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61293 - "POST /api/v1/works/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61295 - "POST /api/v1/editions/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61297 - "POST /api/v1/assets/upload-musicxml HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61301 - "POST /api/v1/projects/2c9021d5-86b1-4fde-bf5c-0705c1036669/repertoire HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/academy.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [30762]
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [32279]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'check_db.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [32279]
+WARNING:  WatchFiles detected changes in 'check_db.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [33730]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'models/user.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [33730]
+WARNING:  WatchFiles detected changes in 'schemas/user.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/users.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [39505]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+INFO:     Started server process [39528]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'schemas/choir.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [39528]
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'api/v1/api.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-26:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/choirs.py", line 5, in <module>
+    from schemas.choir import ChoirCreate, ChoirSchema, ChoirUpdate, ChoirAssignment
+ImportError: cannot import name 'ChoirCreate' from 'schemas.choir' (/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/schemas/choir.py)
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-27:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/choirs.py", line 5, in <module>
+    from schemas.choir import ChoirCreate, ChoirSchema, ChoirUpdate, ChoirAssignment
+ImportError: cannot import name 'ChoirCreate' from 'schemas.choir' (/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/schemas/choir.py)
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/progress.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-28:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/choirs.py", line 5, in <module>
+    from schemas.choir import ChoirCreate, ChoirSchema, ChoirUpdate, ChoirAssignment
+ImportError: cannot import name 'ChoirCreate' from 'schemas.choir' (/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/schemas/choir.py)
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/progress.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-29:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/choirs.py", line 5, in <module>
+    from schemas.choir import ChoirCreate, ChoirSchema, ChoirUpdate, ChoirAssignment
+ImportError: cannot import name 'ChoirCreate' from 'schemas.choir' (/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/schemas/choir.py)
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/progress.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-30:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/choirs.py", line 5, in <module>
+    from schemas.choir import ChoirCreate, ChoirSchema, ChoirUpdate, ChoirAssignment
+ImportError: cannot import name 'ChoirCreate' from 'schemas.choir' (/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/schemas/choir.py)
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/users.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-31:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/choirs.py", line 5, in <module>
+    from schemas.choir import ChoirCreate, ChoirSchema, ChoirUpdate, ChoirAssignment
+ImportError: cannot import name 'ChoirCreate' from 'schemas.choir' (/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/schemas/choir.py)
+WARNING:  WatchFiles detected changes in 'services/storage.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/assets.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-32:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-33:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'services/email.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'services/email.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/projects.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-35:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-36:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-37:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-39:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'models/feedback.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'models/feedback.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'models/__init__.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-42:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'models/feedback.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-43:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'alembic/versions/c66f1c34d45b_add_direct_feedback_model.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-44:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'schemas/feedback.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'schemas/feedback.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-46:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-47:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/users.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-48:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'api/deps.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-49:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/choir_management.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-50:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-51:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent
+WARNING:  WatchFiles detected changes in 'api/v1/endpoints/works.py'. Reloading...
+/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/pydantic/_internal/_config.py:383: UserWarning: Valid config keys have changed in V2:
+* 'orm_mode' has been renamed to 'from_attributes'
+  warnings.warn(message, UserWarning)
+Process SpawnProcess-52:
+Traceback (most recent call last):
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 320, in _bootstrap
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/_subprocess.py", line 78, in subprocess_started
+    target(sockets=sockets)
+    ~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 65, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 204, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/asyncio/runners.py", line 127, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 69, in serve
+    await self._serve(sockets)
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/server.py", line 76, in _serve
+    config.load()
+    ~~~~~~~~~~~^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/config.py", line 433, in load
+    self.loaded_app = import_from_string(self.app)
+                      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/venv/lib/python3.14/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/usr/local/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/main.py", line 11, in <module>
+    from api.v1.api import api_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/api.py", line 2, in <module>
+    from api.v1.endpoints import (
+    ...<11 lines>...
+    )
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/__init__.py", line 8, in <module>
+    from .assets import router as assets_router
+  File "/Users/angelguerraiglesias/Documents/AI_Corales/apps/api/api/v1/endpoints/assets.py", line 19
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+IndentationError: unexpected indent

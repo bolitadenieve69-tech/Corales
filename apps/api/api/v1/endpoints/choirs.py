@@ -2,7 +2,7 @@ from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from api import deps
-from schemas.choir import ChoirCreate, ChoirSchema, ChoirUpdate
+from schemas.choir import ChoirCreate, ChoirSchema, ChoirUpdate, ChoirAssignment
 from models.user import User, UserRole
 from models.choir import Choir, Membership, VoicePart
 import uuid
@@ -25,12 +25,49 @@ def read_choirs(
     choirs = db.query(Choir).join(Membership).filter(Membership.user_id == current_user.id).all()
     return choirs
 
+@router.post("/admin/assign", response_model=ChoirSchema)
+def assign_choir_admin(
+    *,
+    db: Session = Depends(deps.get_db),
+    assignment: ChoirAssignment,
+    current_user: User = Depends(deps.get_current_active_admin)
+) -> Any:
+    """
+    (ADMIN ONLY) Create a choir and assign a user as DIRECTOR or SUBDIRECTOR.
+    """
+    # Create the choir
+    choir = Choir(
+        id=str(uuid.uuid4()),
+        name=assignment.name,
+        description=assignment.description,
+        max_users=assignment.max_users
+    )
+    db.add(choir)
+    
+    # Map the role string to VoicePart
+    role = VoicePart.DIRECTOR
+    if assignment.role.upper() == "SUBDIRECTOR":
+        role = VoicePart.SUBDIRECTOR
+        
+    # Assign the target user
+    membership = Membership(
+        id=str(uuid.uuid4()),
+        user_id=assignment.user_id,
+        choir_id=choir.id,
+        voice_part=role
+    )
+    db.add(membership)
+    
+    db.commit()
+    db.refresh(choir)
+    return choir
+
 @router.post("/", response_model=ChoirSchema)
 def create_choir(
     *,
     db: Session = Depends(deps.get_db),
     choir_in: ChoirCreate,
-    current_user: User = Depends(deps.get_current_active_director)
+    current_user: User = Depends(deps.get_current_active_admin)
 ) -> Any:
     """
     Create a new choir.
@@ -38,7 +75,8 @@ def create_choir(
     choir = Choir(
         id=str(uuid.uuid4()),
         name=choir_in.name,
-        description=choir_in.description
+        description=choir_in.description,
+        max_users=choir_in.max_users
     )
     db.add(choir)
     
@@ -84,6 +122,11 @@ def update_my_choir(
     
     choir = membership.choir
     update_data = choir_in.model_dump(exclude_unset=True)
+    
+    # Only ADMIN can update max_users
+    if "max_users" in update_data and current_user.role != UserRole.ADMIN:
+        update_data.pop("max_users")
+        
     for field, value in update_data.items():
         setattr(choir, field, value)
     

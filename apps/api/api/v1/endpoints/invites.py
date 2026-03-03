@@ -30,14 +30,39 @@ def create_invite(
     if not membership and current_user.role != "ADMIN":
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    # Check quota
+    # Check quota availability (Strict Distribution)
+    # We sum: Current members + Pending slots in all active non-expired invites
     choir = db.query(Choir).filter(Choir.id == invite_in.choir_id).first()
     current_members = db.query(Membership).filter(Membership.choir_id == invite_in.choir_id).count()
     
-    if current_members >= (choir.max_users or 50):
+    # Get all active invites for this choir
+    from sqlalchemy import or_
+    active_invites = db.query(Invite).filter(
+        Invite.choir_id == invite_in.choir_id,
+        or_(Invite.expires_at == None, Invite.expires_at > datetime.utcnow()),
+        or_(Invite.max_uses == None, Invite.uses_count < Invite.max_uses)
+    ).all()
+    
+    # Calculate pending reserved slots
+    # Note: If an invite is "unlimited" (max_uses=None), it technically consumes all remaining slots.
+    # We treat None as a large number or handle it as "full" for directors.
+    reserved_slots = 0
+    for inv in active_invites:
+        if inv.max_uses is None:
+            # Unlimited invite exists; no more slots can be reserved by others
+            reserved_slots = choir.max_users
+            break
+        reserved_slots += (inv.max_uses - inv.uses_count)
+    
+    requested_slots = invite_in.max_uses if invite_in.max_uses is not None else (choir.max_users - current_members - reserved_slots)
+    
+    if (current_members + reserved_slots + (invite_in.max_uses or 0)) > (choir.max_users or 50):
+        # Allow Admin to bypass if needed, but for now enforce for everyone to keep it consistent with "pactado"
+        available = max(0, choir.max_users - current_members - reserved_slots)
         raise HTTPException(
             status_code=400, 
-            detail=f"Has alcanzado el límite de {choir.max_users} miembros para este coro."
+            detail=f"No hay suficiente cuota disponible. Espacio restante: {available}. "
+                   f"Ya hay {current_members} miembros y {reserved_slots} espacios reservados en otras invitaciones."
         )
 
     # Generate unique code

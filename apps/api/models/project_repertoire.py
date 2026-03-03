@@ -7,6 +7,7 @@ class ProjectRepertoire(Base):
 
     project_id = Column(String, ForeignKey("projects.id"), nullable=False, index=True)
     edition_id = Column(String, ForeignKey("editions.id"), nullable=True, index=True)
+    work_id = Column(String, ForeignKey("works.id"), nullable=True, index=True)
     
     # Placeholder for UI testing (antes de tener ediciones creadas)
     work_title = Column(String, nullable=True) 

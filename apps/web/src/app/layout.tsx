@@ -1,13 +1,32 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth-context";
 
-const inter = Inter({ subsets: ["latin"] });
+const cormorantGaramond = Cormorant_Garamond({
+  weight: ['400', '500', '600', '700'],
+  subsets: ["latin"],
+  variable: '--font-display',
+});
+
+const dmSans = DM_Sans({
+  weight: ['400', '500', '700'],
+  subsets: ["latin"],
+  variable: '--font-ui',
+});
+
+const dmMono = DM_Mono({
+  weight: ['400', '500'],
+  subsets: ["latin"],
+  variable: '--font-mono',
+});
 
 export const metadata: Metadata = {
   title: "Corales",
   description: "Estudio coral simplificado",
 };
+
+import { ToastContainer } from "@/components/ui/ToastContainer";
 
 export default function RootLayout({
   children,
@@ -16,7 +35,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${inter.className} antialiased bg-[#050511] text-white min-h-screen`}>{children}</body>
+      <body className={`${cormorantGaramond.variable} ${dmSans.variable} ${dmMono.variable} antialiased min-h-screen bg-transparent`}>
+        <AuthProvider>
+          {children}
+          <ToastContainer />
+        </AuthProvider>
+      </body>
     </html>
   );
 }

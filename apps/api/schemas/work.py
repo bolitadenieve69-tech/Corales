@@ -1,12 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
-
-# Basic Edition schema to include in Works
-class EditionSchemaBase(BaseModel):
-    id: str
-    publisher: Optional[str] = None
-    notes: Optional[str] = None
-    model_config = ConfigDict(from_attributes=True)
+from .edition import EditionSchema
 
 class WorkBase(BaseModel):
     title: str
@@ -34,6 +28,6 @@ class WorkUpdate(BaseModel):
 
 class WorkSchema(WorkBase):
     id: str
-    editions: List[EditionSchemaBase] = []
+    editions: List[EditionSchema] = []
     
     model_config = ConfigDict(from_attributes=True)
