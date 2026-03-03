@@ -69,4 +69,4 @@ except Exception:
 # Add a direct debug endpoint just in case
 @app.get("/api/v1/auth-check")
 def auth_check():
-    return {"status": "present", "version": "7.1.7", "router_error": router_error}
+    return {"status": "present", "version": "7.1.9", "router_error": router_error}
