@@ -1,11 +1,9 @@
-import sys
-import os
-
-sys.path.append(os.path.join(os.getcwd(), "apps/api"))
-
+import logging
 from core.database import SessionLocal
 from models.user import User, UserRole
 from core.security import get_password_hash
+
+logger = logging.getLogger(__name__)
 
 def seed_admin():
     db = SessionLocal()
@@ -14,6 +12,7 @@ def seed_admin():
         password = "password123"
         user = db.query(User).filter(User.email == email).first()
         if not user:
+            logger.info(f"Creando usuario administrador inicial: {email}")
             user = User(
                 email=email,
                 full_name="Admin",
@@ -22,13 +21,15 @@ def seed_admin():
             )
             db.add(user)
             db.commit()
-            print(f"Usuario admin creado exitosamente: {email} / {password}")
+            logger.info("Usuario administrador creado exitosamente.")
         else:
-             user.hashed_password = get_password_hash(password)
-             db.commit()
-             print(f"El usuario {email} ya existía. La contraseña se reinició a: {password}")
+            # Silence update if already exists with correct hash
+            logger.info(f"El usuario administrador {email} ya existe.")
+    except Exception as e:
+        logger.error(f"Error crítico al crear admin inicial: {e}")
     finally:
         db.close()
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     seed_admin()

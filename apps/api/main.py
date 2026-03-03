@@ -7,13 +7,22 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Execute on startup
-    from create_admin import seed_admin
-    seed_admin()
+    logger.info("Iniciando aplicación Corales API...")
+    try:
+        from create_admin import seed_admin
+        seed_admin()
+    except Exception as e:
+        logger.error(f"Fallo en el seeding inicial: {e}")
     yield
-    # Execute on shutdown (nothing needed for now)
+    logger.info("Apagando aplicación Corales API...")
 
 app = FastAPI(
     title="Corales API",
