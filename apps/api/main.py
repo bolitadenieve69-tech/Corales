@@ -1,36 +1,23 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 import os
-import logging
 import sys
 
-# Minimal logging
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-logger = logging.getLogger(__name__)
-
-app = FastAPI(title="Corales API DEBUG", version="3.3.0")
-
-# Simplified CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# TOTAL INDEPENDENCE: No imports from the app code
+app = FastAPI(title="Naked Boot", version="4.0.0")
 
 @app.get("/")
 def read_root():
     return {
-        "status": "CoralApp API is Running!",
-        "version": "3.3.0_MINIMAL",
-        "message": "If you see this, the deployment finally worked."
+        "status": "NAKED BOOT SUCCESS",
+        "ver": "4.0.0_FINAL_TEST",
+        "cwd": os.getcwd(),
+        "ls": os.listdir(".")
     }
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "version": "3.3.0"}
+    return {"status": "ok", "ver": "4.0.0"}
 
-# Include routers - we keep them but migrations won't run automatically
-from api.v1.api import api_router
-app.include_router(api_router, prefix="/api/v1")
+# Everything else is commented out to prove the point
+# from api.v1.api import api_router
+# app.include_router(api_router, prefix="/api/v1")
