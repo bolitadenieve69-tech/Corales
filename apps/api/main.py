@@ -71,13 +71,20 @@ def debug_auth():
         
         # 2. Verificar estado actual
         users_count = db.query(User).count()
-        admin_exists = db.query(User).filter(User.email == "admin@corales.com").first() is not None
+        admin = db.query(User).filter(User.email == "admin@corales.com").first()
+        
+        password_check = False
+        if admin:
+            from core.security import verify_password
+            password_check = verify_password("password123", admin.hashed_password)
         
         return {
             "status": "diagnostic_complete",
             "users_in_db": users_count,
-            "admin_ready": admin_exists,
-            "db_url_redacted": settings.DATABASE_URL.split("@")[-1] if "@" in settings.DATABASE_URL else "local_sqlite"
+            "admin_found": admin is not None,
+            "password_is_correct": password_check,
+            "hint": "Si password_is_correct es False, el seeding no se aplicó bien.",
+            "db_type": settings.DATABASE_URL.split("://")[0]
         }
     except Exception as e:
         logger.error(f"Fallo en diagnóstico: {e}")

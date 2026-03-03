@@ -18,8 +18,12 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not security.verify_password(form_data.password, user.hashed_password):
+    username = form_data.username.lower().strip()
+    user = db.query(User).filter(User.email == username).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    
+    if not security.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
