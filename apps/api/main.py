@@ -2,10 +2,24 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import os
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Execute on startup
+    from create_admin import seed_admin
+    seed_admin()
+    yield
+    # Execute on shutdown (nothing needed for now)
+
 app = FastAPI(
     title="Corales API",
     description="API para la gestión de coros y progreso de estudio",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 from api.v1.api import api_router
