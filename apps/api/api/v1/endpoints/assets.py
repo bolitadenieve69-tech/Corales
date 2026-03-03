@@ -16,6 +16,12 @@ from fastapi import UploadFile, File, Form
 
 router = APIRouter(tags=["assets"])
 
+@router.get("/download/{asset_id}")
+def download_asset(
+    asset_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     asset = db.query(Asset).filter(Asset.id == asset_id).first()
     if not asset:
         raise HTTPException(status_code=404, detail="Asset not found")
@@ -28,6 +34,7 @@ router = APIRouter(tags=["assets"])
         if not os.path.exists(file_path):
             raise HTTPException(status_code=404, detail="File physical path not found")
         return FileResponse(path=file_path, filename=asset.original_filename)
+
 
 @router.post("/", response_model=AssetSchema)
 def create_asset(
