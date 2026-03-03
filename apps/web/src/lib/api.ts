@@ -1,6 +1,7 @@
 // Centralized API utility for Next.js
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+export const API_URL = rawUrl.includes('/api/v1') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api/v1`;
 
 /**
  * Helper to get the auth token from cookies (if doing client side fetching)
