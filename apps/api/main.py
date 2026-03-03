@@ -1,13 +1,11 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-import os
-
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
-
 import logging
+
+from api.v1.api import api_router
+from core.config import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,9 +29,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-from api.v1.api import api_router
-from core.config import settings
-
 # CORS configuration
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 allow_origins = [FRONTEND_URL]
@@ -49,45 +44,3 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok", "version": "1.0.0", "environment": settings.ENVIRONMENT}
-
-@app.get("/debug-auth")
-def debug_auth():
-    """
-    Endpoint temporal para forzar la creación del admin y verificar el estado de la BD.
-    SOPORTE TÉCNICO: Solo usar si el login falla tras el despliegue.
-    """
-    from create_admin import seed_admin
-    from core.database import SessionLocal
-    from models.user import User
-    
-    db = SessionLocal()
-    try:
-        # 1. Intentar forzar seeding
-        seed_admin()
-        
-        # 2. Verificar estado actual
-        users_count = db.query(User).count()
-        admin = db.query(User).filter(User.email == "admin@corales.com").first()
-        
-        password_check = False
-        if admin:
-            from core.security import verify_password
-            password_check = verify_password("password123", admin.hashed_password)
-        
-        return {
-            "status": "diagnostic_complete",
-            "users_in_db": users_count,
-            "admin_found": admin is not None,
-            "password_is_correct": password_check,
-            "hint": "Si password_is_correct es False, el seeding no se aplicó bien.",
-            "db_type": settings.DATABASE_URL.split("://")[0]
-        }
-    except Exception as e:
-        logger.error(f"Fallo en diagnóstico: {e}")
-        return {"error": str(e)}
-    finally:
-        db.close()
