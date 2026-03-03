@@ -33,3 +33,30 @@ def login_access_token(
         ),
         "token_type": "bearer",
     }
+
+@router.get("/health")
+def health_check():
+    return {"status": "ok", "version": "1.0.0"}
+
+@router.get("/debug-auth")
+def debug_auth(db: Session = Depends(get_db)):
+    """
+    Endpoint temporal de diagnóstico.
+    """
+    from create_admin import seed_admin
+    from models.user import User
+    
+    # 1. Forzar seeding
+    seed_admin()
+    
+    # 2. Verificar
+    admin = db.query(User).filter(User.email == "admin@corales.com").first()
+    password_ok = False
+    if admin:
+        password_ok = security.verify_password("password123", admin.hashed_password)
+        
+    return {
+        "admin_found": admin is not None,
+        "password_ok": password_ok,
+        "users_count": db.query(User).count()
+    }
