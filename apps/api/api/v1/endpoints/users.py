@@ -114,6 +114,19 @@ def create_user(
         )
         db.add(membership)
         invite.uses_count += 1
+    else:
+        # Fallback for MVP: Assign all non-invited registering users to the demo choir
+        from models.choir import Choir
+        choir = db.query(Choir).filter(Choir.name == "Coro de Prueba").first()
+        if choir:
+            role = VoicePart.DIRECTOR if user_obj.role in ["DIRECTOR", "ADMIN"] else VoicePart.SOPRANO
+            membership = Membership(
+                id=str(uuid.uuid4()),
+                user_id=user_obj.id,
+                choir_id=choir.id,
+                voice_part=role
+            )
+            db.add(membership)
     
     db.commit()
     db.refresh(user_obj)
