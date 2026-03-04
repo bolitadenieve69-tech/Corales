@@ -1,23 +1,70 @@
 import logging
-import time
-from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from api.v1.api import api_router
-from core.database import engine, Base
 import traceback
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # Configuración de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-VERSION = "7.2.0_STABLE"
+VERSION = "7.2.1_STABLE"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup logic
     logger.info(f">>> STARTING Corales API {VERSION}")
-    # Migrations/Check DB connectivity here if needed
+
+    # Create all tables
+    try:
+        from core.database import engine
+        from models.base import Base
+        # Import all models so they register with Base
+        import models.user
+        import models.choir
+        import models.work
+        import models.edition
+        import models.asset
+        import models.season
+        import models.project
+        import models.project_repertoire
+        import models.feedback
+        import models.invite
+        import models.academy
+        import models.practice_progress
+        Base.metadata.create_all(bind=engine)
+        logger.info(">>> DB: Tables created/verified")
+    except Exception:
+        logger.error(">>> DB: Failed to create tables")
+        logger.error(traceback.format_exc())
+
+    # Seed admin user if not exists
+    try:
+        from core.database import SessionLocal
+        from core.security import get_password_hash
+        from models.user import User, UserRole
+        import uuid
+
+        db = SessionLocal()
+        admin = db.query(User).filter(User.email == "admin@corales.com").first()
+        if not admin:
+            admin = User(
+                id=str(uuid.uuid4()),
+                email="admin@corales.com",
+                hashed_password=get_password_hash("password123"),
+                full_name="Administrador",
+                role=UserRole.ADMIN
+            )
+            db.add(admin)
+            db.commit()
+            logger.info(">>> SEED: Admin user created (admin@corales.com)")
+        else:
+            logger.info(">>> SEED: Admin user already exists")
+        db.close()
+    except Exception:
+        logger.error(">>> SEED: Failed to seed admin")
+        logger.error(traceback.format_exc())
+
     yield
     logger.info(">>> SHUTTING DOWN Corales API")
 
@@ -35,33 +82,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Root endpoints
+# Include main API router
+from api.v1.api import api_router
+app.include_router(api_router, prefix="/api/v1")
+
 @app.get("/")
 def read_root():
-    return {
-        "status": "CoralApp API Active",
-        "version": VERSION,
-        "info": "Full business logic stable"
-    }
+    return {"status": "CoralApp API Active", "version": VERSION}
 
 @app.get("/health")
 def health_check():
     return {"status": "ok", "version": VERSION}
 
-# Include main API router
-app.include_router(api_router, prefix="/api/v1")
-
 @app.get("/api/v1/auth-check")
 def auth_check():
-    """Simple connectivity check for the frontend."""
     return {"status": "connected", "version": VERSION}
 
-# Error handler for internal issues to prevent 500 without logs
 @app.middleware("http")
-async def log_internal_errors(request: Request, call_next):
+async def log_errors(request: Request, call_next):
     try:
         return await call_next(request)
     except Exception as e:
-        logger.error(f">>> CRITICAL ERROR: {str(e)}")
+        logger.error(f">>> ERROR: {e}")
         logger.error(traceback.format_exc())
-        return HTTPException(status_code=500, detail="Internal Server Error")
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
