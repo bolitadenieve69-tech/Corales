@@ -5,21 +5,20 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-# Configuración de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-VERSION = "7.2.1_STABLE"
+VERSION = "7.3.0_STABLE"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info(f">>> STARTING Corales API {VERSION}")
 
-    # Create all tables
+    # Create all tables using the CORRECT Base (from models/base.py)
     try:
         from core.database import engine
-        from models.base import Base
-        # Import all models so they register with Base
+        from models.base import Base  # THIS is the Base all models inherit from
+        # Import all models so they register with Base.metadata
         import models.user
         import models.choir
         import models.work
@@ -30,15 +29,22 @@ async def lifespan(app: FastAPI):
         import models.project_repertoire
         import models.feedback
         import models.invite
-        import models.academy
-        import models.practice_progress
+        try:
+            import models.academy
+        except Exception:
+            logger.warning(">>> models.academy not available, skipping")
+        try:
+            import models.practice_progress
+        except Exception:
+            logger.warning(">>> models.practice_progress not available, skipping")
+
         Base.metadata.create_all(bind=engine)
-        logger.info(">>> DB: Tables created/verified")
+        logger.info(">>> DB: All tables created/verified successfully")
     except Exception:
         logger.error(">>> DB: Failed to create tables")
         logger.error(traceback.format_exc())
 
-    # Seed admin user if not exists
+    # Seed admin user
     try:
         from core.database import SessionLocal
         from core.security import get_password_hash
@@ -57,22 +63,18 @@ async def lifespan(app: FastAPI):
             )
             db.add(admin)
             db.commit()
-            logger.info(">>> SEED: Admin user created (admin@corales.com)")
+            logger.info(">>> SEED: Admin user created")
         else:
-            logger.info(">>> SEED: Admin user already exists")
+            logger.info(">>> SEED: Admin user exists")
         db.close()
     except Exception:
-        logger.error(">>> SEED: Failed to seed admin")
+        logger.error(">>> SEED: Failed")
         logger.error(traceback.format_exc())
 
     yield
     logger.info(">>> SHUTTING DOWN Corales API")
 
-app = FastAPI(
-    title="Corales API",
-    version=VERSION,
-    lifespan=lifespan
-)
+app = FastAPI(title="Corales API", version=VERSION, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -82,7 +84,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include main API router
+# Include API router
 from api.v1.api import api_router
 app.include_router(api_router, prefix="/api/v1")
 
@@ -94,15 +96,11 @@ def read_root():
 def health_check():
     return {"status": "ok", "version": VERSION}
 
-@app.get("/api/v1/auth-check")
-def auth_check():
-    return {"status": "connected", "version": VERSION}
-
 @app.middleware("http")
 async def log_errors(request: Request, call_next):
     try:
         return await call_next(request)
     except Exception as e:
-        logger.error(f">>> ERROR: {e}")
+        logger.error(f">>> {request.url.path}: {e}")
         logger.error(traceback.format_exc())
         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
