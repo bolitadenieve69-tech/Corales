@@ -215,6 +215,20 @@ def seed_everything(db: Session):
         else:
             print(f"SEEDING: Excel file not found at {excel_path}, skipping works.")
 
+        # Create default editions for works that don't have any
+        from models.edition import Edition
+        all_works = db.query(Work).all()
+        edition_count = 0
+        for w in all_works:
+            existing_ed = db.query(Edition).filter_by(work_id=w.id).first()
+            if not existing_ed:
+                e = Edition(id=str(uuid.uuid4()), work_id=w.id, publisher='Edición Principal')
+                db.add(e)
+                edition_count += 1
+        if edition_count:
+            db.commit()
+            print(f"SEEDING: Created {edition_count} default editions.")
+
     except Exception as e:
         import traceback
         print(f"Error during seeding: {e}")

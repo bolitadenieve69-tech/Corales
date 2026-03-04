@@ -9,6 +9,7 @@ import ProgressControls from './progress-controls';
 import PipelineStatus from './pipeline-status';
 import Metronome from '@/components/rehearsal/Metronome';
 import { RehearsalPanel } from '@/components/rehearsal/RehearsalPanel';
+import { UploadAssetModal } from '@/components/library/UploadAssetModal';
 import { fetchApi, API_URL } from '@/lib/api';
 
 export default function WorkDetailPage() {
@@ -20,8 +21,9 @@ export default function WorkDetailPage() {
     const [selectedAsset, setSelectedAsset] = useState<any>(null);
     const [studyMode, setStudyMode] = useState(false);
     const [isMetronomeActive, setIsMetronomeActive] = useState(false);
+    const [uploadModalEdition, setUploadModalEdition] = useState<string | null>(null);
 
-    useEffect(() => {
+    const loadWork = () => {
         if (!id) return;
         fetchApi(`/works/${id}`)
             .then(data => {
@@ -34,6 +36,10 @@ export default function WorkDetailPage() {
                 console.error("Error fetching work details", err);
                 setLoading(false);
             });
+    };
+
+    useEffect(() => {
+        loadWork();
     }, [id]);
 
     const handlePlayAsset = (asset: any) => {
@@ -173,7 +179,7 @@ export default function WorkDetailPage() {
                                     {edition.notes && <span className="text-sm text-neutral-300">{edition.notes}</span>}
                                 </div>
                                 <button
-                                    onClick={() => alert('Próximamente: Modal para añadir MIDI/PDF a esta edición')}
+                                    onClick={() => setUploadModalEdition(edition.id)}
                                     className="flex items-center gap-2 px-4 py-2 bg-accent-500/20 text-accent-500 hover:bg-accent-500 hover:text-primary-900 border-none transition-all rounded-lg text-sm font-semibold"
                                 >
                                     <Upload size={16} /> Subir MIDI / PDF
@@ -323,6 +329,18 @@ export default function WorkDetailPage() {
                     work={work}
                     selectedAsset={selectedAsset}
                     onClose={handleStopStudy}
+                />
+            )}
+
+            {/* Upload Asset Modal */}
+            {uploadModalEdition && (
+                <UploadAssetModal
+                    editionId={uploadModalEdition}
+                    workTitle={work?.title || ''}
+                    onClose={() => setUploadModalEdition(null)}
+                    onSuccess={() => {
+                        loadWork(); // Refetch work data to show new assets
+                    }}
                 />
             )}
         </div>
