@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, Image as ImageIcon, Save, Loader2, Link2 } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, API_URL } from '@/lib/api';
 import { useUIStore } from '@/store/uiStore';
 import Image from 'next/image';
 
@@ -182,7 +182,7 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
             <div className="space-y-4">
                 <div className="relative h-48 w-full rounded-[2rem] bg-primary-900 border border-white/10 overflow-hidden group">
                     {formData.cover_photo_url ? (
-                        <Image src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/assets/download/${formData.cover_photo_url.split('/').pop()}`} alt="Portada" fill className="object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
+                        <Image src={`${API_URL.replace('/api/v1', '')}/api/v1/assets/download/${formData.cover_photo_url.split('/').pop()}`} alt="Portada" fill className="object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-primary-700">
                             <ImageIcon size={64} />
@@ -200,7 +200,7 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
                 <div className="flex px-8 -mt-16 relative z-10 gap-6">
                     <div className="relative w-32 h-32 rounded-full border-4 border-primary-800 bg-primary-900 overflow-hidden group shadow-2xl">
                         {formData.logo_url ? (
-                            <Image src={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/assets/download/${formData.logo_url.split('/').pop()}`} alt="Logo" fill className="object-cover" />
+                            <Image src={`${API_URL.replace('/api/v1', '')}/api/v1/assets/download/${formData.logo_url.split('/').pop()}`} alt="Logo" fill className="object-cover" />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center text-primary-500">
                                 <ImageIcon size={40} className="opacity-50" />

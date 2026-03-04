@@ -165,11 +165,19 @@ export default function WorkDetailPage() {
 
                     return (
                         <div key={edition.id} className="space-y-6">
-                            <div className="flex items-baseline gap-4 mb-2">
-                                <h2 className="text-2xl font-bold tracking-tight text-white">
-                                    {edition.publisher || 'Edición Predeterminada'}
-                                </h2>
-                                {edition.notes && <span className="text-sm text-neutral-300">{edition.notes}</span>}
+                            <div className="flex items-center justify-between gap-4 mb-2">
+                                <div className="flex items-baseline gap-4">
+                                    <h2 className="text-2xl font-bold tracking-tight text-white">
+                                        {edition.publisher || 'Edición Predeterminada'}
+                                    </h2>
+                                    {edition.notes && <span className="text-sm text-neutral-300">{edition.notes}</span>}
+                                </div>
+                                <button
+                                    onClick={() => alert('Próximamente: Modal para añadir MIDI/PDF a esta edición')}
+                                    className="flex items-center gap-2 px-4 py-2 bg-accent-500/20 text-accent-500 hover:bg-accent-500 hover:text-primary-900 border-none transition-all rounded-lg text-sm font-semibold"
+                                >
+                                    <Upload size={16} /> Subir MIDI / PDF
+                                </button>
                             </div>
 
                             {/* Pipeline Status for MusicXML assets */}
