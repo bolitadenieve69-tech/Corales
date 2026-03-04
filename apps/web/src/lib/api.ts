@@ -1,6 +1,6 @@
 // Centralized API utility for Next.js
 
-const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'https://corales-production.up.railway.app';
 export const API_URL = rawUrl.includes('/api/v1') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api/v1`;
 
 /**
