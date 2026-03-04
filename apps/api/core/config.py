@@ -46,11 +46,7 @@ class Settings(BaseSettings):
                 return env_url.replace("postgres://", "postgresql://", 1)
             return env_url
 
-        # 2. Second priority: Local SQLite for dev
-        if self.ENVIRONMENT in ["development", "local", "test"]:
-            return "sqlite:///./corales.db"
-        
-        # 3. Third priority: Construct from components
-        return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        # 2. Fallback: SQLite (works everywhere without config)
+        return "sqlite:///./corales.db"
 
 settings = Settings()
