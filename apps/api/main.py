@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-VERSION = "7.3.1_DEBUG"
+VERSION = "7.3.2_CLEAN_DB"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,9 +40,15 @@ async def lifespan(app: FastAPI):
 
         Base.metadata.create_all(bind=engine)
         logger.info(">>> DB: All tables created/verified successfully")
-    except Exception:
-        logger.error(">>> DB: Failed to create tables")
-        logger.error(traceback.format_exc())
+    except Exception as e:
+        logger.error(">>> DB: Failed to create tables, attempting auto-heal...")
+        logger.error(str(e))
+        import os
+        if os.path.exists("./corales.db"):
+            os.remove("./corales.db")
+            logger.info(">>> DB: Deleted old corales.db, retrying create_all...")
+            Base.metadata.create_all(bind=engine)
+            logger.info(">>> DB: Auto-heal successful, tables re-created")
 
     # Seed admin user
     try:
@@ -67,9 +73,28 @@ async def lifespan(app: FastAPI):
         else:
             logger.info(">>> SEED: Admin user exists")
         db.close()
-    except Exception:
-        logger.error(">>> SEED: Failed")
-        logger.error(traceback.format_exc())
+    except Exception as e:
+        logger.error(">>> SEED: Failed, attempting to auto-heal by deleting DB and retrying...")
+        logger.error(str(e))
+        import os
+        if os.path.exists("./corales.db"):
+            os.remove("./corales.db")
+            from core.database import engine
+            from models.base import Base
+            Base.metadata.create_all(bind=engine)
+            # Retry seed
+            db = SessionLocal()
+            admin = User(
+                id=str(uuid.uuid4()),
+                email="admin@corales.com",
+                hashed_password=get_password_hash("password123"),
+                full_name="Administrador",
+                role=UserRole.ADMIN
+            )
+            db.add(admin)
+            db.commit()
+            db.close()
+            logger.info(">>> SEED Auto-heal: Recreated DB and admin")
 
     yield
     logger.info(">>> SHUTTING DOWN Corales API")
