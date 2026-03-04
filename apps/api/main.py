@@ -50,51 +50,14 @@ async def lifespan(app: FastAPI):
             Base.metadata.create_all(bind=engine)
             logger.info(">>> DB: Auto-heal successful, tables re-created")
 
-    # Seed admin user
     try:
+        from seed_full import seed_everything
         from core.database import SessionLocal
-        from core.security import get_password_hash
-        from models.user import User, UserRole
-        import uuid
-
         db = SessionLocal()
-        admin = db.query(User).filter(User.email == "admin@corales.com").first()
-        if not admin:
-            admin = User(
-                id=str(uuid.uuid4()),
-                email="admin@corales.com",
-                hashed_password=get_password_hash("password123"),
-                full_name="Administrador",
-                role=UserRole.ADMIN
-            )
-            db.add(admin)
-            db.commit()
-            logger.info(">>> SEED: Admin user created")
-        else:
-            logger.info(">>> SEED: Admin user exists")
+        seed_everything(db)
         db.close()
     except Exception as e:
-        logger.error(">>> SEED: Failed, attempting to auto-heal by deleting DB and retrying...")
-        logger.error(str(e))
-        import os
-        if os.path.exists("./corales.db"):
-            os.remove("./corales.db")
-            from core.database import engine
-            from models.base import Base
-            Base.metadata.create_all(bind=engine)
-            # Retry seed
-            db = SessionLocal()
-            admin = User(
-                id=str(uuid.uuid4()),
-                email="admin@corales.com",
-                hashed_password=get_password_hash("password123"),
-                full_name="Administrador",
-                role=UserRole.ADMIN
-            )
-            db.add(admin)
-            db.commit()
-            db.close()
-            logger.info(">>> SEED Auto-heal: Recreated DB and admin")
+        logger.error(f">>> SEED: Failed to run complete seed process: {e}")
 
     yield
     logger.info(">>> SHUTTING DOWN Corales API")
