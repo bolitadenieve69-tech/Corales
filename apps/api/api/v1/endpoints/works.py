@@ -38,6 +38,13 @@ def get_works(
     current_user: User = Depends(deps.get_current_active_user)
 ):
     from models.choir import Membership
+    
+    # Check if the user is an admin
+    if current_user.role == "ADMIN":
+        # Admin can see all works in the MVP
+        works = db.query(Work).offset(skip).limit(limit).all()
+        return works
+        
     # Find choirs the user is a member of
     memberships = db.query(Membership).filter(Membership.user_id == current_user.id).all()
     choir_ids = [m.choir_id for m in memberships]
