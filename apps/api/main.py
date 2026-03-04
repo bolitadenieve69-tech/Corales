@@ -1,20 +1,23 @@
 import logging
 import time
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from api.v1.api import api_router
+from core.database import engine, Base
 import traceback
 
 # Configuración de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-VERSION = "7.1.9_FINAL_DEBUG"
-router_error = "No error recorded yet"
+VERSION = "7.2.0_STABLE"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Startup logic
     logger.info(f">>> STARTING Corales API {VERSION}")
+    # Migrations/Check DB connectivity here if needed
     yield
     logger.info(">>> SHUTTING DOWN Corales API")
 
@@ -32,33 +35,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Root endpoints
 @app.get("/")
 def read_root():
     return {
         "status": "CoralApp API Active",
         "version": VERSION,
-        "router_error_summary": router_error[:200] if router_error else "None"
+        "info": "Full business logic stable"
     }
 
 @app.get("/health")
 def health_check():
     return {"status": "ok", "version": VERSION}
 
+# Include main API router
+app.include_router(api_router, prefix="/api/v1")
+
 @app.get("/api/v1/auth-check")
 def auth_check():
-    return {
-        "status": "present",
-        "version": VERSION,
-        "router_error": router_error
-    }
+    """Simple connectivity check for the frontend."""
+    return {"status": "connected", "version": VERSION}
 
-# Intento de carga del ruteador real
-try:
-    from api.v1.api import api_router
-    app.include_router(api_router, prefix="/api/v1")
-    logger.info(">>> ROUTER: API v1 included successfully")
-    router_error = "NONE: API v1 included successfully"
-except Exception:
-    router_error = traceback.format_exc()
-    logger.error(">>> ERROR ROUTER: Failed to include API v1")
-    logger.error(router_error)
+# Error handler for internal issues to prevent 500 without logs
+@app.middleware("http")
+async def log_internal_errors(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except Exception as e:
+        logger.error(f">>> CRITICAL ERROR: {str(e)}")
+        logger.error(traceback.format_exc())
+        return HTTPException(status_code=500, detail="Internal Server Error")
