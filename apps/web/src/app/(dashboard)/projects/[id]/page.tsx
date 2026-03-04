@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit3, Trash2, Calendar, Music, Plus, PlayCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Edit3, Trash2, Calendar, Music, Plus, PlayCircle, Loader2, FileText, Save, ChevronRight } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
 import ProjectProgress from './project-progress';
 
 export default function ProjectDetailPage() {
     const params = useParams();
+    const id = params.id as string;
     const router = useRouter();
     const [project, setProject] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -20,13 +21,17 @@ export default function ProjectDetailPage() {
     const [library, setLibrary] = useState<any[]>([]);
     const [addingWorkLoading, setAddingWorkLoading] = useState(false);
 
+    // Quick Upload State
+    const [uploadData, setUploadData] = useState<{ title: string, composer: string, file: File | null }>({ title: '', composer: '', file: null });
+    const [isUploading, setIsUploading] = useState(false);
+
     useEffect(() => {
-        if (!params.id) return;
+        if (!id) return;
         loadProject();
-    }, [params.id]);
+    }, [id]);
 
     const loadProject = () => {
-        fetchApi(`/projects/${params.id}`)
+        fetchApi(`/projects/${id}`)
             .then(data => {
                 setProject(data);
                 setLoading(false);
@@ -58,7 +63,7 @@ export default function ProjectDetailPage() {
                 })
             });
             setIsAddingWork(false);
-            fetchProject();
+            loadProject();
         } catch (err) {
             console.error("Error adding work to project", err);
         }
@@ -113,7 +118,7 @@ export default function ProjectDetailPage() {
 
             setIsAddingWork(false);
             setUploadData({ title: '', composer: '', file: null });
-            fetchProject();
+            loadProject();
         } catch (err) {
             console.error("Error in fast upload", err);
             alert("Error al subir la obra. Verífica el formato del archivo.");
@@ -134,7 +139,7 @@ export default function ProjectDetailPage() {
             });
         } catch (err) {
             console.error("Error removing work", err);
-            fetchProject();
+            loadProject();
         }
     };
 
@@ -182,7 +187,7 @@ export default function ProjectDetailPage() {
 
                         <div className="flex gap-3">
                             <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-neutral-300 transition-colors border border-white/10">
-                                <Edit size={20} />
+                                <Edit3 size={20} />
                             </button>
                             <button
                                 onClick={() => {
@@ -420,27 +425,3 @@ export default function ProjectDetailPage() {
         </div>
     );
 }
-
-const Plus = ({ size = 20, className = '' }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-);
-
-const Edit = ({ size = 20, className = '' }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-    </svg>
-);
-
-const Trash2 = ({ size = 20, className = '' }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" />
-    </svg>
-);
-
-const ChevronRight = ({ size = 20, className = '' }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <polyline points="9 18 15 12 9 6" />
-    </svg>
-);

@@ -34,8 +34,8 @@ export function ScoreViewer({ xmlUrl, onLoad, onError }: ScoreViewerProps) {
             setError(null);
 
             try {
-                if (!osmdRef.current) {
-                    osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
+                if (!osmdRef.current && containerRef.current) {
+                    osmdRef.current = new OpenSheetMusicDisplay(containerRef.current as HTMLElement, {
                         autoResize: true,
                         drawTitle: false,
                         drawSubtitle: false,
@@ -43,15 +43,18 @@ export function ScoreViewer({ xmlUrl, onLoad, onError }: ScoreViewerProps) {
                         drawLyricist: false,
                         drawCredits: false,
                         drawPartNames: true,
-                        renderBackend: 'svg',
+                        backend: 'svg',
                         coloringMode: 1, // 1 = Simple coloring
                         defaultColorMusic: '#0D1B2A',
                     });
                 }
 
-                await osmdRef.current.load(xmlUrl);
-                osmdRef.current.zoom = zoom;
-                osmdRef.current.render();
+                if (osmdRef.current) {
+                    await osmdRef.current.load(xmlUrl);
+                    osmdRef.current.zoom = zoom;
+                    osmdRef.current.render();
+                }
+
                 setLoading(false);
                 if (onLoad) onLoad();
             } catch (err) {

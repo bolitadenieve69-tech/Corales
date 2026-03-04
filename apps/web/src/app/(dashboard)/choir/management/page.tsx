@@ -6,12 +6,15 @@ import { motion } from 'framer-motion';
 import { Users, Calendar, Settings, Shield, UserPlus, FileText, Search, Filter, Loader2, MessageSquare } from 'lucide-react';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { useUIStore } from '@/store/uiStore';
 import { SeasonForm } from '@/components/choir/SeasonForm';
 import { SendFeedbackModal } from '@/components/choir/SendFeedbackModal';
+import { ChoirSettingsForm } from '@/components/choir/ChoirSettingsForm';
+import { AddMemberModal } from '@/components/choir/AddMemberModal';
 
 export default function ChoirManagementPage() {
     const { user: currentUser } = useAuth();
-    const [activeTab, setActiveTab] = useState<'members' | 'seasons' | 'invites' | 'analytics'>('members');
+    const [activeTab, setActiveTab] = useState<'info' | 'members' | 'seasons' | 'invites' | 'analytics'>('members');
     const [members, setMembers] = useState<any[]>([]);
     const [seasons, setSeasons] = useState<any[]>([]);
     const [stats, setStats] = useState<any>(null);
@@ -20,6 +23,7 @@ export default function ChoirManagementPage() {
     const [choirId, setChoirId] = useState<string>('');
     const [selectedMember, setSelectedMember] = useState<any | null>(null);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 
     useEffect(() => {
         // En una app real, obtendríamos el choir_id del usuario actual (director)
@@ -32,9 +36,9 @@ export default function ChoirManagementPage() {
                     const cid = choirs[0].id;
                     setChoirId(cid);
                     const [membersData, seasonsData, statsData] = await Promise.all([
-                        fetchApi(`/management/${cid}/members`),
-                        fetchApi(`/management/${cid}/seasons`),
-                        fetchApi(`/management/${cid}/stats`)
+                        fetchApi(`/management/choir/${cid}/members`),
+                        fetchApi(`/management/choir/${cid}/seasons`),
+                        fetchApi(`/management/choir/${cid}/stats`)
                     ]);
                     setMembers(membersData || []);
                     setSeasons(seasonsData || []);
@@ -78,8 +82,9 @@ export default function ChoirManagementPage() {
             </header>
 
             {/* Tabs Navigation */}
-            <div className="flex gap-2 p-1 bg-white/5 border border-white/10 rounded-2xl w-fit">
+            <div className="flex gap-2 p-1 bg-white/5 border border-white/10 rounded-2xl w-fit overflow-x-auto">
                 {[
+                    { id: 'info', label: 'Datos', icon: Settings },
                     { id: 'members', label: 'Miembros', icon: Users },
                     { id: 'seasons', label: 'Temporadas', icon: Calendar },
                     { id: 'analytics', label: 'Analíticas', icon: FileText },
@@ -107,6 +112,12 @@ export default function ChoirManagementPage() {
                 transition={{ duration: 0.3 }}
                 className="bg-primary-800/30 border border-white/10 rounded-[2.5rem] p-8 min-h-[500px]"
             >
+                {activeTab === 'info' && (
+                    <div className="max-w-4xl mx-auto">
+                        <ChoirSettingsForm choirId={choirId} />
+                    </div>
+                )}
+
                 {activeTab === 'members' && (
                     <div className="space-y-6">
                         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -122,16 +133,19 @@ export default function ChoirManagementPage() {
                                 <button className="p-3 bg-white/5 border border-white/10 rounded-xl text-neutral-400 hover:text-white">
                                     <Filter size={18} />
                                 </button>
-                                <button className="flex items-center gap-2 bg-primary-500 text-white px-5 py-3 rounded-xl font-bold hover:bg-primary-400 transition-all shadow-glow-primary">
+                                <button
+                                    onClick={() => setShowAddMemberModal(true)}
+                                    className="flex items-center gap-2 bg-primary-500 text-white px-5 py-3 rounded-xl font-bold hover:bg-primary-400 transition-all shadow-glow-primary"
+                                >
                                     <UserPlus size={18} />
-                                    Invitar
+                                    Añadir Miembro
                                 </button>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {members.map((member) => (
-                                <div key={member.id} className="p-5 bg-white/5 border border-white/5 rounded-2xl flex items-center gap-4 group hover:bg-white/10 transition-all border-l-4" style={{ borderColor: voiceColorMap[member.voice_part] || 'transparent' }}>
+                                <div key={member.id} className="p-5 bg-white/5 border border-white/5 rounded-2xl flex items-center gap-4 group hover:bg-white/10 transition-all border-l-4 relative" style={{ borderColor: voiceColorMap[member.voice_part] || 'transparent' }}>
                                     <div className="shrink-0 w-12 h-12 rounded-full bg-primary-700 border border-white/10 flex items-center justify-center overflow-hidden relative">
                                         {member.avatar_url ? (
                                             <Image
@@ -145,8 +159,13 @@ export default function ChoirManagementPage() {
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="text-white font-bold truncate">{member.full_name}</h3>
-                                        <div className="flex items-center gap-2">
+                                        <h3 className="text-white font-bold truncate flex items-center gap-2">
+                                            {member.full_name}
+                                            {member.phone && member.has_whatsapp && (
+                                                <div className="w-2 h-2 rounded-full bg-success flex-shrink-0" title="Tiene WhatsApp" />
+                                            )}
+                                        </h3>
+                                        <div className="flex items-center gap-2 mt-0.5">
                                             <select
                                                 aria-label={`Cambiar voz de ${member.full_name}`}
                                                 value={member.voice_part}
@@ -170,13 +189,13 @@ export default function ChoirManagementPage() {
                                                     <option key={v} value={v} className="bg-primary-800 text-white">{v}</option>
                                                 ))}
                                             </select>
-                                            <span className="text-[10px] text-neutral-500 lowercase truncate">{member.email}</span>
+                                            <span className="text-[10px] text-neutral-500 lowercase truncate" title={member.email}>{member.email}</span>
                                         </div>
                                     </div>
                                     <div className="shrink-0 flex gap-1">
                                         <button
-                                            title="Enviar nota privada"
-                                            aria-label={`Enviar nota privada a ${member.full_name}`}
+                                            title="Enviar mensaje de corrección"
+                                            aria-label={`Enviar mensaje a ${member.full_name}`}
                                             onClick={() => {
                                                 setSelectedMember(member);
                                                 setShowFeedbackModal(true);
@@ -321,6 +340,26 @@ export default function ChoirManagementPage() {
                     </div>
                 )}
             </motion.div>
+
+            {/* Modal Overlay for AddMemberModal */}
+            {showAddMemberModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        className="w-full max-w-2xl"
+                    >
+                        <AddMemberModal
+                            choirId={choirId}
+                            onSuccess={(newMember) => {
+                                setShowAddMemberModal(false);
+                                setMembers(prev => [...prev, newMember]);
+                            }}
+                            onCancel={() => setShowAddMemberModal(false)}
+                        />
+                    </motion.div>
+                </div>
+            )}
 
             {/* Modal Overlay for SeasonForm */}
             {showSeasonForm && (

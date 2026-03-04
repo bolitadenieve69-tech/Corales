@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Lock, ArrowRight, Play, GraduationCap, Loader2, BookOpen } from 'lucide-react';
+import { CheckCircle2, Lock, ArrowRight, Play, GraduationCap, Loader2, BookOpen, Music } from 'lucide-react';
 import Link from 'next/link';
 import { fetchApi } from '@/lib/api';
 
@@ -59,7 +59,7 @@ export default function AcademyPage() {
                             <div>
                                 <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-1">Progreso Actual</p>
                                 <p className="text-3xl font-black text-white font-mono flex items-baseline gap-1">
-                                    {Math.round((dashboardData.completed_lessons / dashboardData.total_lessons) * 100)}
+                                    {dashboardData.total_lessons > 0 ? Math.round((dashboardData.completed_lessons / dashboardData.total_lessons) * 100) : 0}
                                     <span className="text-sm text-accent-500">%</span>
                                 </p>
                             </div>
@@ -72,7 +72,7 @@ export default function AcademyPage() {
                         <div className="relative h-4 bg-primary-900 rounded-full overflow-hidden border border-white/5 ring-4 ring-black/20">
                             <motion.div
                                 initial={{ width: 0 }}
-                                animate={{ width: `${(dashboardData.completed_lessons / dashboardData.total_lessons) * 100}%` }}
+                                animate={{ width: `${dashboardData.total_lessons > 0 ? (dashboardData.completed_lessons / dashboardData.total_lessons) * 100 : 0}%` }}
                                 transition={{ duration: 1.5, ease: "circOut" }}
                                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent-600 to-accent-400 shadow-[0_0_15px_var(--color-accent-500)]"
                             />
@@ -116,6 +116,7 @@ export default function AcademyPage() {
                     {dashboardData.lessons.map((lesson: any, index: number) => {
                         const isCompleted = index < dashboardData.completed_lessons;
                         const isUnlocked = index <= dashboardData.completed_lessons;
+                        const isLocked = !isUnlocked;
                         const isCurrent = lesson.id === dashboardData.current_lesson_id;
                         const isLeft = index % 2 === 0;
 
@@ -161,8 +162,8 @@ export default function AcademyPage() {
                                     <Link
                                         href={isUnlocked ? `/academy/${lesson.id}` : '#'}
                                         className={`group relative flex flex-col items-center p-6 rounded-3xl transition-all duration-500 hover:scale-105 ${isLocked
-                                                ? 'bg-neutral-800/50 border border-white/5 opacity-60 grayscale cursor-not-allowed'
-                                                : 'bg-primary-800/40 border border-white/10 hover:border-primary-500/50 hover:bg-primary-800/60 shadow-xl shadow-black/20'
+                                            ? 'bg-neutral-800/50 border border-white/5 opacity-60 grayscale cursor-not-allowed'
+                                            : 'bg-primary-800/40 border border-white/10 hover:border-primary-500/50 hover:bg-primary-800/60 shadow-xl shadow-black/20'
                                             }`}
                                     >
                                         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:rotate-6 ${isLocked ? 'bg-neutral-700 text-neutral-500' : 'bg-primary-500/20 text-primary-400 group-hover:bg-primary-500/30'

@@ -28,12 +28,36 @@ class ChoirBase(BaseModel):
     description: Optional[str] = None
     max_users: Optional[int] = 50
 
+    social_address: Optional[str] = None
+    director_name: Optional[str] = None
+    director_phone: Optional[str] = None
+    subdirector_name: Optional[str] = None
+    subdirector_phone: Optional[str] = None
+
+    president_name: Optional[str] = None
+    president_phone: Optional[str] = None
+    president_has_whatsapp: Optional[bool] = False
+    president_email: Optional[str] = None
+
+    secretary_name: Optional[str] = None
+    secretary_phone: Optional[str] = None
+    secretary_has_whatsapp: Optional[bool] = False
+    secretary_email: Optional[str] = None
+
+    treasurer_name: Optional[str] = None
+    treasurer_phone: Optional[str] = None
+    treasurer_has_whatsapp: Optional[bool] = False
+    treasurer_email: Optional[str] = None
+
+    other_info: Optional[str] = None
+    logo_url: Optional[str] = None
+    cover_photo_url: Optional[str] = None
+
 class ChoirCreate(ChoirBase):
     pass
 
-class ChoirUpdate(BaseModel):
+class ChoirUpdate(ChoirBase):
     name: Optional[str] = None
-    description: Optional[str] = None
     max_users: Optional[int] = None
 
 class ChoirSchema(ChoirBase):
@@ -48,6 +72,15 @@ class ChoirAssignment(BaseModel):
     user_id: str
     role: str # DIRECTOR or SUBDIRECTOR
 
+class ChoirMemberCreate(BaseModel):
+    email: str
+    full_name: str
+    voice_part: str
+    dni: Optional[str] = None
+    phone: Optional[str] = None
+    has_whatsapp: Optional[bool] = False
+    address: Optional[str] = None
+
 # Member/Management Schemas
 class ChoirMemberDetail(BaseModel):
     id: str
@@ -57,5 +90,10 @@ class ChoirMemberDetail(BaseModel):
     role: Optional[str] = None
     voice_part: str
     avatar_url: Optional[str] = None
+    
+    dni: Optional[str] = None
+    phone: Optional[str] = None
+    has_whatsapp: Optional[bool] = False
+    address: Optional[str] = None
     
     model_config = ConfigDict(from_attributes=True)

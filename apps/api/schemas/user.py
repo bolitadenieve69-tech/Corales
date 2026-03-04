@@ -10,6 +10,11 @@ class UserBase(BaseModel):
     avatar_url: Optional[str] = None
     bio: Optional[str] = None
     favorite_voice: Optional[str] = None
+    
+    dni: Optional[str] = None
+    phone: Optional[str] = None
+    has_whatsapp: Optional[bool] = False
+    address: Optional[str] = None
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):

@@ -39,13 +39,7 @@ def upgrade() -> None:
     with op.batch_alter_table('directfeedback', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_directfeedback_id'), ['id'], unique=False)
 
-    with op.batch_alter_table('project_repertoire', schema=None) as batch_op:
-        batch_op.alter_column('work_id',
-               existing_type=sa.TEXT(),
-               type_=sa.String(),
-               existing_nullable=True)
-        batch_op.create_index(batch_op.f('ix_project_repertoire_work_id'), ['work_id'], unique=False)
-        batch_op.create_foreign_key(None, 'works', ['work_id'], ['id'])
+    # project_repertoire modify removed due to work_id error
 
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.add_column(sa.Column('avatar_url', sa.String(), nullable=True))
@@ -62,13 +56,7 @@ def downgrade() -> None:
         batch_op.drop_column('bio')
         batch_op.drop_column('avatar_url')
 
-    with op.batch_alter_table('project_repertoire', schema=None) as batch_op:
-        batch_op.drop_constraint(None, type_='foreignkey')
-        batch_op.drop_index(batch_op.f('ix_project_repertoire_work_id'))
-        batch_op.alter_column('work_id',
-               existing_type=sa.String(),
-               type_=sa.TEXT(),
-               existing_nullable=True)
+    # project_repertoire downgrade removed
 
     with op.batch_alter_table('directfeedback', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_directfeedback_id'))

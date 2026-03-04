@@ -134,3 +134,52 @@ def update_my_choir(
     db.commit()
     db.refresh(choir)
     return choir
+
+from fastapi import UploadFile, File
+import os
+import shutil
+from services.storage import storage_service
+
+@router.post("/me/upload-asset", response_model=ChoirSchema)
+def upload_choir_asset(
+    db: Session = Depends(deps.get_db),
+    file: UploadFile = File(...),
+    asset_type: str = "logo", # "logo" or "cover"
+    current_user: User = Depends(deps.get_current_active_director)
+) -> Any:
+    """
+    Upload a logo or cover photo for the choir.
+    """
+    membership = db.query(Membership).filter(Membership.user_id == current_user.id).first()
+    if not membership:
+        raise HTTPException(status_code=404, detail="No choir found")
+    
+    choir = membership.choir
+    
+    # Temporary save to local disk
+    temp_dir = "data/temp"
+    os.makedirs(temp_dir, exist_ok=True)
+    file_extension = os.path.splitext(file.filename)[1] if file.filename else ".jpg"
+    unique_filename = f"choir_{choir.id}_{asset_type}{file_extension}"
+    temp_path = os.path.join(temp_dir, unique_filename)
+    
+    with open(temp_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    try:
+        remote_path = f"choirs/{choir.id}/{unique_filename}"
+        storage_path = storage_service.upload_file(temp_path, remote_path)
+        
+        # Determine whether to set logo_url or cover_photo_url
+        if asset_type == "cover":
+            choir.cover_photo_url = storage_path
+        else:
+            choir.logo_url = storage_path
+            
+        db.add(choir)
+        db.commit()
+        db.refresh(choir)
+        return choir
+    finally:
+        if os.path.exists(temp_path) and temp_path != storage_path:
+            os.remove(temp_path)
