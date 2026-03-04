@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-VERSION = "7.3.0_STABLE"
+VERSION = "7.3.1_DEBUG"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -102,5 +102,6 @@ async def log_errors(request: Request, call_next):
         return await call_next(request)
     except Exception as e:
         logger.error(f">>> {request.url.path}: {e}")
-        logger.error(traceback.format_exc())
-        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
+        tb = traceback.format_exc()
+        logger.error(tb)
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error", "error": str(e), "traceback": tb})
