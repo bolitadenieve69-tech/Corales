@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-VERSION = "7.3.7_NO_ALEMBIC_START"
+VERSION = "7.3.8_READY_TO_GO"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -53,11 +53,16 @@ async def lifespan(app: FastAPI):
     def run_seed_in_background():
         try:
             from seed_csv_library import seed_csv_library
+            from seed_user import seed_user
             from core.database import SessionLocal
             db = SessionLocal()
-            seed_csv_library(db)
+            try:
+                seed_user() # Asegurar acceso admin
+            except Exception as e:
+                logger.error(f">>> SEED: User seed failed: {e}")
+            seed_csv_library(db) # Asegurar 163 obras
             db.close()
-            logger.info(">>> SEED: CSV Library seed completed successfully in background")
+            logger.info(">>> SEED: Full background initialization (Users + CSV Library) completed successfully")
         except Exception as e:
             logger.error(f">>> SEED: Failed to run CSV library seed process: {e}")
 
