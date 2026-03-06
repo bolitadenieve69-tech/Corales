@@ -10,6 +10,10 @@ from models import User
 
 router = APIRouter(tags=["works"])
 
+@router.get("/debug-count")
+def get_debug_count(db: Session = Depends(get_db)):
+    return {"works_count": db.query(Work).count(), "users_count": db.query(User).count()}
+
 @router.post("/", response_model=WorkSchema)
 def create_work(
     work: WorkCreate, 
