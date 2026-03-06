@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-VERSION = "7.3.3_INTERNAL_SEED"
+VERSION = "7.3.4_AUTO_SEED"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -51,13 +51,14 @@ async def lifespan(app: FastAPI):
             logger.info(">>> DB: Auto-heal successful, tables re-created")
 
     try:
-        from seed_full import seed_everything
+        from seed_csv_library import seed_csv_library
         from core.database import SessionLocal
         db = SessionLocal()
-        seed_everything(db)
+        seed_csv_library(db)
         db.close()
+        logger.info(">>> SEED: CSV Library seed completed successfully")
     except Exception as e:
-        logger.error(f">>> SEED: Failed to run complete seed process: {e}")
+        logger.error(f">>> SEED: Failed to run CSV library seed process: {e}")
 
     yield
     logger.info(">>> SHUTTING DOWN Corales API")
