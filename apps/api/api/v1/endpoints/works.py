@@ -14,6 +14,12 @@ router = APIRouter(tags=["works"])
 def get_debug_count(db: Session = Depends(get_db)):
     return {"works_count": db.query(Work).count(), "users_count": db.query(User).count()}
 
+@router.get("/seed-all")
+def trigger_seed(db: Session = Depends(get_db)):
+    from seed_csv_library import seed_csv_library
+    count = seed_csv_library(db)
+    return {"status": "success", "added": count}
+
 @router.post("/", response_model=WorkSchema)
 def create_work(
     work: WorkCreate, 
