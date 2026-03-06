@@ -49,7 +49,13 @@ def get_works(
     memberships = db.query(Membership).filter(Membership.user_id == current_user.id).all()
     choir_ids = [m.choir_id for m in memberships]
     
-    works = db.query(Work).filter(Work.choir_id.in_(choir_ids)).offset(skip).limit(limit).all()
+    from sqlalchemy import or_
+    works = db.query(Work).filter(
+        or_(
+            Work.choir_id.in_(choir_ids),
+            Work.choir_id == None
+        )
+    ).offset(skip).limit(limit).all()
     return works
 
 @router.get("/choir/{choir_id}", response_model=List[WorkSchema])
