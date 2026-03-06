@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
+import { Cormorant_Garamond, Manrope, DM_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 
@@ -12,8 +12,8 @@ const cormorantGaramond = Cormorant_Garamond({
   variable: '--font-display',
 });
 
-const dmSans = DM_Sans({
-  weight: ['400', '500', '700'],
+const manrope = Manrope({
+  weight: ['400', '500', '600', '700', '800'],
   subsets: ["latin"],
   variable: '--font-ui',
 });
@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${cormorantGaramond.variable} ${dmSans.variable} ${dmMono.variable} antialiased min-h-screen bg-transparent`}>
+      <body className={`${cormorantGaramond.variable} ${manrope.variable} ${dmMono.variable} antialiased min-h-screen bg-transparent`}>
         <AuthProvider>
           {children}
           <ToastContainer />

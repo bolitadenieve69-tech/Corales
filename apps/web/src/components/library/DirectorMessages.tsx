@@ -56,27 +56,27 @@ export function DirectorMessages() {
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-4xl mx-auto mt-16 bg-primary-800/40 border border-white/10 rounded-[2.5rem] overflow-hidden backdrop-blur-md"
+            className="w-full max-w-4xl mx-auto mt-16 bg-white border border-neutral-100 rounded-[2.5rem] shadow-2xl overflow-hidden"
         >
-            <div className="p-8 border-b border-white/5 bg-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-accent-500/20 flex items-center justify-center text-accent-500 border border-accent-500/20">
-                        <MessageSquare size={24} />
+            <div className="p-10 border-b border-neutral-100 bg-neutral-50/50 flex items-center justify-between">
+                <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-primary-500 border border-primary-500/20 shadow-sm">
+                        <MessageSquare size={28} />
                     </div>
                     <div>
-                        <h3 className="font-display font-bold text-white text-xl">Notas del Director</h3>
-                        <p className="text-[10px] text-neutral-500 font-black tracking-widest uppercase">Indicaciones personales y técnica vocal</p>
+                        <h3 className="font-display font-bold text-foreground text-2xl">Notas del Maestro</h3>
+                        <p className="text-[10px] text-primary-500 font-bold tracking-widest uppercase mt-0.5">Indicaciones personales y técnica vocal</p>
                     </div>
                 </div>
                 {unreadCount > 0 && (
-                    <div className="flex items-center gap-2 bg-accent-500 text-primary-900 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-glow-accent">
-                        <Bell size={12} className="animate-bounce" />
+                    <div className="flex items-center gap-2 bg-primary-500 text-white px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary-500/20">
+                        <Bell size={14} className="animate-bounce" />
                         {unreadCount} nuevas
                     </div>
                 )}
             </div>
 
-            <div className="divide-y divide-white/5 max-h-[450px] overflow-y-auto scrollbar-hide">
+            <div className="divide-y divide-neutral-100 max-h-[500px] overflow-y-auto scrollbar-hide">
                 <AnimatePresence>
                     {messages.map((msg, index) => (
                         <motion.div
@@ -84,38 +84,38 @@ export function DirectorMessages() {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className={`p-8 hover:bg-white/5 transition-all relative ${!msg.read_at ? 'bg-accent-500/5' : 'opacity-60 grayscale-[0.5]'}`}
+                            className={`p-10 hover:bg-neutral-50 transition-all relative ${!msg.read_at ? 'bg-primary-50/30' : 'opacity-60'}`}
                         >
                             <div className="flex gap-6">
                                 <div className="flex-1 space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-accent-500 bg-accent-500/10 px-2 py-0.5 rounded">Director</span>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-primary-500 bg-primary-100 px-3 py-1 rounded-full">Director</span>
                                             <span className="text-neutral-400 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
-                                                <Clock size={12} />
+                                                <Clock size={14} />
                                                 {timeAgo(msg.created_at)}
                                             </span>
                                         </div>
                                         {!msg.read_at && (
                                             <button
                                                 onClick={() => markAsRead(msg.id)}
-                                                className="text-[10px] font-black uppercase tracking-widest text-primary-300 hover:text-white transition-colors flex items-center gap-1.5 p-1 hover:bg-white/5 rounded"
+                                                className="text-[10px] font-bold uppercase tracking-widest text-primary-500 hover:text-white hover:bg-primary-500 transition-all flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary-500/20"
                                                 title="Marcar como leído"
                                             >
-                                                <CheckCircle size={14} />
-                                                Leído
+                                                <CheckCircle size={16} />
+                                                Finalizar
                                             </button>
                                         )}
                                     </div>
 
-                                    <p className="text-base text-neutral-200 leading-relaxed font-medium italic border-l-2 border-accent-500/30 pl-4 py-1">
+                                    <p className="text-lg text-foreground leading-relaxed font-display font-medium border-l-4 border-primary-500/20 pl-6 py-2">
                                         "{msg.content}"
                                     </p>
 
                                     {msg.work_id && (
-                                        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary-500/10 border border-primary-500/20 rounded-xl w-fit">
-                                            <Music size={14} className="text-primary-300" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-primary-300">Apunte de Obra</span>
+                                        <div className="flex items-center gap-2 px-4 py-2 bg-neutral-100 border border-neutral-200 rounded-xl w-fit">
+                                            <Music size={14} className="text-primary-500" />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-600">Apunte de Obra</span>
                                         </div>
                                     )}
                                 </div>
