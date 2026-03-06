@@ -14,7 +14,7 @@ class Work(Base):
     language = Column(String, nullable=True)
     difficulty = Column(String, nullable=True)
     
-    choir_id = Column(String, ForeignKey("choirs.id"), nullable=False, index=True)
+    choir_id = Column(String, ForeignKey("choirs.id"), nullable=True, default=None, index=True)
 
     choir = relationship("Choir")
     editions = relationship("Edition", back_populates="work", cascade="all, delete-orphan")

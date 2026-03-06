@@ -7,6 +7,7 @@ class Edition(Base):
 
     work_id = Column(String, ForeignKey("works.id"), nullable=False, index=True)
     publisher = Column(String, nullable=True) # CPDL, Durand, etc.
+    source = Column(String, nullable=True, index=True) # IMSLP, CPDL, etc.
     notes = Column(String, nullable=True)
     
     work = relationship("Work", back_populates="editions")

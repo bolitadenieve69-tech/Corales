@@ -1,16 +1,3 @@
-"""
-seed_catalog.py — Import obras_corales_final.csv into the global catalog.
-
-Creates Work entries (choir_id=None) with associated Edition + Asset records
-for IMSLP and CPDL sources.
-
-Usage:
-    # With DATABASE_URL env var (recommended for production Postgres):
-    DATABASE_URL=postgresql://user:pass@host/db python seed_catalog.py
-
-    # Without env var (falls back to local SQLite):
-    python seed_catalog.py
-"""
 import os
 import sys
 import csv
@@ -23,11 +10,9 @@ from models.work import Work
 from models.edition import Edition
 from models.asset import Asset
 
+CSV_PATH = "/Users/angelguerraiglesias/Documents/AI_Corales/obras_trujillo_nuevas.csv"
 
-CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "obras_corales_final.csv")
-
-
-def seed_catalog():
+def seed_trujillo():
     if not os.path.exists(CSV_PATH):
         print(f"❌ CSV not found: {CSV_PATH}")
         return
@@ -52,6 +37,8 @@ def seed_catalog():
                 title = row["titulo"].strip()
                 composer = row["compositor"].strip()
                 voice_format = row["voces"].strip() if row.get("voces") else None
+                genre = row["genre"].strip() if row.get("genre") else None
+                era = row["era"].strip() if row.get("era") else None
                 url_imslp = row.get("url_imslp", "").strip() or None
                 url_cpdl = row.get("url_cpdl", "").strip() or None
 
@@ -66,6 +53,8 @@ def seed_catalog():
                     title=title,
                     composer=composer,
                     voice_format=voice_format,
+                    genre=genre,
+                    era=era,
                     choir_id=None,  # Global catalog
                 )
                 db.add(work)
@@ -126,4 +115,4 @@ def seed_catalog():
 
 
 if __name__ == "__main__":
-    seed_catalog()
+    seed_trujillo()

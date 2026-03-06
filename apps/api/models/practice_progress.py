@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
+import uuid
 from .base import Base
 
 class PracticeStatus(str, enum.Enum):
@@ -12,13 +13,13 @@ class PracticeStatus(str, enum.Enum):
 class PracticeProgress(Base):
     __tablename__ = "practice_progress"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    id = Column(String, primary_key=True, index=True, default=lambda: uuid.uuid4().hex)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
     # Puede ser que el progreso esté asociado a un "project_repertoire_id" o a una "work_id"
     # Segun las instrucciones: "estado y minutos de estudio por coralista/obra" (o por "piece" dentro de un proyecto)
     # Lo vincularemos a la `work_id` para que el esfuerzo del coralista en una obra persista 
     # incluso si la obra se repite en otro proyecto.
-    work_id = Column(Integer, ForeignKey("works.id"), nullable=False)
+    work_id = Column(String, ForeignKey("works.id"), nullable=False)
     
     status = Column(Enum(PracticeStatus), default=PracticeStatus.NUEVA, nullable=False)
     minutes_practiced = Column(Integer, default=0, nullable=False)
