@@ -41,7 +41,7 @@ def seed_csv_library(db: Session):
             continue
             
         print(f"PROCESSING: {filename}")
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, "r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             # Handle potential BOM or different headers if necessary
             # For these 3 files, the headers are fairly consistent
