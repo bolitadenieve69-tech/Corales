@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-VERSION = "7.3.9_FINAL_ACCESS"
+VERSION = "7.3.10_SCHEMA_FIX"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

@@ -11,7 +11,7 @@ class WorkBase(BaseModel):
     accompaniment: Optional[str] = None
     language: Optional[str] = None
     difficulty: Optional[str] = None
-    choir_id: str
+    choir_id: Optional[str] = None
 
 class WorkCreate(WorkBase):
     pass
