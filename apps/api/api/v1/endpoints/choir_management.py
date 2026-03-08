@@ -324,6 +324,35 @@ def update_member_voice(
         "avatar_url": membership.user.avatar_url
     }
 
+@router.delete("/{choir_id}/members/{membership_id}")
+def remove_member(
+    choir_id: str,
+    membership_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(deps.get_current_active_director),
+) -> Any:
+    """
+    Remove a member from the choir. Only for Directors of this choir.
+    """
+    if not deps.check_choir_access(choir_id, current_user.id, db, required_role="DIRECTOR") and current_user.role != "ADMIN":
+        raise HTTPException(status_code=403, detail="No tienes permisos de dirección en este coro")
+        
+    membership = db.query(Membership).filter(
+        Membership.id == membership_id,
+        Membership.choir_id == choir_id
+    ).first()
+    
+    if not membership:
+        raise HTTPException(status_code=404, detail="Membership not found")
+        
+    if membership.user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="No puedes eliminarte a ti mismo")
+        
+    db.delete(membership)
+    db.commit()
+    
+    return {"message": "Miembro eliminado con éxito"}
+
 @router.get("/{choir_id}/stats", response_model=Any)
 def get_choir_stats(
     choir_id: str,

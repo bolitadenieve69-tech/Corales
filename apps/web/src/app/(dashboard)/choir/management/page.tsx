@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Users, Calendar, Settings, Shield, UserPlus, FileText, Search, Filter, Loader2, MessageSquare } from 'lucide-react';
+import { Users, Calendar, Settings, Shield, UserPlus, FileText, Search, Filter, Loader2, MessageSquare, Trash } from 'lucide-react';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useUIStore } from '@/store/uiStore';
@@ -204,6 +204,28 @@ export default function ChoirManagementPage() {
                                         >
                                             <MessageSquare size={18} />
                                         </button>
+                                        {member.user_id !== currentUser?.id && (
+                                            <button
+                                                title="Expulsar miembro"
+                                                aria-label={`Expulsar a ${member.full_name}`}
+                                                onClick={async () => {
+                                                    if (confirm(`¿Estás seguro de que quieres eliminar a ${member.full_name} del coro?`)) {
+                                                        try {
+                                                            await fetchApi(`/management/choir/${choirId}/members/${member.id}`, {
+                                                                method: 'DELETE'
+                                                            });
+                                                            setMembers(prev => prev.filter(m => m.id !== member.id));
+                                                            useUIStore.getState().addToast('Miembro eliminado correctamente', 'success');
+                                                        } catch (err: any) {
+                                                            useUIStore.getState().addToast(err.message || 'Error al eliminar miembro', 'error');
+                                                        }
+                                                    }
+                                                }}
+                                                className="p-2 hover:bg-red-500/10 rounded-xl text-neutral-400 hover:text-red-500 transition-all focus-ring"
+                                            >
+                                                <Trash size={18} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             ))}
