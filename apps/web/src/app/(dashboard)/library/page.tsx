@@ -102,9 +102,6 @@ export default function LibraryPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Link href="/library/manager" className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-primary-500 text-primary-500 hover:bg-primary-50 rounded-full font-bold transition-all shadow-sm active:scale-95 text-sm">
-                        <Filter size={18} /> Gestionar PDFs
-                    </Link>
                     <Link href="/library/upload" className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-800 text-white rounded-full font-bold transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 text-sm">
                         <Plus size={18} /> Añadir Obra
                     </Link>
