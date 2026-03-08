@@ -75,18 +75,26 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
         e.preventDefault();
         setSaving(true);
         try {
+            // Filter out empty strings to prevent schema validation errors
+            const cleanData: any = {};
+            for (const [key, value] of Object.entries(formData)) {
+                if (value !== '') {
+                    cleanData[key] = value;
+                }
+            }
+
             if (hasChoir) {
                 await fetchApi('/choirs/me', {
                     method: 'PUT',
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify(cleanData)
                 });
             } else {
                 // If the user doesn't have a choir yet, create one
                 const res = await fetchApi('/choirs/', {
                     method: 'POST',
                     body: JSON.stringify({
-                        ...formData,
-                        name: formData.name || 'Mi Coro',
+                        ...cleanData,
+                        name: cleanData.name || 'Mi Coro',
                         max_users: 50,
                     })
                 });
@@ -97,8 +105,9 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
 
             addToast('Datos del coro guardados correctamente', 'success');
             if (onUpdate) onUpdate();
-        } catch (error) {
-            addToast('Error guardando los datos del coro', 'error');
+        } catch (error: any) {
+            console.error(error);
+            addToast(`Error guardando los datos del coro: ${error.message}`, 'error');
         } finally {
             setSaving(false);
         }

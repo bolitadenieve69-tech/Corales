@@ -81,13 +81,17 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     });
 
     if (!response.ok) {
-        // Handle common errors like 401 Unauthorized globally if needed
         if (response.status === 401 && typeof window !== 'undefined') {
-            // Optional: redirect to login or clear token
-            // localStorage.removeItem('token');
-            // window.location.href = '/login';
         }
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
+        let errorMsg = `API error: ${response.status} ${response.statusText}`;
+        try {
+            const errData = await response.json();
+            if (errData.detail) {
+                // Return detailed validation errors if it's an array or string
+                errorMsg = typeof errData.detail === 'string' ? errData.detail : JSON.stringify(errData.detail);
+            }
+        } catch (e) { }
+        throw new Error(errorMsg);
     }
 
     // Try to parse JSON unless it's a 204 No Content
