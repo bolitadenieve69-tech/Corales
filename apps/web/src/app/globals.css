@@ -22,19 +22,18 @@
   --color-neutral-100: #F8F5F2;
   /* Stitch Background */
   --color-neutral-000: #FFFFFF;
-  ...
+
   /* Fonts */
   --font-display: 'Cormorant Garamond', serif;
   --font-ui: 'Manrope', sans-serif;
   --font-mono: 'DM Mono', monospace;
-  ...
+
   /* Border Radius - More rounded per Stitch */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-xl: 32px;
   --radius-full: 9999px;
-  ...
 }
 
 :root {
