@@ -67,17 +67,14 @@ def create_choir(
     *,
     db: Session = Depends(deps.get_db),
     choir_in: ChoirCreate,
-    current_user: User = Depends(deps.get_current_active_admin)
+    current_user: User = Depends(deps.get_current_active_director)
 ) -> Any:
     """
     Create a new choir.
     """
-    choir = Choir(
-        id=str(uuid.uuid4()),
-        name=choir_in.name,
-        description=choir_in.description,
-        max_users=choir_in.max_users
-    )
+    create_data = choir_in.model_dump()
+    create_data["id"] = str(uuid.uuid4())
+    choir = Choir(**create_data)
     db.add(choir)
     
     # Automatically add the creator as DIRECTOR

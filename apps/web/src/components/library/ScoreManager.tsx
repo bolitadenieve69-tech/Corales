@@ -12,7 +12,8 @@ import {
     ExternalLink,
     MoreVertical,
     Filter,
-    Check
+    Check,
+    FileText
 } from 'lucide-react';
 
 import scoresData from '@/data/scores.json';
@@ -117,11 +118,11 @@ export default function ScoreManager() {
                         </div>
 
                         <div className="flex items-center gap-3">
+                            <Link href="/library/upload" className="flex items-center gap-2 px-6 py-2.5 bg-primary-500 text-white rounded-full text-sm font-bold hover:bg-primary-800 transition-all shadow-lg shadow-primary-500/20 active:scale-95">
+                                <Plus size={18} /> Nueva Obra
+                            </Link>
                             <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-neutral-200 rounded-full text-sm font-bold text-neutral-600 hover:border-primary-500 hover:text-primary-500 transition-all shadow-sm">
-                                <FileJson size={18} /> Exportar JSON
-                            </button>
-                            <button className="flex items-center gap-2 px-6 py-2.5 bg-primary-500 text-white rounded-full text-sm font-bold hover:bg-primary-800 transition-all shadow-lg shadow-primary-500/20 active:scale-95">
-                                <Download size={18} /> Descargar CSV
+                                <FileJson size={18} /> Exportar
                             </button>
                         </div>
                     </div>
@@ -216,6 +217,7 @@ export default function ScoreManager() {
                                             </div>
                                         </th>
                                     ))}
+                                    <th className="px-6 py-4 text-right">Partitura</th>
                                     <th className="px-6 py-4 text-right">Fuente</th>
                                     <th className="px-6 py-4 w-10"></th>
                                 </tr>
@@ -255,6 +257,23 @@ export default function ScoreManager() {
                                                     <cfg.icon size={12} />
                                                     {cfg.label}
                                                 </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                {score.pdf_filename ? (
+                                                    <div className="flex flex-col items-end">
+                                                        <span className="text-[10px] text-neutral-400 font-mono mb-1">{score.pdf_filename}</span>
+                                                        <a
+                                                            href={`/api/v1/assets/download/${score.pdf_filename}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 font-bold transition-colors text-xs"
+                                                        >
+                                                            <FileText size={12} /> Ver PDF
+                                                        </a>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-neutral-300 italic text-xs">Sin archivo</span>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 {score.pdf_source_url ? (

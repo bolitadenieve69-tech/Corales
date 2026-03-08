@@ -16,6 +16,7 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
     const [saving, setSaving] = useState(false);
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
+    const [hasChoir, setHasChoir] = useState(false);
 
     const [formData, setFormData] = useState<any>({
         name: '',
@@ -50,6 +51,9 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
                         ...formData,
                         ...data
                     });
+                    setHasChoir(true);
+                } else {
+                    setHasChoir(false);
                 }
             })
             .finally(() => setLoading(false));
@@ -68,10 +72,41 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
         e.preventDefault();
         setSaving(true);
         try {
-            await fetchApi('/choirs/me', {
-                method: 'PUT',
-                body: JSON.stringify(formData)
-            });
+            if (hasChoir) {
+                await fetchApi('/choirs/me', {
+                    method: 'PUT',
+                    body: JSON.stringify(formData)
+                });
+            } else {
+                // If the user doesn't have a choir yet, create one
+                const res = await fetchApi('/choirs/', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: formData.name || 'Mi Coro',
+                        description: formData.description || '',
+                        max_users: 50,
+                        social_address: formData.social_address,
+                        director_name: formData.director_name,
+                        director_phone: formData.director_phone,
+                        subdirector_name: formData.subdirector_name,
+                        president_name: formData.president_name,
+                        secretary_name: formData.secretary_name,
+                        treasurer_name: formData.treasurer_name,
+                        other_info: formData.other_info,
+                    })
+                });
+                if (res && res.id) {
+                    setHasChoir(true);
+
+                    // The first POST only handles basic info due to schema restrictions.
+                    // Follow up with PUT to save all the extended info (email, whatsapp, etc).
+                    await fetchApi('/choirs/me', {
+                        method: 'PUT',
+                        body: JSON.stringify(formData)
+                    });
+                }
+            }
+
             addToast('Datos del coro guardados correctamente', 'success');
             if (onUpdate) onUpdate();
         } catch (error) {
@@ -82,6 +117,11 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, assetType: 'logo' | 'cover') => {
+        if (!hasChoir) {
+            addToast('Por favor, guarda la información básica del coro primero', 'error');
+            return;
+        }
+
         const file = e.target.files?.[0];
         if (!file) return;
 

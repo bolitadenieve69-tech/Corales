@@ -1,296 +1,291 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShieldAlert, Upload, Loader2, ArrowLeft, FileMusic, Sparkles } from 'lucide-react';
+import { Upload, Music, Loader2, FileMusic, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { fetchApi, API_URL, getAuthToken } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { API_URL, fetchApi } from '@/lib/api';
 
 export default function UploadPrivateWorkPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+    const [assetType, setAssetType] = useState('musicxml');
+
     const [title, setTitle] = useState('');
     const [composer, setComposer] = useState('');
-    const [format, setFormat] = useState('SATB');
-    const [assetType, setAssetType] = useState('sheet_music');
-    const [file, setFile] = useState<File | null>(null);
+    const [era, setEra] = useState('');
+    const [voiceFormat, setVoiceFormat] = useState('SATB');
     const [rightsConfirmed, setRightsConfirmed] = useState(false);
-    const [error, setError] = useState('');
-    const [pipelineStarted, setPipelineStarted] = useState(false);
-    const [choir, setChoir] = useState<any>(null);
 
     const isMusicXML = assetType === 'musicxml';
 
-    useEffect(() => {
-        fetchApi('/choirs/me')
-            .then(data => {
-                if (data) setChoir(data);
-            })
-            .catch(err => console.error("Error fetching choir for upload", err));
-    }, []);
-
-    const getAcceptedExtensions = () => {
-        switch (assetType) {
-            case 'musicxml': return '.musicxml,.xml,.mxl';
-            case 'sheet_music': return '.pdf';
-            case 'midi': return '.mid,.midi';
-            default: return 'audio/*';
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!rightsConfirmed) {
-            setError("Debes confirmar que posees los derechos de este material.");
+        if (!file || !title || !composer || !rightsConfirmed) {
+            setError('Por favor rellena todos los campos obligatorios y acepta los términos.');
             return;
         }
-        if (!file) {
-            setError("Debes seleccionar un archivo.");
-            return;
-        }
+
         setLoading(true);
         setError('');
 
         try {
-            if (!choir) {
-                throw new Error("No se ha encontrado un coro asociado a tu cuenta. Ve a 'Mi Coro' primero.");
-            }
-            const token = getAuthToken();
-            const headers: Record<string, string> = {};
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-
             // 1. Create Work
             const work = await fetchApi('/works/', {
                 method: 'POST',
-                body: JSON.stringify({ title, composer, voice_format: format, choir_id: choir.id })
-            });
-
-            // 2. Create Edition
-            const edition = await fetchApi('/editions/', {
-                method: 'POST',
                 body: JSON.stringify({
-                    work_id: work.id,
-                    publishing_house: "Biblioteca Privada",
-                    year: new Date().getFullYear(),
-                    language: "Varios"
+                    title,
+                    composer,
+                    era,
+                    voice_format: voiceFormat,
+                    genre: 'Coral',
+                    difficulty: 'Media',
+                    accompaniment: 'A Capella'
                 })
             });
+
+            if (!work || !work.id) throw new Error('Error al crear la obra');
+
+            // 2. Get/Create Edition (the backend might create one by default in the seed, 
+            // but for new works we might need to ensure one exists or get the ID)
+            // Our generic POST /works/ already creates a default edition.
+            const edition = work.editions?.[0];
+            if (!edition) throw new Error('No se pudo encontrar la edición de la obra');
 
             // 3. Upload File
             const formData = new FormData();
             formData.append('file', file);
             formData.append('edition_id', edition.id);
+            formData.append('asset_type', assetType.toUpperCase());
+            formData.append('rights_confirmed', 'true');
 
-            if (isMusicXML) {
-                // Use the dedicated MusicXML upload endpoint → triggers pipeline
-                const uploadRes = await fetch(`${API_URL}/assets/upload-musicxml`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: formData
-                });
-                if (!uploadRes.ok) {
-                    const errData = await uploadRes.json();
-                    throw new Error(errData.detail || "Error subiendo el MusicXML");
-                }
-                const asset = await uploadRes.json();
-                setPipelineStarted(true);
+            const uploadRes = await fetch(`${API_URL}/assets/upload`, {
+                method: 'POST',
+                // Note: Fetch with FormData automatically sets multipart/form-data with boundary
+                body: formData
+            });
 
-                // Wait a moment then redirect to work detail
-                setTimeout(() => {
-                    router.push(`/library/${work.id}`);
-                    router.refresh();
-                }, 2000);
-            } else {
-                // Regular upload
-                formData.append('asset_type', assetType);
-                formData.append('rights_confirmed', rightsConfirmed.toString());
-
-                const uploadRes = await fetch(`${API_URL}/assets/upload`, {
-                    method: 'POST',
-                    headers: headers,
-                    body: formData
-                });
-                if (!uploadRes.ok) {
-                    const errData = await uploadRes.json();
-                    throw new Error(errData.detail || "Error subiendo el archivo");
-                }
-                router.push('/library');
-                router.refresh();
+            if (!uploadRes.ok) {
+                const errData = await uploadRes.json();
+                throw new Error(errData.detail || 'Error al subir el archivo');
             }
+
+            setSuccess(true);
+            setTimeout(() => {
+                router.push(`/library/${work.id}`);
+            }, 3000);
+
         } catch (err: any) {
-            console.error(err);
-            setError(err.message || "Ocurrió un error inesperado.");
+            console.error("Upload error", err);
+            setError(err.message || 'Ocurrió un error inesperado');
             setLoading(false);
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">
             <div className="flex items-center gap-4">
-                <Link href="/library" className="p-2 text-neutral-300 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                <Link href="/library" className="p-2 hover:bg-white/5 rounded-full transition-colors text-neutral-400 hover:text-white">
                     <ArrowLeft size={24} />
                 </Link>
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Subir Obra Privada</h1>
-                    <p className="text-neutral-300">Añade partituras, audios o MusicXML para tu coro.</p>
+                    <h1 className="text-3xl font-display font-bold text-white">Subir Nueva Obra</h1>
+                    <p className="text-neutral-500">Añade partituras o grabaciones a la biblioteca de tu coro.</p>
                 </div>
             </div>
 
-            {/* Pipeline Success Banner */}
-            {pipelineStarted && (
+            {success && (
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="p-6 bg-green-500/10 border border-green-500/30 rounded-2xl text-center"
+                    className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 text-center space-y-4"
                 >
-                    <Sparkles className="mx-auto text-green-400 mb-3" size={32} />
-                    <h3 className="text-lg font-semibold text-green-300 mb-1">¡MusicXML subido con éxito!</h3>
-                    <p className="text-green-400/80 text-sm">
-                        El pipeline automático está procesando tu partitura.
-                        Se detectarán las voces SATB y se generarán los audios de estudio.
+                    <div className="w-16 h-16 bg-emerald-500 text-primary-900 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+                        <Upload size={32} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">¡Obra subida con éxito!</h2>
+                    <p className="text-neutral-300">
+                        El archivo se ha subido correctamente. {isMusicXML ? 'El pipeline está procesando las voces.' : ''}
                     </p>
-                    <p className="text-green-400/60 text-xs mt-2">Redirigiendo a la obra...</p>
+                    <p className="text-emerald-500/60 text-xs mt-2 font-mono uppercase tracking-widest">Redirigiendo a la obra...</p>
                 </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="bg-primary-800 border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl shadow-black/50">
-                {error && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
-                        {error}
-                    </div>
-                )}
+            {!success && (
+                <form onSubmit={handleSubmit} className="bg-primary-800 border border-white/10 rounded-[2.5rem] p-8 md:p-12 space-y-10 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-accent-500/10 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
 
-                <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2">Datos de la Obra</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-neutral-300">Título de la Obra <span className="text-red-400">*</span></label>
-                            <input
-                                required
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500"
-                                placeholder="Ej: Ave Verum Corpus"
-                            />
+                    {error && (
+                        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-medium">
+                            {error}
                         </div>
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-neutral-300">Compositor <span className="text-red-400">*</span></label>
-                            <input
-                                required
-                                value={composer}
-                                onChange={e => setComposer(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white placeholder:text-neutral-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500"
-                                placeholder="Ej: W.A. Mozart"
-                            />
+                    )}
+
+                    {/* Section 1: File Selection */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-accent-500/20 text-accent-500 flex items-center justify-center shadow-lg shadow-accent-500/10">
+                                <Upload size={20} />
+                            </div>
+                            <h3 className="text-2xl font-display font-bold text-white">Archivo Principal</h3>
                         </div>
-                        <div className="space-y-1.5 sm:col-span-2">
-                            <label className="text-sm font-medium text-neutral-300">Formato / Voces</label>
-                            <select
-                                value={format}
-                                onChange={e => setFormat(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500"
-                            >
-                                <option value="SATB">SATB</option>
-                                <option value="SSA">SSA</option>
-                                <option value="TTBB">TTBB</option>
-                                <option value="Unísono">Unísono</option>
-                                <option value="Otro">Otro</option>
-                            </select>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-1">
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Tipo de Documento</label>
+                                <div className="relative">
+                                    <select
+                                        value={assetType}
+                                        onChange={e => setAssetType(e.target.value)}
+                                        aria-label="Tipo de Documento"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-accent-500 appearance-none text-sm transition-all"
+                                    >
+                                        <option value="musicxml" className="bg-primary-900">🎼 MusicXML (Procesado IA)</option>
+                                        <option value="sheet_music" className="bg-primary-900">📄 Partitura (PDF)</option>
+                                        <option value="midi" className="bg-primary-900">🎹 Archivo MIDI (.mid)</option>
+                                        <option value="learning_track" className="bg-primary-900">🎵 Pista de Estudio (Audio)</option>
+                                        <option value="reference_recording" className="bg-primary-900">🎤 Grabación (Audio)</option>
+                                    </select>
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500">
+                                        <ArrowLeft size={16} className="-rotate-90" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Seleccionar Archivo</label>
+                                <div className="relative">
+                                    <input
+                                        type="file"
+                                        onChange={e => setFile(e.target.files?.[0] || null)}
+                                        className="hidden"
+                                        id="primary-file-upload"
+                                        accept={assetType === 'sheet_music' ? '.pdf' : assetType === 'musicxml' ? '.xml,.mxl,.musicxml' : assetType === 'midi' ? '.mid,.midi' : '.mp3,.wav,.ogg,.m4a'}
+                                    />
+                                    <label
+                                        htmlFor="primary-file-upload"
+                                        className={`flex items-center justify-between w-full bg-white/5 border ${file ? 'border-accent-500/50' : 'border-white/10'} rounded-2xl px-5 py-4 cursor-pointer hover:bg-white/10 transition-all border-dashed`}
+                                    >
+                                        <span className={`text-sm truncate pr-2 ${file ? 'text-white font-medium' : 'text-neutral-600'}`}>
+                                            {file ? file.name : "Subir archivo..."}
+                                        </span>
+                                        <Upload size={18} className={file ? 'text-accent-500' : 'text-neutral-600'} />
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2">Archivo</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-neutral-300">Tipo de Archivo</label>
-                            <select
-                                value={assetType}
-                                onChange={e => setAssetType(e.target.value)}
-                                className="w-full px-4 py-2.5 bg-black/50 border border-white/10 rounded-xl text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-accent-500 focus-visible:outline-offset-2 focus:ring-2 focus:ring-accent-500 focus-visible:outline-2 focus-visible:outline-accent-500"
-                            >
-                                <option value="musicxml">🎼 MusicXML (genera audios automáticamente)</option>
-                                <option value="sheet_music">📄 Partitura (PDF)</option>
-                                <option value="midi">🎹 Archivo MIDI (.mid)</option>
-                                <option value="learning_track">🎵 Pista de Estudio (Audio)</option>
-                                <option value="reference_recording">🎤 Grabación de Referencia (Audio)</option>
-                            </select>
+                    {/* Section 2: Metadata */}
+                    <div className="space-y-6 pt-6 border-t border-white/5">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary-500/20 text-primary-300 flex items-center justify-center shadow-lg shadow-primary-500/10">
+                                <Music size={20} />
+                            </div>
+                            <h3 className="text-2xl font-display font-bold text-white">Información de la Obra</h3>
                         </div>
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-neutral-300">Seleccionar Archivo <span className="text-red-400">*</span></label>
-                            <div className="w-full px-4 py-2 bg-black/50 border border-white/10 rounded-xl text-white flex items-center justify-between">
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-1">
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Título de la Obra *</label>
                                 <input
+                                    type="text"
+                                    value={title}
+                                    onChange={e => setTitle(e.target.value)}
+                                    placeholder="Ej. Ave Verum Corpus"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-accent-500 text-sm transition-all"
                                     required
-                                    type="file"
-                                    accept={getAcceptedExtensions()}
-                                    onChange={e => setFile(e.target.files?.[0] || null)}
-                                    className="w-full text-sm text-neutral-300 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-500/10 file:text-primary-300 hover:file:bg-primary-500/20"
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Compositor *</label>
+                                <input
+                                    type="text"
+                                    value={composer}
+                                    onChange={e => setComposer(e.target.value)}
+                                    placeholder="Ej. W.A. Mozart"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-accent-500 text-sm transition-all"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Época / Estilo</label>
+                                <input
+                                    type="text"
+                                    value={era}
+                                    onChange={e => setEra(e.target.value)}
+                                    placeholder="Ej. Barroco"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-accent-500 text-sm transition-all"
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-xs font-black uppercase tracking-[0.2em] text-neutral-500">Formato Vocal</label>
+                                <input
+                                    type="text"
+                                    value={voiceFormat}
+                                    onChange={e => setVoiceFormat(e.target.value)}
+                                    placeholder="Ej. SATB"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-accent-500 text-sm transition-all"
                                 />
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* MusicXML Pipeline Info */}
-                {isMusicXML && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 flex gap-4"
-                    >
-                        <FileMusic className="text-primary-300 shrink-0 mt-1" size={24} />
-                        <div>
-                            <h4 className="font-medium text-primary-100 mb-1">Pipeline Automático</h4>
-                            <p className="text-sm text-primary-300/80">
-                                Al subir un MusicXML, Corales analizará automáticamente las partes,
-                                intentará asignar las voces SATB y generará los audios de estudio
-                                para cada cuerda. Si no puede identificar las voces, te pedirá que
-                                las asignes manualmente.
-                            </p>
+                    {/* Pipeline Info */}
+                    {isMusicXML && (
+                        <div className="bg-primary-500/5 border border-primary-500/10 rounded-2xl p-6 flex gap-4">
+                            <FileMusic className="text-primary-300 shrink-0" size={24} />
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-primary-300 text-sm uppercase tracking-wider">Análisis Inteligente ACTIVADO</h4>
+                                <p className="text-sm text-neutral-400 leading-relaxed">
+                                    Al subir un archivo MusicXML, el sistema detectará automáticamente las cuerdas (S, A, T, B) y generará los audios de estudio.
+                                </p>
+                            </div>
                         </div>
-                    </motion.div>
-                )}
+                    )}
 
-                <div className="bg-accent-500/10 border border-amber-500/20 rounded-xl p-4 flex gap-4 mt-6">
-                    <ShieldAlert className="text-accent-500 shrink-0 mt-1" size={24} />
-                    <div className="space-y-2">
-                        <h4 className="font-medium text-accent-500">Confirmación de Derechos y Copyright</h4>
-                        <p className="text-sm text-accent-500/80">
-                            Como director o administrador, es tu responsabilidad asegurar que las obras subidas a Corales cuentan con los permisos de distribución necesarios o se encuentran en dominio público.
-                        </p>
-                        <label className="flex items-start gap-3 mt-3 cursor-pointer group">
-                            <input
-                                type="checkbox"
-                                checked={rightsConfirmed}
-                                onChange={e => setRightsConfirmed(e.target.checked)}
-                                className="mt-1 w-4 h-4 rounded border-accent-500/30 bg-black/50 text-amber-600 focus:ring-amber-500 focus:ring-offset-gray-900"
-                            />
-                            <span className="text-sm text-neutral-300 group-hover:text-white transition-colors">
-                                Confirmo que tengo el derecho legal o permiso expreso para compartir y distribuir este material a los miembros de mi coro.
-                            </span>
+                    {/* Footer Actions */}
+                    <div className="pt-8 border-t border-white/5 space-y-8">
+                        <label className="flex items-start gap-4 cursor-pointer group p-5 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
+                            <div className="mt-1">
+                                <input
+                                    type="checkbox"
+                                    checked={rightsConfirmed}
+                                    onChange={e => setRightsConfirmed(e.target.checked)}
+                                    className="w-6 h-6 rounded-lg border-white/20 text-accent-500 bg-black/40 focus:ring-accent-500 focus:ring-offset-0 transition-all cursor-pointer"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-sm text-white font-bold">Declaración de Responsabilidad</p>
+                                <p className="text-xs text-neutral-400 leading-relaxed group-hover:text-neutral-300 transition-colors">
+                                    Confirmo que tengo los derechos para distribuir este material o que es de dominio público. Entiendo que como director soy responsable legal de los contenidos subidos.
+                                </p>
+                            </div>
                         </label>
-                    </div>
-                </div>
 
-                <div className="pt-4 flex justify-end gap-3">
-                    <Link
-                        href="/library"
-                        className="px-6 py-2.5 rounded-xl font-medium text-neutral-300 hover:bg-white/5 transition-colors"
-                    >
-                        Cancelar
-                    </Link>
-                    <button
-                        type="submit"
-                        disabled={loading || !rightsConfirmed || !file}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-accent-500 hover:bg-accent-300 text-primary-900 border-none transition-all shadow-glow-accent text-white rounded-xl font-medium transition-all shadow-lg shadow-glow-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {loading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
-                        {loading ? (isMusicXML ? 'Procesando...' : 'Subiendo...') : (isMusicXML ? 'Subir y Procesar' : 'Subir Archivo')}
-                    </button>
-                </div>
-            </form>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <Link
+                                href="/library"
+                                className="flex-1 px-8 py-5 rounded-2xl font-bold text-neutral-500 hover:text-white hover:bg-white/5 transition-all text-center border border-transparent hover:border-white/10"
+                            >
+                                Cancelar
+                            </Link>
+                            <button
+                                type="submit"
+                                disabled={loading || !file || !title || !composer || !rightsConfirmed}
+                                className="flex-[2] bg-accent-500 hover:bg-accent-400 text-primary-900 font-bold py-5 px-8 rounded-2xl transition-all shadow-glow-accent disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
+                            >
+                                {loading ? <Loader2 size={24} className="animate-spin" /> : <Upload size={24} />}
+                                {loading ? 'Subiendo...' : 'Publicar Obra'}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            )}
         </div>
     );
 }

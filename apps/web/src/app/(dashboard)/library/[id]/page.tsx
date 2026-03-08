@@ -121,12 +121,12 @@ export default function WorkDetailPage() {
                     Volver a Biblioteca
                 </Link>
                 <div className="flex gap-3">
-                    <Link
-                        href="/library/upload"
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-accent-500 hover:bg-accent-300 text-primary-900 border-none transition-all shadow-glow-accent rounded-xl transition-all shadow-lg shadow-glow-primary"
+                    <button
+                        onClick={() => setUploadModalEdition(work.editions?.[0]?.id)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-500 hover:bg-primary-800 transition-all shadow-lg shadow-glow-primary rounded-xl"
                     >
-                        <Upload size={16} /> Subir Archivo
-                    </Link>
+                        <Plus size={16} /> Gestionar Archivos
+                    </button>
                 </div>
             </div>
 
@@ -203,12 +203,21 @@ export default function WorkDetailPage() {
                                     </h3>
                                     <div className="space-y-3 flex-1 overflow-y-auto">
                                         {categories.pdfs.map((asset: any) => (
-                                            <a href={`${API_URL}/assets/${asset.id}/stream`} target="_blank" rel="noreferrer" key={asset.id} className="group p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-accent-500/30 transition-all cursor-pointer flex items-center justify-between">
-                                                <span className="font-medium text-neutral-300 group-hover:text-amber-100 transition-colors line-clamp-1">{getAssetLabel(asset)}</span>
-                                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button title="Descargar" className="p-1.5 bg-accent-500/20 text-accent-300 rounded-md hover:bg-accent-500/40 transition-colors">
-                                                        <Download size={16} />
-                                                    </button>
+                                            <a
+                                                href={`${API_URL.replace('/api/v1', '')}/api/v1/assets/download/${asset.storage_path.split('/').pop()}`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                key={asset.id}
+                                                className="group p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-accent-500/30 transition-all cursor-pointer flex items-center justify-between"
+                                            >
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-slate-200 group-hover:text-accent-500 transition-colors">{getAssetLabel(asset)}</span>
+                                                    <span className="text-[10px] text-neutral-500 font-mono">{asset.original_filename}</span>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <div className="p-2 bg-accent-500/10 text-accent-500 rounded-lg group-hover:bg-accent-500 group-hover:text-primary-900 transition-all">
+                                                        <FileText size={18} />
+                                                    </div>
                                                 </div>
                                             </a>
                                         ))}
