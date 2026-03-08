@@ -276,7 +276,6 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {renderContactBlock('Director', 'director')}
-                {renderContactBlock('Subdirector', 'subdirector')}
             </div>
 
             <div className="space-y-6">
