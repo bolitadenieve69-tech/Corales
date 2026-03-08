@@ -8,15 +8,15 @@ import { fetchApi } from '@/lib/api';
 
 // Era ordering and visual config
 const ERA_CONFIG: Record<string, { order: number; icon: string; color: string; bg: string }> = {
-    'Renacimiento': { order: 1, icon: '🏛️', color: 'text-primary-500', bg: 'bg-white border-primary-500/20 shadow-sm' },
-    'Barroco': { order: 2, icon: '🎻', color: 'text-primary-500', bg: 'bg-white border-primary-500/20 shadow-sm' },
-    'Clasicismo': { order: 3, icon: '🎼', color: 'text-primary-500', bg: 'bg-white border-primary-500/20 shadow-sm' },
-    'Romanticismo': { order: 4, icon: '🌹', color: 'text-primary-500', bg: 'bg-white border-primary-500/20 shadow-sm' },
-    'Zarzuela': { order: 5, icon: '🎭', color: 'text-primary-500', bg: 'bg-white border-primary-500/20 shadow-sm' },
-    'Siglo XX': { order: 6, icon: '🎷', color: 'text-primary-500', bg: 'bg-white border-primary-500/20 shadow-sm' },
-    'Contemporánea': { order: 7, icon: '✨', color: 'text-primary-500', bg: 'bg-white border-primary-500/20 shadow-sm' },
-    'Tradicional': { order: 8, icon: '🎶', color: 'text-primary-500', bg: 'bg-white border-primary-500/20 shadow-sm' },
-    'Por definir': { order: 99, icon: '📋', color: 'text-neutral-500', bg: 'bg-white border-neutral-200' },
+    'Renacimiento': { order: 1, icon: '🏛️', color: 'text-white', bg: 'bg-primary-500 border-primary-800 shadow-md shadow-primary-500/20' },
+    'Barroco': { order: 2, icon: '🎻', color: 'text-white', bg: 'bg-primary-500 border-primary-800 shadow-md shadow-primary-500/20' },
+    'Clasicismo': { order: 3, icon: '🎼', color: 'text-white', bg: 'bg-primary-500 border-primary-800 shadow-md shadow-primary-500/20' },
+    'Romanticismo': { order: 4, icon: '🌹', color: 'text-white', bg: 'bg-primary-500 border-primary-800 shadow-md shadow-primary-500/20' },
+    'Zarzuela': { order: 5, icon: '🎭', color: 'text-white', bg: 'bg-primary-500 border-primary-800 shadow-md shadow-primary-500/20' },
+    'Siglo XX': { order: 6, icon: '🎷', color: 'text-white', bg: 'bg-primary-500 border-primary-800 shadow-md shadow-primary-500/20' },
+    'Contemporánea': { order: 7, icon: '✨', color: 'text-white', bg: 'bg-primary-500 border-primary-800 shadow-md shadow-primary-500/20' },
+    'Tradicional': { order: 8, icon: '🎶', color: 'text-white', bg: 'bg-primary-500 border-primary-800 shadow-md shadow-primary-500/20' },
+    'Por definir': { order: 99, icon: '📋', color: 'text-primary-900', bg: 'bg-neutral-100 border-neutral-200' },
 };
 
 function getEraConfig(era: string) {
@@ -101,9 +101,14 @@ export default function LibraryPage() {
                         {loading ? 'Sincronizando...' : `Gestionando ${totalCount} obras magistrales`}
                     </p>
                 </div>
-                <Link href="/library/upload" className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-800 text-white rounded-full font-bold transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 text-sm">
-                    <Plus size={18} /> Añadir Obra
-                </Link>
+                <div className="flex items-center gap-3">
+                    <Link href="/library/manager" className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-primary-500 text-primary-500 hover:bg-primary-50 rounded-full font-bold transition-all shadow-sm active:scale-95 text-sm">
+                        <Filter size={18} /> Gestionar PDFs
+                    </Link>
+                    <Link href="/library/upload" className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-800 text-white rounded-full font-bold transition-all shadow-lg hover:shadow-primary-500/20 active:scale-95 text-sm">
+                        <Plus size={18} /> Añadir Obra
+                    </Link>
+                </div>
             </div>
 
             {/* Search + Era Filters */}
@@ -194,12 +199,12 @@ export default function LibraryPage() {
                                 {/* Era Header */}
                                 <button
                                     onClick={() => toggleEraCollapse(era)}
-                                    className="w-full flex items-center justify-between px-6 py-4 hover:bg-neutral-50 transition-colors"
+                                    className="w-full flex items-center justify-between px-6 py-4 hover:brightness-105 transition-all"
                                 >
                                     <div className="flex items-center gap-4">
                                         <span className="text-2xl drop-shadow-sm">{config.icon}</span>
-                                        <h2 className={`text-xl font-display font-bold text-foreground`}>{era}</h2>
-                                        <span className="text-xs font-bold text-neutral-500 bg-neutral-100 px-3 py-1 rounded-full uppercase tracking-widest">
+                                        <h2 className={`text-xl font-display font-bold ${config.color}`}>{era}</h2>
+                                        <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest ${era === 'Por definir' ? 'text-neutral-600 bg-white/50 border border-neutral-200' : 'text-primary-500 bg-white shadow-sm'}`}>
                                             {eraWorks.length} {eraWorks.length === 1 ? 'partitura' : 'partituras'}
                                         </span>
                                     </div>
@@ -207,7 +212,7 @@ export default function LibraryPage() {
                                         animate={{ rotate: isCollapsed ? -90 : 0 }}
                                         transition={{ duration: 0.3, ease: 'backOut' }}
                                     >
-                                        <ChevronDown size={24} className="text-neutral-300" />
+                                        <ChevronDown size={24} className={config.color} />
                                     </motion.div>
                                 </button>
 
