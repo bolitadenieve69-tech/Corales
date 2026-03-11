@@ -19,12 +19,12 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: 'localhost',
         port: '8000',
-        pathname: '/api/v1/assets/**',
+        pathname: '/api/v1/**',
       },
       {
         protocol: 'https',
         hostname: '*.railway.app',
-        pathname: '/api/v1/assets/**',
+        pathname: '/api/v1/**',
       },
       {
         protocol: 'https',

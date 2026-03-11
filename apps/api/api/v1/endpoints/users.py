@@ -9,7 +9,7 @@ from api import deps
 from core.database import get_db
 from core.security import get_password_hash
 from models.user import User
-from schemas.user import User as UserSchema, UserCreate
+from schemas.user import User as UserSchema, UserCreate, UserUpdate
 from schemas.feedback import FeedbackRead
 
 router = APIRouter()
@@ -145,7 +145,7 @@ def read_user_me(
 def update_user_me(
     *,
     db: Session = Depends(get_db),
-    user_in: UserSchema, # Using full schema for simplicity in mapping
+    user_in: UserUpdate, # Use Update schema to avoid ID requirements
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     """

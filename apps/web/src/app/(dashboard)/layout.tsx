@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Music, CalendarDays, Users, Settings, LogOut, GraduationCap, UserCircle } from 'lucide-react';
+import { Music, CalendarDays, Users, Settings, LogOut, GraduationCap, UserCircle, BookOpen } from 'lucide-react';
 import { logout } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 
@@ -52,7 +52,7 @@ export default function DashboardLayout({
         { href: '/seasons', icon: Music, label: 'Mi Repertorio', roles: ['ADMIN', 'DIRECTOR', 'SUBDIRECTOR', 'CORALISTA'] },
         { href: '/academy', icon: GraduationCap, label: 'Academia', roles: ['ADMIN', 'DIRECTOR', 'SUBDIRECTOR', 'CORALISTA'] },
         { href: '/choir/management', icon: Users, label: 'Mi Coro', roles: ['ADMIN', 'DIRECTOR', 'SUBDIRECTOR'] },
-        { href: '/library', icon: GraduationCap, label: 'Biblioteca', roles: ['ADMIN', 'DIRECTOR', 'SUBDIRECTOR'] },
+        { href: '/library', icon: BookOpen, label: 'Biblioteca', roles: ['ADMIN', 'DIRECTOR', 'SUBDIRECTOR'] },
     ];
 
     const filteredNav = navItems.filter(item => user && item.roles.includes(user.role));

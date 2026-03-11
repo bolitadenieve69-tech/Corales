@@ -30,8 +30,10 @@ export const SeasonForm = ({ choirId, onSuccess, onCancel }: SeasonFormProps) =>
                 })
             });
             onSuccess();
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error creating season", err);
+            // We use standard vanilla alert as a quick fallback if we don't have useUIStore here, or we can use it.
+            alert(`Error al crear la temporada: ${err.message}`);
         } finally {
             setLoading(false);
         }

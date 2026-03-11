@@ -3,14 +3,17 @@ import { Camera, Image as ImageIcon, Save, Loader2, Link2 } from 'lucide-react';
 import { fetchApi, API_URL } from '@/lib/api';
 import { useUIStore } from '@/store/uiStore';
 import Image from 'next/image';
+import { useAuth } from '@/lib/auth-context';
 
 interface ChoirSettingsFormProps {
     choirId: string;
-    onUpdate?: () => void;
+    onUpdate?: (updatedChoir?: any) => void;
+    onIdDiscovered?: (id: string) => void;
 }
 
-export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps) {
+export function ChoirSettingsForm({ choirId, onUpdate, onIdDiscovered }: ChoirSettingsFormProps) {
     const addToast = useUIStore(state => state.addToast);
+    const { refreshUser } = useAuth();
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -52,6 +55,7 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
                         ...data
                     });
                     setHasChoir(true);
+                    if (onIdDiscovered) onIdDiscovered(data.id);
                 } else {
                     setHasChoir(false);
                 }
@@ -60,7 +64,7 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
                 setHasChoir(false);
             })
             .finally(() => setLoading(false));
-    }, []);
+    }, [choirId]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, type, value } = e.target;
@@ -88,6 +92,7 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
                     method: 'PUT',
                     body: JSON.stringify(cleanData)
                 });
+                if (onUpdate) onUpdate(cleanData);
             } else {
                 // If the user doesn't have a choir yet, create one
                 const res = await fetchApi('/choirs/', {
@@ -100,11 +105,14 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
                 });
                 if (res && res.id) {
                     setHasChoir(true);
+                    if (onIdDiscovered) onIdDiscovered(res.id);
+                    if (onUpdate) onUpdate(res);
                 }
             }
 
             addToast('Datos del coro guardados correctamente', 'success');
-            if (onUpdate) onUpdate();
+            // Refresh user context to show updated name in sidebar etc
+            refreshUser();
         } catch (error: any) {
             console.error(error);
             addToast(`Error guardando los datos del coro: ${error.message}`, 'error');
@@ -146,7 +154,8 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
             setFormData((prev: any) => ({
                 ...prev,
                 logo_url: updatedChoir.logo_url,
-                cover_photo_url: updatedChoir.cover_photo_url
+                cover_photo_url: updatedChoir.cover_photo_url,
+                updated_at: updatedChoir.updated_at
             }));
 
             addToast(`${assetType === 'logo' ? 'Logo' : 'Foto'} subido correctamente`, 'success');
@@ -219,7 +228,12 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
             <div className="space-y-4">
                 <div className="relative h-48 w-full rounded-[2rem] bg-primary-900 border border-white/10 overflow-hidden group">
                     {formData.cover_photo_url ? (
-                        <Image src={`${API_URL.replace('/api/v1', '')}/api/v1/assets/download/${formData.cover_photo_url.split('/').pop()}`} alt="Portada" fill className="object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
+                        <Image
+                            src={`${API_URL}/choirs/me/asset/cover?t=${new Date(formData.updated_at || Date.now()).getTime()}`}
+                            alt="Portada"
+                            fill
+                            className="object-cover opacity-60 group-hover:opacity-40 transition-opacity"
+                        />
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-primary-700">
                             <ImageIcon size={64} />
@@ -237,7 +251,12 @@ export function ChoirSettingsForm({ choirId, onUpdate }: ChoirSettingsFormProps)
                 <div className="flex px-8 -mt-16 relative z-10 gap-6">
                     <div className="relative w-32 h-32 rounded-full border-4 border-primary-800 bg-primary-900 overflow-hidden group shadow-2xl">
                         {formData.logo_url ? (
-                            <Image src={`${API_URL.replace('/api/v1', '')}/api/v1/assets/download/${formData.logo_url.split('/').pop()}`} alt="Logo" fill className="object-cover" />
+                            <Image
+                                src={`${API_URL}/choirs/me/asset/logo?t=${new Date(formData.updated_at || Date.now()).getTime()}`}
+                                alt="Logo"
+                                fill
+                                className="object-cover"
+                            />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center text-primary-500">
                                 <ImageIcon size={40} className="opacity-50" />

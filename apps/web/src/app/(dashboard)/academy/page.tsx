@@ -83,7 +83,7 @@ export default function AcademyPage() {
 
             {/* Path Title */}
             <div className="flex items-center justify-between px-4">
-                <h2 className="text-2xl font-display font-bold text-white flex items-center gap-4">
+                <h2 className="text-2xl font-display font-bold text-foreground flex items-center gap-4">
                     <span className="w-12 h-px bg-primary-500/30" />
                     Ritmo y Lectura 1
                     <span className="w-12 h-px bg-primary-500/30" />
@@ -102,12 +102,12 @@ export default function AcademyPage() {
                         strokeWidth="4"
                         strokeDasharray="12 8"
                         strokeLinecap="round"
-                        className="opacity-20 translate-x-[50%] md:translate-x-[50%]"
+                        className="opacity-10 translate-x-[50%] md:translate-x-[50%]"
                     />
                     <defs>
                         <linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="var(--color-accent-500)" />
-                            <stop offset="100%" stopColor="var(--color-primary-500)" />
+                            <stop offset="0%" stopColor="var(--color-primary-500)" />
+                            <stop offset="100%" stopColor="var(--color-accent-gold)" />
                         </linearGradient>
                     </defs>
                 </svg>
@@ -136,15 +136,15 @@ export default function AcademyPage() {
                                             <motion.div
                                                 animate={{ scale: [1, 1.4, 1] }}
                                                 transition={{ duration: 2, repeat: Infinity }}
-                                                className="absolute inset-0 bg-accent-500/30 rounded-full blur-xl"
+                                                className="absolute inset-0 bg-primary-500/20 rounded-full blur-xl"
                                             />
                                         )}
                                         <Link
                                             href={isUnlocked ? `/academy/${lesson.id}` : '#'}
-                                            className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center border-4 transition-all duration-300 ${!isUnlocked ? 'bg-primary-900 border-white/5 text-neutral-600 scale-90 grayscale' :
-                                                isCurrent ? 'bg-accent-500 border-white/20 text-primary-900 shadow-glow-accent scale-110 active:scale-95' :
-                                                    isCompleted ? 'bg-primary-500 border-white/10 text-white shadow-glow-primary hover:scale-105' :
-                                                        'bg-primary-800 border-white/10 text-neutral-400 hover:border-primary-500/50 hover:text-white'
+                                            className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center border-4 transition-all duration-300 ${!isUnlocked ? 'bg-neutral-200 border-neutral-300 text-neutral-400 scale-90' :
+                                                isCurrent ? 'bg-primary-500 border-white/20 text-white shadow-glow-primary scale-110 active:scale-95' :
+                                                    isCompleted ? 'bg-accent-gold border-white/10 text-white shadow-lg hover:scale-105' :
+                                                        'bg-white border-neutral-200 text-neutral-400 hover:border-primary-500/50 hover:text-primary-500 shadow-sm'
                                                 }`}
                                         >
                                             {isCompleted ? <CheckCircle2 size={32} /> :
@@ -152,7 +152,7 @@ export default function AcademyPage() {
                                                     <Play size={32} className={isCurrent ? 'translate-x-0.5' : ''} />}
 
                                             {/* Order Number Badge */}
-                                            <div className="absolute -top-1 -right-1 w-7 h-7 bg-black/50 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-[10px] font-black text-white">
+                                            <div className="absolute -top-1 -right-1 w-7 h-7 bg-white rounded-full border border-neutral-200 flex items-center justify-center text-[10px] font-black text-neutral-600 shadow-sm">
                                                 {index + 1}
                                             </div>
                                         </Link>
@@ -161,28 +161,28 @@ export default function AcademyPage() {
                                     {/* Content Card */}
                                     <Link
                                         href={isUnlocked ? `/academy/${lesson.id}` : '#'}
-                                        className={`group relative flex flex-col items-center p-6 rounded-3xl transition-all duration-500 hover:scale-105 ${isLocked
-                                            ? 'bg-neutral-800/50 border border-white/5 opacity-60 grayscale cursor-not-allowed'
-                                            : 'bg-primary-800/40 border border-white/10 hover:border-primary-500/50 hover:bg-primary-800/60 shadow-xl shadow-black/20'
+                                        className={`group relative flex flex-col items-center p-6 rounded-[2rem] transition-all duration-500 hover:scale-105 ${isLocked
+                                            ? 'bg-neutral-100 border border-neutral-200 opacity-60 grayscale cursor-not-allowed'
+                                            : 'bg-white border border-neutral-200 hover:border-primary-500/30 hover:shadow-2xl shadow-sm'
                                             }`}
                                     >
-                                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:rotate-6 ${isLocked ? 'bg-neutral-700 text-neutral-500' : 'bg-primary-500/20 text-primary-400 group-hover:bg-primary-500/30'
+                                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:rotate-6 ${isLocked ? 'bg-neutral-200 text-neutral-400' : 'bg-primary-100 text-primary-500 group-hover:bg-primary-500 group-hover:text-white'
                                             }`}>
                                             {lesson.lesson_type === 'RHYTHM' ? <Music size={28} /> :
                                                 lesson.lesson_type === 'THEORY' ? <BookOpen size={28} /> :
                                                     <GraduationCap size={28} />}
                                         </div>
                                         <div className="space-y-2 text-center">
-                                            <p className="text-[10px] font-bold text-accent-500 uppercase tracking-widest">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-primary-500">
                                                 {lesson.lesson_type === 'RHYTHM' ? 'Ritmo' : 'Teoría'}
                                             </p>
-                                            <h3 className="font-bold text-white leading-tight">{lesson.title}</h3>
-                                            <p className="text-xs text-neutral-400 line-clamp-2 leading-relaxed">{lesson.description}</p>
+                                            <h3 className="font-display font-bold text-foreground leading-tight text-xl">{lesson.title}</h3>
+                                            <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed font-medium">{lesson.description}</p>
                                         </div>
 
                                         {isUnlocked && (
-                                            <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-neutral-300">
-                                                {isCompleted ? 'Volver a ver' : 'Comenzar ahora'} <ArrowRight size={14} className="text-accent-500" />
+                                            <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-neutral-400 group-hover:text-primary-500 transition-colors">
+                                                {isCompleted ? 'Volver a ver' : 'Comenzar ahora'} <ArrowRight size={14} className="text-primary-500" />
                                             </div>
                                         )}
                                     </Link>
@@ -194,13 +194,13 @@ export default function AcademyPage() {
             </div>
 
             {/* Bottom Invitation */}
-            <div className="text-center py-20 px-8 bg-gradient-to-b from-transparent to-primary-900/50 rounded-b-[4rem]">
+            <div className="text-center py-24 px-8 bg-white border border-neutral-200 rounded-[3rem] shadow-sm">
                 <div className="max-w-md mx-auto space-y-6">
-                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto border border-white/10">
+                    <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto border border-primary-500/10">
                         <GraduationCap size={32} className="text-primary-500" />
                     </div>
-                    <h3 className="text-2xl font-display font-bold text-white">Próximo Nivel</h3>
-                    <p className="text-neutral-400">Continúa practicando para desbloquear ejercicios de armonía y entrenamiento auditivo avanzado.</p>
+                    <h3 className="text-3xl font-display font-bold text-foreground">Próximo Nivel</h3>
+                    <p className="text-neutral-500 font-medium">Continúa practicando para desbloquear ejercicios de armonía y entrenamiento auditivo avanzado.</p>
                 </div>
             </div>
         </div>

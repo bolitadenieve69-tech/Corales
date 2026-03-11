@@ -11,6 +11,7 @@ import { SeasonForm } from '@/components/choir/SeasonForm';
 import { SendFeedbackModal } from '@/components/choir/SendFeedbackModal';
 import { ChoirSettingsForm } from '@/components/choir/ChoirSettingsForm';
 import { AddMemberModal } from '@/components/choir/AddMemberModal';
+import { InvitationManager } from '@/components/choir/InvitationManager';
 
 export default function ChoirManagementPage() {
     const { user: currentUser } = useAuth();
@@ -114,186 +115,238 @@ export default function ChoirManagementPage() {
             >
                 {activeTab === 'info' && (
                     <div className="max-w-4xl mx-auto">
-                        <ChoirSettingsForm choirId={choirId} />
+                        <ChoirSettingsForm
+                            choirId={choirId}
+                            onIdDiscovered={(id) => {
+                                if (!choirId) setChoirId(id);
+                            }}
+                            onUpdate={(choir) => {
+                                // Potentially update choir name in local state if we started displaying it
+                                if (choir && choir.id) setChoirId(choir.id);
+                            }}
+                        />
                     </div>
                 )}
 
                 {activeTab === 'members' && (
                     <div className="space-y-6">
-                        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                            <div className="relative w-full md:w-96">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500" size={18} />
-                                <input
-                                    type="text"
-                                    placeholder="Buscar miembro..."
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:outline-none focus:border-accent-500/50"
-                                />
+                        {!choirId ? (
+                            <div className="py-20 text-center space-y-4">
+                                <Shield className="mx-auto text-neutral-600" size={48} />
+                                <p className="text-neutral-500">Primero configura la información de tu coro en la pestaña "Datos".</p>
                             </div>
-                            <div className="flex gap-2">
-                                <button className="p-3 bg-white/5 border border-white/10 rounded-xl text-neutral-400 hover:text-white">
-                                    <Filter size={18} />
-                                </button>
-                                <button
-                                    onClick={() => setShowAddMemberModal(true)}
-                                    className="flex items-center gap-2 bg-primary-500 text-white px-5 py-3 rounded-xl font-bold hover:bg-primary-400 transition-all shadow-glow-primary"
-                                >
-                                    <UserPlus size={18} />
-                                    Añadir Miembro
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {members.map((member) => (
-                                <div key={member.id} className="p-5 bg-white/5 border border-white/5 rounded-2xl flex items-center gap-4 group hover:bg-white/10 transition-all border-l-4 relative" style={{ borderColor: voiceColorMap[member.voice_part] || 'transparent' }}>
-                                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary-700 border border-white/10 flex items-center justify-center overflow-hidden relative">
-                                        {member.avatar_url ? (
-                                            <Image
-                                                src={member.avatar_url}
-                                                alt={`Avatar de ${member.full_name}`}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-primary-300 font-bold">{member.full_name?.[0] || 'U'}</span>
-                                        )}
+                        ) : (
+                            <>
+                                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                                    <div className="relative w-full md:w-96">
+                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500" size={18} />
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar miembro..."
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:outline-none focus:border-accent-500/50"
+                                        />
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="text-white font-bold truncate flex items-center gap-2">
-                                            {member.full_name}
-                                            {member.phone && member.has_whatsapp && (
-                                                <div className="w-2 h-2 rounded-full bg-success flex-shrink-0" title="Tiene WhatsApp" />
-                                            )}
-                                        </h3>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            <select
-                                                aria-label={`Cambiar voz de ${member.full_name}`}
-                                                value={member.voice_part}
-                                                onChange={async (e) => {
-                                                    const newVoice = e.target.value;
-                                                    try {
-                                                        const updated = await fetchApi(`/management/${choirId}/members/${member.id}/voice?voice_part=${newVoice}`, {
-                                                            method: 'PUT'
-                                                        });
-                                                        if (updated) {
-                                                            setMembers(prev => prev.map(m => m.id === member.id ? { ...m, voice_part: newVoice } : m));
-                                                            useUIStore.getState().addToast('Voz actualizada', 'success');
-                                                        }
-                                                    } catch (err) {
-                                                        useUIStore.getState().addToast('Error al cambiar voz', 'error');
-                                                    }
-                                                }}
-                                                className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-neutral-300 uppercase font-black tracking-widest border-none cursor-pointer focus:ring-1 focus:ring-accent-500"
-                                            >
-                                                {['SOPRANO', 'ALTO', 'TENOR', 'BASS'].map(v => (
-                                                    <option key={v} value={v} className="bg-primary-800 text-white">{v}</option>
-                                                ))}
-                                            </select>
-                                            <span className="text-[10px] text-neutral-500 lowercase truncate" title={member.email}>{member.email}</span>
-                                        </div>
-                                    </div>
-                                    <div className="shrink-0 flex gap-1">
-                                        <button
-                                            title="Enviar mensaje de corrección"
-                                            aria-label={`Enviar mensaje a ${member.full_name}`}
-                                            onClick={() => {
-                                                setSelectedMember(member);
-                                                setShowFeedbackModal(true);
-                                            }}
-                                            className="p-2 hover:bg-white/10 rounded-xl text-neutral-400 hover:text-accent-500 transition-all focus-ring"
-                                        >
-                                            <MessageSquare size={18} />
+                                    <div className="flex gap-2">
+                                        <button className="p-3 bg-white/5 border border-white/10 rounded-xl text-neutral-400 hover:text-white">
+                                            <Filter size={18} />
                                         </button>
-                                        {member.user_id !== currentUser?.id && (
-                                            <button
-                                                title="Expulsar miembro"
-                                                aria-label={`Expulsar a ${member.full_name}`}
-                                                onClick={async () => {
-                                                    if (confirm(`¿Estás seguro de que quieres eliminar a ${member.full_name} del coro?`)) {
-                                                        try {
-                                                            await fetchApi(`/management/choir/${choirId}/members/${member.id}`, {
-                                                                method: 'DELETE'
-                                                            });
-                                                            setMembers(prev => prev.filter(m => m.id !== member.id));
-                                                            useUIStore.getState().addToast('Miembro eliminado correctamente', 'success');
-                                                        } catch (err: any) {
-                                                            useUIStore.getState().addToast(err.message || 'Error al eliminar miembro', 'error');
-                                                        }
-                                                    }
-                                                }}
-                                                className="p-2 hover:bg-red-500/10 rounded-xl text-neutral-400 hover:text-red-500 transition-all focus-ring"
-                                            >
-                                                <Trash size={18} />
-                                            </button>
-                                        )}
+                                        <button
+                                            onClick={() => setShowAddMemberModal(true)}
+                                            className="flex items-center gap-2 bg-primary-500 text-white px-5 py-3 rounded-xl font-bold hover:bg-primary-400 transition-all shadow-glow-primary"
+                                        >
+                                            <UserPlus size={18} />
+                                            Añadir Miembro
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {members.map((member) => (
+                                        <div key={member.id} className="p-5 bg-white/5 border border-white/5 rounded-2xl flex items-center gap-4 group hover:bg-white/10 transition-all border-l-4 relative" style={{ borderColor: voiceColorMap[member.voice_part] || 'transparent' }}>
+                                            <div className="shrink-0 w-12 h-12 rounded-full bg-primary-700 border border-white/10 flex items-center justify-center overflow-hidden relative">
+                                                {member.avatar_url ? (
+                                                    <Image
+                                                        src={member.avatar_url}
+                                                        alt={`Avatar de ${member.full_name}`}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                ) : (
+                                                    <span className="text-primary-300 font-bold">{member.full_name?.[0] || 'U'}</span>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-white font-bold truncate flex items-center gap-2">
+                                                    {member.full_name}
+                                                    {member.phone && member.has_whatsapp && (
+                                                        <div className="w-2 h-2 rounded-full bg-success flex-shrink-0" title="Tiene WhatsApp" />
+                                                    )}
+                                                </h3>
+                                                <div className="flex items-center gap-2 mt-0.5">
+                                                    <select
+                                                        aria-label={`Cambiar voz de ${member.full_name}`}
+                                                        value={member.voice_part}
+                                                        onChange={async (e) => {
+                                                            const newVoice = e.target.value;
+                                                            try {
+                                                                const updated = await fetchApi(`/management/choir/${choirId}/members/${member.id}/voice?voice_part=${newVoice}`, {
+                                                                    method: 'PUT'
+                                                                });
+                                                                if (updated) {
+                                                                    setMembers(prev => prev.map(m => m.id === member.id ? { ...m, voice_part: newVoice } : m));
+                                                                    useUIStore.getState().addToast('Voz actualizada', 'success');
+                                                                }
+                                                            } catch (err) {
+                                                                useUIStore.getState().addToast('Error al cambiar voz', 'error');
+                                                            }
+                                                        }}
+                                                        className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-neutral-300 uppercase font-black tracking-widest border-none cursor-pointer focus:ring-1 focus:ring-accent-500"
+                                                    >
+                                                        {['SOPRANO', 'ALTO', 'TENOR', 'BASS', 'DIRECTOR', 'SUBDIRECTOR'].map(v => (
+                                                            <option
+                                                                key={v}
+                                                                value={v}
+                                                                className={`bg-primary-800 text-white ${['DIRECTOR', 'SUBDIRECTOR'].includes(v) ? 'font-bold' : ''}`}
+                                                            >
+                                                                {v}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    <span className="text-[10px] text-neutral-500 lowercase truncate" title={member.email}>{member.email}</span>
+                                                </div>
+                                            </div>
+                                            <div className="shrink-0 flex gap-1">
+                                                <button
+                                                    title="Enviar mensaje de corrección"
+                                                    aria-label={`Enviar mensaje a ${member.full_name}`}
+                                                    onClick={() => {
+                                                        setSelectedMember(member);
+                                                        setShowFeedbackModal(true);
+                                                    }}
+                                                    className="p-2 hover:bg-white/10 rounded-xl text-neutral-400 hover:text-accent-500 transition-all focus-ring"
+                                                >
+                                                    <MessageSquare size={18} />
+                                                </button>
+                                                {member.user_id !== currentUser?.id && (
+                                                    <button
+                                                        title="Expulsar miembro"
+                                                        aria-label={`Expulsar a ${member.full_name}`}
+                                                        onClick={async () => {
+                                                            if (confirm(`¿Estás seguro de que quieres eliminar a ${member.full_name} del coro?`)) {
+                                                                try {
+                                                                    await fetchApi(`/management/choir/${choirId}/members/${member.id}`, {
+                                                                        method: 'DELETE'
+                                                                    });
+                                                                    setMembers(prev => prev.filter(m => m.id !== member.id));
+                                                                    useUIStore.getState().addToast('Miembro eliminado correctamente', 'success');
+                                                                } catch (err: any) {
+                                                                    useUIStore.getState().addToast(err.message || 'Error al eliminar miembro', 'error');
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="p-2 hover:bg-red-500/10 rounded-xl text-neutral-400 hover:text-red-500 transition-all focus-ring"
+                                                    >
+                                                        <Trash size={18} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
                 )}
 
                 {activeTab === 'seasons' && (
                     <div className="space-y-8">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-2xl font-display font-bold text-white">Ciclos Musicales</h2>
-                            <button
-                                onClick={() => setShowSeasonForm(true)}
-                                className="flex items-center gap-2 bg-accent-500 text-primary-900 px-5 py-3 rounded-xl font-bold hover:bg-accent-400 transition-all shadow-glow-accent"
-                            >
-                                <Calendar size={18} />
-                                Nueva Temporada
-                            </button>
-                        </div>
-
-                        {seasons.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-                                <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-primary-300">
-                                    <Calendar size={40} />
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-xl font-bold text-white">No hay temporadas aún</h3>
-                                    <p className="text-neutral-500 max-w-xs">Organiza tus proyectos escolares y conciertos por periodos de tiempo.</p>
-                                </div>
+                        {!choirId ? (
+                            <div className="py-20 text-center space-y-4">
+                                <Calendar className="mx-auto text-neutral-600" size={48} />
+                                <p className="text-neutral-500">Primero configura la información de tu coro en la pestaña "Datos".</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {seasons.map((season) => (
-                                    <div key={season.id} className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-4 hover:border-primary-500/30 transition-all">
-                                        <div className="flex justify-between">
-                                            <h3 className="text-xl font-bold text-white">{season.name}</h3>
-                                            <span className="px-3 py-1 rounded-full bg-success/10 text-success text-[10px] font-black uppercase tracking-widest">Activo</span>
+                            <>
+                                <div className="flex justify-between items-center">
+                                    <h2 className="text-2xl font-display font-bold text-white">Ciclos Musicales</h2>
+                                    <button
+                                        onClick={() => setShowSeasonForm(true)}
+                                        className="flex items-center gap-2 bg-accent-500 text-primary-900 px-5 py-3 rounded-xl font-bold hover:bg-accent-400 transition-all shadow-glow-accent"
+                                    >
+                                        <Calendar size={18} />
+                                        Nueva Temporada
+                                    </button>
+                                </div>
+
+                                {seasons.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                                        <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-primary-300">
+                                            <Calendar size={40} />
                                         </div>
-                                        <div className="flex items-center gap-4 text-sm text-neutral-400">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar size={14} />
-                                                {season.start_date || 'N/A'} — {season.end_date || 'Presente'}
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <FileText size={14} />
-                                                0 proyectos
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-2 pt-2">
-                                            <button className="flex-1 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold hover:bg-white/10 transition-all">Ver Repertorio</button>
-                                            <button
-                                                aria-label="Configurar temporada"
-                                                className="py-2 px-4 rounded-xl bg-white/5 border border-white/10 text-xs hover:bg-white/10"
-                                            >
-                                                <Settings size={14} />
-                                            </button>
+                                        <div className="space-y-1">
+                                            <h3 className="text-xl font-bold text-white">No hay temporadas aún</h3>
+                                            <p className="text-neutral-500 max-w-xs">Organiza tus proyectos escolares y conciertos por periodos de tiempo.</p>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {seasons.map((season) => (
+                                            <div key={season.id} className="p-6 bg-white/5 border border-white/10 rounded-3xl space-y-4 hover:border-primary-500/30 transition-all">
+                                                <div className="flex justify-between">
+                                                    <h3 className="text-xl font-bold text-white">{season.name}</h3>
+                                                    <span className="px-3 py-1 rounded-full bg-success/10 text-success text-[10px] font-black uppercase tracking-widest">Activo</span>
+                                                </div>
+                                                <div className="flex items-center gap-4 text-sm text-neutral-400">
+                                                    <div className="flex items-center gap-2">
+                                                        <Calendar size={14} />
+                                                        {season.start_date || 'N/A'} — {season.end_date || 'Presente'}
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText size={14} />
+                                                        0 proyectos
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-2 pt-2">
+                                                    <button className="flex-1 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold hover:bg-white/10 transition-all">Ver Repertorio</button>
+                                                    <button
+                                                        aria-label="Configurar temporada"
+                                                        className="py-2 px-4 rounded-xl bg-white/5 border border-white/10 text-xs hover:bg-white/10"
+                                                    >
+                                                        <Settings size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 )}
 
                 {activeTab === 'invites' && (
-                    <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 text-neutral-500">
-                        <UserPlus size={48} />
-                        <p>Gestión de invitaciones próximamente...</p>
+                    <div className="max-w-4xl mx-auto space-y-10">
+                        {/* Summary Card */}
+                        <div className="p-8 bg-gradient-to-br from-primary-500/20 to-accent-500/10 border border-white/10 rounded-[2.5rem] relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <UserPlus size={120} />
+                            </div>
+                            <div className="relative z-10 space-y-4">
+                                <h3 className="text-2xl font-display font-bold text-white tracking-tight">Crecimiento del Coro</h3>
+                                <p className="text-primary-100/70 max-w-lg leading-relaxed font-ui">
+                                    Genera enlaces de acceso para tus coralistas. Cada enlace tiene un límite de usos que consume la cuota pactada de tu agrupación.
+                                </p>
+                            </div>
+                        </div>
+
+                        {!choirId ? (
+                            <div className="py-20 text-center space-y-4">
+                                <UserPlus className="mx-auto text-neutral-600" size={48} />
+                                <p className="text-neutral-500">Primero configura la información de tu coro en la pestaña "Datos".</p>
+                            </div>
+                        ) : (
+                            <InvitationManager choirId={choirId} />
+                        )}
                     </div>
                 )}
 

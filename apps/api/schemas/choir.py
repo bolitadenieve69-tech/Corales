@@ -60,8 +60,12 @@ class ChoirUpdate(ChoirBase):
     name: Optional[str] = None
     max_users: Optional[int] = None
 
+from datetime import date, datetime
+
 class ChoirSchema(ChoirBase):
     id: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 

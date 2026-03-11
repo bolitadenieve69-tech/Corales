@@ -65,8 +65,8 @@ def create_invite(
                    f"Ya hay {current_members} miembros y {reserved_slots} espacios reservados en otras invitaciones."
         )
 
-    # Generate unique code
-    code = secrets.token_urlsafe(8)
+    # Generate unique code (32 bytes as per rules)
+    code = secrets.token_urlsafe(32)
     
     db_invite = Invite(
         id=str(uuid.uuid4()),
