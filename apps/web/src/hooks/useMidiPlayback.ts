@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import * as Tone from 'tone';
 import { API_URL } from '@/lib/api';
+import { usePlaybackStore } from '@/store/playbackStore';
 
 export type MidiVoice = 'soprano' | 'alto' | 'tenor' | 'bajo';
 
@@ -20,6 +21,8 @@ export interface MidiVoiceInfo {
 }
 
 export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
+    const { volumes, isMuted, setScoreBpm, isPlaying: transportPlaying, togglePlay } = usePlaybackStore();
+    
     const [voiceInfo, setVoiceInfo] = useState<Record<MidiVoice, MidiVoiceInfo>>({
         soprano: { assetId: null, isLoading: false, isPlaying: false },
         alto:    { assetId: null, isLoading: false, isPlaying: false },
@@ -30,8 +33,22 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
     const synthsRef = useRef<Record<MidiVoice, Tone.PolySynth | null>>({
         soprano: null, alto: null, tenor: null, bajo: null,
     });
+    const partRefs = useRef<Record<MidiVoice, Tone.Part | null>>({
+        soprano: null, alto: null, tenor: null, bajo: null,
+    });
 
-    // Resolve asset IDs whenever the assets list changes
+    // Sync volume and mute states to synths
+    useEffect(() => {
+        (Object.keys(synthsRef.current) as MidiVoice[]).forEach(voice => {
+            const synth = synthsRef.current[voice];
+            if (synth) {
+                const vol = volumes[voice] ?? 100;
+                const muted = isMuted[voice] ?? false;
+                synth.volume.value = muted ? -100 : Tone.gainToDb(vol / 100);
+            }
+        });
+    }, [volumes, isMuted]);
+
     useEffect(() => {
         setVoiceInfo(prev => {
             const updated = { ...prev };
@@ -44,10 +61,14 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
     }, [assets]);
 
     const stopVoice = useCallback((voice: MidiVoice) => {
-        const synth = synthsRef.current[voice];
-        if (synth) {
-            synth.releaseAll();
-            synth.dispose();
+        if (partRefs.current[voice]) {
+            partRefs.current[voice]?.stop();
+            partRefs.current[voice]?.dispose();
+            partRefs.current[voice] = null;
+        }
+        if (synthsRef.current[voice]) {
+            synthsRef.current[voice]?.releaseAll();
+            synthsRef.current[voice]?.dispose();
             synthsRef.current[voice] = null;
         }
         setVoiceInfo(prev => ({
@@ -60,7 +81,6 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
         const assetId = voiceInfo[voice].assetId;
         if (!assetId) return;
 
-        // Toggle off if already playing
         if (voiceInfo[voice].isPlaying) {
             stopVoice(voice);
             return;
@@ -70,40 +90,45 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
 
         try {
             await Tone.start();
-
-            // Dynamic import to avoid SSR issues
             const { Midi } = await import('@tonejs/midi');
             const midi = await Midi.fromUrl(`${API_URL}/assets/${assetId}/stream`);
 
-            // Create a PolySynth with a piano-like envelope
+            // Expose score BPM so ScoreViewer can sync cursor correctly
+            const midiFileBpm = midi.header.tempos[0]?.bpm ?? 120;
+            setScoreBpm(midiFileBpm);
+
+            // Start Transport if not already running (first voice play)
+            if (!transportPlaying) {
+                Tone.getTransport().position = 0;
+                togglePlay();
+            }
+
+            // Create Synth
             const synth = new Tone.PolySynth(Tone.Synth, {
                 oscillator: { type: 'triangle' },
                 envelope: { attack: 0.02, decay: 0.1, sustain: 0.5, release: 0.8 },
             }).toDestination();
-            synth.volume.value = -6;
+            
+            // Apply current volume immediately
+            const vol = volumes[voice] ?? 100;
+            const muted = isMuted[voice] ?? false;
+            synth.volume.value = muted ? -100 : Tone.gainToDb(vol / 100);
+            
             synthsRef.current[voice] = synth;
 
-            // Schedule all notes at absolute audio-context times (no Transport dependency)
-            const startAt = Tone.now() + 0.1;
-            midi.tracks.forEach(track => {
-                track.notes.forEach(note => {
-                    synth.triggerAttackRelease(
-                        note.name,
-                        note.duration,
-                        startAt + note.time,
-                        note.velocity,
-                    );
-                });
-            });
+            // Prepare part for Transport synchronization
+            const notes = midi.tracks.flatMap(t => t.notes);
+            const part = new Tone.Part((time, note) => {
+                synth.triggerAttackRelease(note.name, note.duration, time, note.velocity);
+            }, notes.map(n => ({ time: n.time, name: n.name, duration: n.duration, velocity: n.velocity })));
+
+            part.start(0);
+            partRefs.current[voice] = part;
 
             setVoiceInfo(prev => ({
                 ...prev,
                 [voice]: { ...prev[voice], isLoading: false, isPlaying: true },
             }));
-
-            // Auto-stop once the MIDI finishes
-            const durationMs = (midi.duration + 0.5) * 1000;
-            setTimeout(() => stopVoice(voice), durationMs);
 
         } catch (err) {
             console.error(`[useMidiPlayback] Error loading MIDI for ${voice}:`, err);
@@ -112,7 +137,7 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
                 [voice]: { ...prev[voice], isLoading: false, isPlaying: false },
             }));
         }
-    }, [voiceInfo, stopVoice]);
+    }, [voiceInfo, stopVoice, volumes, isMuted]);
 
     const stopAll = useCallback(() => {
         (Object.keys(VOICE_ASSET_TYPES) as MidiVoice[]).forEach(stopVoice);

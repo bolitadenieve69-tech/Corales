@@ -1,0 +1,17 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "library": "Biblioteca",
+    "academy": "Academia",
+    "rehearsal": "Ensayo",
+    "profile": "Perfil",
+    "settings": "Ajustes"
+  }
+}

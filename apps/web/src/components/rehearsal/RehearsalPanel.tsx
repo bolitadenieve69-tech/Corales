@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Maximize2, Settings2, PlayCircle, PauseCircle, MessageSquare } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { usePlayback, Voice } from '@/hooks/usePlayback';
+import { X, Maximize2, Settings2, PlayCircle, PauseCircle, MessageSquare, Headphones } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { usePlayback } from '@/hooks/usePlayback';
+import { usePlaybackStore } from '@/store/playbackStore';
 import { usePracticeTracking } from '@/hooks/usePracticeTracking';
 import { useDirectorNotes } from '@/hooks/useDirectorNotes';
 import { VoiceMixer } from './VoiceMixer';
@@ -26,7 +27,7 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
         isMuted,
         toggleMute,
         setSolo,
-        minutesPracticed
+        currentTime
     } = usePlayback({
         workId: work.id,
         assets: work.editions?.[0]?.assets || []
@@ -38,13 +39,20 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
         isActive: isPlaying
     });
 
+    const scoreBpm = usePlaybackStore(s => s.scoreBpm);
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const { notes: directorNotes, markAsRead } = useDirectorNotes(work.id);
+    const { notes: directorNotes } = useDirectorNotes(work.id);
     const unreadNotes = directorNotes.filter(n => !n.read_at);
 
     // Find the MusicXML asset if any
     const xmlAsset = work.editions?.[0]?.assets?.find((a: any) => a.asset_type?.toUpperCase() === 'MUSICXML');
     const pdfAsset = work.editions?.[0]?.assets?.find((a: any) => ['PDF', 'SHEET_MUSIC'].includes(a.asset_type?.toUpperCase()));
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
 
     return (
         <div className={`fixed inset-0 z-[100] bg-primary-900 flex flex-col items-stretch overflow-hidden animate-in slide-in-from-bottom-4 duration-300 ${isFullscreen ? 'p-0' : ''}`}>
@@ -55,8 +63,7 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                     <button
                         onClick={onClose}
                         title="Cerrar modo ensayo"
-                        aria-label="Cerrar modo ensayo"
-                        className="p-2 hover:bg-white/10 rounded-full text-neutral-300 hover:text-white transition-all focus-ring"
+                        className="p-2 hover:bg-white/10 rounded-full text-neutral-300 hover:text-white transition-all"
                     >
                         <X size={24} />
                     </button>
@@ -83,17 +90,8 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
 
                 <div className="flex items-center justify-end gap-2 flex-1">
                     <button
-                        title="Ajustes de audio"
-                        aria-label="Ajustes de audio"
-                        className="p-2 hover:bg-white/10 rounded-full text-neutral-300 transition-colors focus-ring"
-                    >
-                        <Settings2 size={20} />
-                    </button>
-                    <button
                         onClick={() => setIsFullscreen(!isFullscreen)}
-                        title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-                        aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-                        className="p-2 hover:bg-white/10 rounded-full text-neutral-300 transition-colors focus-ring"
+                        className="p-2 hover:bg-white/10 rounded-full text-neutral-300 transition-colors"
                     >
                         <Maximize2 size={20} />
                     </button>
@@ -102,10 +100,14 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
 
             {/* Zone 2: Main Area */}
             <main className="flex-1 bg-neutral-900 flex flex-col md:flex-row relative overflow-hidden">
-                {/* Score Area */}
                 <div className="flex-1 p-4 md:p-8 flex justify-center items-start overflow-y-auto">
                     {xmlAsset ? (
-                        <ScoreViewer xmlUrl={`/api/v1/assets/${xmlAsset.id}/stream`} />
+                        <ScoreViewer
+                            xmlUrl={`/api/v1/assets/${xmlAsset.id}/stream`}
+                            currentTime={currentTime}
+                            isPlaying={isPlaying}
+                            scoreBpm={scoreBpm}
+                        />
                     ) : pdfAsset ? (
                         <div className="w-full max-w-5xl h-full bg-neutral-100 rounded-xl shadow-2xl overflow-hidden">
                             <iframe
@@ -121,27 +123,16 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                     )}
                 </div>
 
-                {/* Sidebar Controls */}
-                <aside className="hidden lg:flex w-80 bg-primary-800 border-l border-white/10 p-6 flex-col shrink-0 shadow-2xl">
+                <aside className="hidden lg:flex w-80 bg-primary-800 border-l border-white/10 p-6 flex-col shrink-0 shadow-2xl overflow-y-auto">
                     <div className="space-y-8">
                         <div>
-                            <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Metrónomo</h3>
+                            <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4 font-ui">Metrónomo</h3>
                             <Metronome playing={isPlaying} initialBpm={work.bpm || 80} />
                         </div>
 
                         <div>
-                            <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">MIDIs por Voz</h3>
+                            <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4 font-ui">MIDIs por Voz</h3>
                             <MidiVoicePlayer assets={work.editions?.[0]?.assets || []} />
-                        </div>
-
-                        <div>
-                            <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Estadísticas de Sesión</h3>
-                            <div className="p-4 bg-black/20 rounded-2xl border border-white/5 space-y-2">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-neutral-400">Hoy has ensayado:</span>
-                                    <span className="text-white font-bold">{minutesPracticed.toFixed(1)} min</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </aside>
@@ -149,31 +140,28 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
 
             {/* Zone 3: Bottom Control Bar */}
             <footer className="bg-primary-900 border-t border-white/10 px-4 sm:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-6 z-20">
-
-                {/* Playback Controls */}
                 <div className="flex items-center gap-4">
                     <button
                         onClick={togglePlay}
-                        title={isPlaying ? "Pausar" : "Reproducir"}
-                        aria-label={isPlaying ? "Pausar" : "Reproducir"}
-                        className="w-14 h-14 flex items-center justify-center rounded-full bg-accent-500 hover:bg-accent-400 text-primary-900 transition-all shadow-glow-accent active:scale-95 focus-ring"
+                        className="w-14 h-14 flex items-center justify-center rounded-full bg-accent-500 hover:bg-accent-400 text-primary-900 transition-all shadow-glow-accent active:scale-95"
                     >
                         {isPlaying ? <PauseCircle size={32} /> : <PlayCircle size={32} className="ml-1" />}
                     </button>
 
                     <div className="hidden sm:block">
-                        <span className="text-lg font-mono font-bold text-white">0:00</span>
+                        <span className="text-lg font-mono font-bold text-white">{formatTime(currentTime)}</span>
                     </div>
                 </div>
 
-                {/* Center: Timeline placeholder */}
                 <div className="flex-1 w-full max-w-xl hidden md:block">
                     <div className="h-1.5 w-full bg-primary-800 rounded-full overflow-hidden border border-white/5 cursor-pointer relative group">
-                        <div className="absolute top-0 left-0 h-full bg-primary-500 w-[10%] group-hover:bg-primary-400" />
+                        <div 
+                            className="absolute top-0 left-0 h-full bg-primary-500 transition-all duration-300" 
+                            style={{ width: `${Math.min((currentTime / (work.duration || 300)) * 100, 100)}%` }} 
+                        />
                     </div>
                 </div>
 
-                {/* Voice Mixer */}
                 <VoiceMixer
                     volumes={volumes}
                     isMuted={isMuted}

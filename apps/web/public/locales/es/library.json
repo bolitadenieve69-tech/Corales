@@ -1,0 +1,12 @@
+{
+  "title": "Biblioteca Musical",
+  "synchronizing": "Sincronizando catálogo...",
+  "managing_count": "Gestionando {{count}} obras magistrales",
+  "add_work": "Añadir Obra",
+  "search_placeholder": "Buscar por título o compositor...",
+  "clear_search": "Limpiar búsqueda",
+  "all_eras": "Todas",
+  "no_works_found": "No se encontraron partituras",
+  "adjust_filters": "Prueba a ajustar los filtros o el compositor.",
+  "anonymous": "Anónimo"
+}

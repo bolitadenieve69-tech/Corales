@@ -1,156 +1,75 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback } from 'react';
 import * as Tone from 'tone';
-
-// Design tokens match tokens.css
-// --color-voice-soprano: #E8A0BF;
-// --color-voice-alto:    #F0A500;
-// --color-voice-tenor:   #4EA8DE;
-// --color-voice-bajo:    #6C5CE7;
+import { usePlaybackStore } from '@/store/playbackStore';
 
 export type Voice = 'soprano' | 'alto' | 'tenor' | 'bajo';
 
 interface UsePlaybackProps {
     workId: string;
     assets?: any[];
-    onProgress?: (progress: number) => void;
 }
 
-export function usePlayback({ workId, assets = [], onProgress }: UsePlaybackProps) {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [tempo, setTempo] = useState(100);
-    const [volumes, setVolumes] = useState<Record<Voice, number>>({
-        soprano: 100,
-        alto: 100,
-        tenor: 100,
-        bajo: 100
-    });
-    const [isMuted, setIsMuted] = useState<Record<Voice, boolean>>({
-        soprano: false,
-        alto: false,
-        tenor: false,
-        bajo: false
-    });
+export function usePlayback({ workId, assets = [] }: UsePlaybackProps) {
+    const {
+        isPlaying,
+        setIsPlaying,
+        setCurrentTime,
+        tempo,
+        volumes,
+        isMuted,
+        setVolume,
+        setMuted,
+        togglePlay
+    } = usePlaybackStore();
 
-    const [minutesPracticed, setMinutesPracticed] = useState(0);
-    const startTimeRef = useRef<number | null>(null);
+    // Sync Tone.Transport state with store on mount/init
+    useEffect(() => {
+        Tone.getTransport().bpm.value = tempo;
+    }, []);
 
-    // Tone.js player refs
-    const playersRef = useRef<Record<Voice, Tone.Player | null>>({
-        soprano: null,
-        alto: null,
-        tenor: null,
-        bajo: null
-    });
+    // Animation loop to update current time
+    useEffect(() => {
+        let animationId: number;
 
-    const setupAudio = useCallback(async () => {
-        if (Tone.getContext().state !== 'running') {
-            await Tone.start();
-        }
-
-        // Find audio tracks for each voice
-        const voiceTracks: Record<Voice, string | null> = {
-            soprano: assets?.find(a => a.asset_type === 'AUDIO_SOPRANO')?.id || null,
-            alto: assets?.find(a => a.asset_type === 'AUDIO_ALTO')?.id || null,
-            tenor: assets?.find(a => a.asset_type === 'AUDIO_TENOR')?.id || null,
-            bajo: assets?.find(a => a.asset_type === 'AUDIO_BASS')?.id || null,
+        const updateTime = () => {
+            if (Tone.getTransport().state === 'started') {
+                setCurrentTime(Tone.getTransport().seconds);
+            }
+            animationId = requestAnimationFrame(updateTime);
         };
 
-        // Create players for found tracks
-        for (const [voice, assetId] of Object.entries(voiceTracks)) {
-            if (assetId && !playersRef.current[voice as Voice]) {
-                const player = new Tone.Player({
-                    url: `/api/v1/assets/${assetId}/stream`,
-                    autostart: false,
-                    loop: true,
-                }).toDestination();
-                playersRef.current[voice as Voice] = player;
-            }
-        }
-
-        console.log('Audio context and players initialized');
-    }, [assets]);
-
-    const togglePlay = useCallback(async () => {
-        if (Tone.getContext().state !== 'running') {
-            await setupAudio();
-        }
-
-        if (isPlaying) {
-            Tone.getTransport().pause();
-            setIsPlaying(false);
-            if (startTimeRef.current) {
-                const sessionMinutes = (Date.now() - startTimeRef.current) / 60000;
-                setMinutesPracticed(prev => prev + sessionMinutes);
-                startTimeRef.current = null;
-            }
-        } else {
-            Tone.getTransport().start();
-            setIsPlaying(true);
-            startTimeRef.current = Date.now();
-        }
-    }, [isPlaying, setupAudio]);
+        animationId = requestAnimationFrame(updateTime);
+        return () => cancelAnimationFrame(animationId);
+    }, [setCurrentTime]);
 
     const setVoiceVolume = useCallback((voice: Voice, volume: number) => {
-        setVolumes(prev => ({ ...prev, [voice]: volume }));
-        const player = playersRef.current[voice];
-        if (player) {
-            // Volume in Tone.js is in decibels. 0 is original, -inf is mute.
-            // Simplified linear mapping for now.
-            player.volume.value = Tone.gainToDb(volume / 100);
-        }
-    }, []);
+        setVolume(voice, volume);
+        // If there were players, we'd update them here.
+        // This hook is becoming a coordinator.
+    }, [setVolume]);
 
-    const toggleMute = useCallback((voice: Voice) => {
-        setIsMuted(prev => {
-            const newState = !prev[voice];
-            const player = playersRef.current[voice];
-            if (player) {
-                player.mute = newState;
-            }
-            return { ...prev, [voice]: newState };
-        });
-    }, []);
+    const toggleVoiceMute = useCallback((voice: Voice) => {
+        setMuted(voice, !isMuted[voice]);
+    }, [isMuted, setMuted]);
 
     const setSolo = useCallback((voice: Voice) => {
-        const newMutedState: Record<Voice, boolean> = {
-            soprano: voice !== 'soprano',
-            alto: voice !== 'alto',
-            tenor: voice !== 'tenor',
-            bajo: voice !== 'bajo'
-        };
-        setIsMuted(newMutedState);
-        Object.entries(newMutedState).forEach(([v, muted]) => {
-            const player = playersRef.current[v as Voice];
-            if (player) player.mute = muted;
+        const voices: Voice[] = ['soprano', 'alto', 'tenor', 'bajo'];
+        voices.forEach(v => {
+            setMuted(v, v !== voice);
         });
-    }, []);
-
-    const resetMixer = useCallback(() => {
-        const resetMuted = { soprano: false, alto: false, tenor: false, bajo: false };
-        const resetVolumes = { soprano: 100, alto: 100, tenor: 100, bajo: 100 };
-        setIsMuted(resetMuted);
-        setVolumes(resetVolumes);
-        Object.values(playersRef.current).forEach(player => {
-            if (player) {
-                player.mute = false;
-                player.volume.value = 0;
-            }
-        });
-    }, []);
+    }, [setMuted]);
 
     return {
         isPlaying,
         togglePlay,
         tempo,
-        setTempo,
         volumes,
         setVoiceVolume,
         isMuted,
-        toggleMute,
+        toggleMute: toggleVoiceMute,
         setSolo,
-        resetMixer,
-        minutesPracticed
+        currentTime: usePlaybackStore(s => s.currentTime)
     };
 }

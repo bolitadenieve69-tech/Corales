@@ -31,6 +31,8 @@ export const metadata: Metadata = {
 
 import { ToastContainer } from "@/components/ui/ToastContainer";
 
+import { Providers } from "@/components/layout/Providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,10 +41,12 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${cormorantGaramond.variable} ${manrope.variable} ${dmMono.variable} antialiased min-h-screen bg-transparent`}>
-        <AuthProvider>
-          {children}
-          <ToastContainer />
-        </AuthProvider>
+        <Providers>
+          <AuthProvider>
+            {children}
+            <ToastContainer />
+          </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

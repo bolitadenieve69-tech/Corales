@@ -79,8 +79,15 @@ export default function LessonDetailPage() {
                     <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
                     <span>Volver a la Academia</span>
                 </Link>
-                <div className="px-4 py-1.5 bg-primary-500/10 border border-primary-500/20 rounded-full text-primary-300 text-xs font-bold uppercase tracking-widest">
-                    Lección {lesson.order}
+                <div className="flex items-center gap-3">
+                    {lesson.level && (
+                        <div className="px-4 py-1.5 bg-accent-500/10 border border-accent-500/20 rounded-full text-accent-500 text-[10px] font-black uppercase tracking-widest">
+                            {lesson.level}
+                        </div>
+                    )}
+                    <div className="px-4 py-1.5 bg-primary-500/10 border border-primary-500/20 rounded-full text-primary-300 text-xs font-bold uppercase tracking-widest">
+                        Unidad {lesson.order}
+                    </div>
                 </div>
             </div>
 

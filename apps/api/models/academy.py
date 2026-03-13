@@ -22,6 +22,7 @@ class AcademyLesson(Base):
     lesson_type = Column(String, nullable=False, default=LessonType.RHYTHM)
     content = Column(JSON) # Detailed lesson content (theory, references)
     goal = Column(String) # What the student needs to achieve
+    level = Column(String, default="INICIACION")
     
     exercises = relationship("AcademyExercise", back_populates="lesson", cascade="all, delete-orphan")
 

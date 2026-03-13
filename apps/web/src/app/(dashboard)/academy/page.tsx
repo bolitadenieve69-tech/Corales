@@ -1,207 +1,265 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Lock, ArrowRight, Play, GraduationCap, Loader2, BookOpen, Music } from 'lucide-react';
+import { CheckCircle2, Lock, ArrowRight, Play, GraduationCap, BookOpen, Music } from 'lucide-react';
 import Link from 'next/link';
-import { fetchApi } from '@/lib/api';
+import { useTranslation } from 'react-i18next';
+import { useAcademyDashboard } from '@/hooks/useAcademy';
+import { QueryBoundary } from '@/components/layout/QueryBoundary';
 
 export default function AcademyPage() {
-    const [dashboardData, setDashboardData] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const { t } = useTranslation('academy');
+    const { data: dashboardData, isLoading, error, refetch } = useAcademyDashboard();
+    const [activeLevel, setActiveLevel] = useState('INICIACION');
 
-    useEffect(() => {
-        fetchApi('/academy/dashboard')
-            .then(data => {
-                setDashboardData(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Error fetching academy dashboard", err);
-                setLoading(false);
-            });
-    }, []);
+    const levels = [
+        { id: 'INICIACION', label: 'Iniciación', color: 'primary' },
+        { id: 'ELEMENTAL', label: 'Elemental', color: 'accent-gold' },
+        { id: 'BASICO', label: 'Básico', color: 'emerald' }
+    ];
 
-    if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-                <Loader2 size={48} className="animate-spin text-primary-500 mb-4" />
-                <p className="text-neutral-400 animate-pulse font-medium">Cargando tu camino musical...</p>
-            </div>
-        );
-    }
+    if (isLoading) return <AcademySkeleton />;
 
-    if (!dashboardData) return null;
+    const filteredLessons = dashboardData?.lessons.filter((l: any) => l.level === activeLevel) || [];
+    
+    // Calculate level progress
+    const levelCompletedCount = dashboardData?.lessons.filter((l: any) => l.level === activeLevel && dashboardData.lessons.indexOf(l) < dashboardData.completed_lessons).length || 0;
+    const levelTotalCount = filteredLessons.length || 1;
+    const levelProgress = Math.round((levelCompletedCount / levelTotalCount) * 100);
 
     return (
-        <div className="max-w-5xl mx-auto space-y-12 pb-24 animate-in fade-in duration-1000">
-            {/* Premium Header */}
-            <div className="relative rounded-[2rem] overflow-hidden bg-primary-800 border border-white/10 p-8 md:p-12 shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800/80 to-indigo-900/40" />
-                <div className="absolute top-0 right-0 w-96 h-96 bg-accent-500/10 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none" />
+        <QueryBoundary isLoading={isLoading} error={error} onRetry={() => refetch()}>
+            {dashboardData && (
+                <div className="max-w-5xl mx-auto space-y-12 pb-24 animate-in fade-in duration-1000">
+                    {/* Premium Header */}
+                    <div className="relative rounded-[3rem] overflow-hidden bg-primary-900 border border-white/10 p-8 md:p-12 shadow-2xl">
+                        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-800/80 to-indigo-900/40" />
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-500/20 rounded-full blur-[120px] -mr-48 -mt-48 pointer-events-none" />
 
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-12">
-                    <div className="space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent-500/10 border border-accent-500/20 rounded-full text-accent-500">
-                            <GraduationCap size={16} />
-                            <span className="font-bold uppercase tracking-[0.2em] text-[10px]">Escuela de Solfeo</span>
-                        </div>
-                        <h1 className="text-5xl md:text-6xl font-display font-bold text-white tracking-tight leading-none">
-                            Tu Camino <br />de Aprendizaje
-                        </h1>
-                        <p className="text-lg text-neutral-300 max-w-lg leading-relaxed font-ui">
-                            Domina el ritmo y la lectura musical con un sistema progresivo diseñado para coralistas.
-                        </p>
-                    </div>
-
-                    <div className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-3xl p-6 min-w-[320px] shadow-2xl space-y-6">
-                        <div className="flex justify-between items-end">
-                            <div>
-                                <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-1">Progreso Actual</p>
-                                <p className="text-3xl font-black text-white font-mono flex items-baseline gap-1">
-                                    {dashboardData.total_lessons > 0 ? Math.round((dashboardData.completed_lessons / dashboardData.total_lessons) * 100) : 0}
-                                    <span className="text-sm text-accent-500">%</span>
+                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-12">
+                            <div className="space-y-6">
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent-500/10 border border-accent-500/20 rounded-full text-accent-500 shadow-glow-accent"
+                                >
+                                    <GraduationCap size={16} />
+                                    <span className="font-bold uppercase tracking-[0.25em] text-[10px]">Escuela de Corales</span>
+                                </motion.div>
+                                <h1 className="text-6xl md:text-7xl font-display font-bold text-white tracking-tight leading-[0.9] drop-shadow-2xl">
+                                    Tu Camino <br /><span className="text-accent-500">Musical</span>
+                                </h1>
+                                <p className="text-xl text-neutral-400 max-w-lg leading-relaxed font-ui">
+                                    De la primera nota a la maestría coral. Un sistema progresivo basado en la práctica real.
                                 </p>
                             </div>
-                            <div className="text-right">
-                                <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-1">Lecciones</p>
-                                <p className="text-white font-bold">{dashboardData.completed_lessons} / {dashboardData.total_lessons}</p>
-                            </div>
-                        </div>
 
-                        <div className="relative h-4 bg-primary-900 rounded-full overflow-hidden border border-white/5 ring-4 ring-black/20">
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${dashboardData.total_lessons > 0 ? (dashboardData.completed_lessons / dashboardData.total_lessons) * 100 : 0}%` }}
-                                transition={{ duration: 1.5, ease: "circOut" }}
-                                className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent-600 to-accent-400 shadow-[0_0_15px_var(--color-accent-500)]"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Path Title */}
-            <div className="flex items-center justify-between px-4">
-                <h2 className="text-2xl font-display font-bold text-foreground flex items-center gap-4">
-                    <span className="w-12 h-px bg-primary-500/30" />
-                    Ritmo y Lectura 1
-                    <span className="w-12 h-px bg-primary-500/30" />
-                </h2>
-                <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.3em]">Nivel Iniciación</span>
-            </div>
-
-            {/* The Map (Zig-Zag Path) */}
-            <div className="relative max-w-3xl mx-auto py-12">
-                {/* SVG Connecting Path */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d={generatePath(dashboardData.lessons.length)}
-                        fill="none"
-                        stroke="url(#pathGradient)"
-                        strokeWidth="4"
-                        strokeDasharray="12 8"
-                        strokeLinecap="round"
-                        className="opacity-10 translate-x-[50%] md:translate-x-[50%]"
-                    />
-                    <defs>
-                        <linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="var(--color-primary-500)" />
-                            <stop offset="100%" stopColor="var(--color-accent-gold)" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-
-                <div className="relative space-y-24">
-                    {dashboardData.lessons.map((lesson: any, index: number) => {
-                        const isCompleted = index < dashboardData.completed_lessons;
-                        const isUnlocked = index <= dashboardData.completed_lessons;
-                        const isLocked = !isUnlocked;
-                        const isCurrent = lesson.id === dashboardData.current_lesson_id;
-                        const isLeft = index % 2 === 0;
-
-                        return (
-                            <motion.div
-                                key={lesson.id}
-                                initial={{ opacity: 0, x: isLeft ? -50 : 50 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1, duration: 0.6 }}
-                                className={`flex items-center w-full ${isLeft ? 'justify-start md:pl-12' : 'justify-end md:pr-12'}`}
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 min-w-[340px] shadow-3xl space-y-6"
                             >
-                                <div className={`flex items-center gap-8 ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}>
-                                    {/* The Node */}
-                                    <div className="relative">
-                                        {isCurrent && (
-                                            <motion.div
-                                                animate={{ scale: [1, 1.4, 1] }}
-                                                transition={{ duration: 2, repeat: Infinity }}
-                                                className="absolute inset-0 bg-primary-500/20 rounded-full blur-xl"
-                                            />
-                                        )}
-                                        <Link
-                                            href={isUnlocked ? `/academy/${lesson.id}` : '#'}
-                                            className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center border-4 transition-all duration-300 ${!isUnlocked ? 'bg-neutral-200 border-neutral-300 text-neutral-400 scale-90' :
-                                                isCurrent ? 'bg-primary-500 border-white/20 text-white shadow-glow-primary scale-110 active:scale-95' :
-                                                    isCompleted ? 'bg-accent-gold border-white/10 text-white shadow-lg hover:scale-105' :
-                                                        'bg-white border-neutral-200 text-neutral-400 hover:border-primary-500/50 hover:text-primary-500 shadow-sm'
-                                                }`}
-                                        >
-                                            {isCompleted ? <CheckCircle2 size={32} /> :
-                                                !isUnlocked ? <Lock size={28} /> :
-                                                    <Play size={32} className={isCurrent ? 'translate-x-0.5' : ''} />}
-
-                                            {/* Order Number Badge */}
-                                            <div className="absolute -top-1 -right-1 w-7 h-7 bg-white rounded-full border border-neutral-200 flex items-center justify-center text-[10px] font-black text-neutral-600 shadow-sm">
-                                                {index + 1}
-                                            </div>
-                                        </Link>
-                                    </div>
-
-                                    {/* Content Card */}
-                                    <Link
-                                        href={isUnlocked ? `/academy/${lesson.id}` : '#'}
-                                        className={`group relative flex flex-col items-center p-6 rounded-[2rem] transition-all duration-500 hover:scale-105 ${isLocked
-                                            ? 'bg-neutral-100 border border-neutral-200 opacity-60 grayscale cursor-not-allowed'
-                                            : 'bg-white border border-neutral-200 hover:border-primary-500/30 hover:shadow-2xl shadow-sm'
-                                            }`}
-                                    >
-                                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:rotate-6 ${isLocked ? 'bg-neutral-200 text-neutral-400' : 'bg-primary-100 text-primary-500 group-hover:bg-primary-500 group-hover:text-white'
-                                            }`}>
-                                            {lesson.lesson_type === 'RHYTHM' ? <Music size={28} /> :
-                                                lesson.lesson_type === 'THEORY' ? <BookOpen size={28} /> :
-                                                    <GraduationCap size={28} />}
-                                        </div>
-                                        <div className="space-y-2 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-primary-500">
-                                                {lesson.lesson_type === 'RHYTHM' ? 'Ritmo' : 'Teoría'}
+                                <div className="flex justify-between items-end">
+                                    <div>
+                                        <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-2">Progreso Global</p>
+                                        <div className="flex items-baseline gap-2">
+                                            <p className="text-5xl font-black text-white font-mono tracking-tighter">
+                                                {Math.round((dashboardData.completed_lessons / dashboardData.total_lessons) * 100)}
                                             </p>
-                                            <h3 className="font-display font-bold text-foreground leading-tight text-xl">{lesson.title}</h3>
-                                            <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed font-medium">{lesson.description}</p>
+                                            <span className="text-xl font-bold text-accent-500">%</span>
                                         </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="w-12 h-12 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 mb-3 ml-auto">
+                                            <Music size={24} />
+                                        </div>
+                                        <p className="text-white font-mono text-sm font-bold opacity-60">
+                                            {dashboardData.completed_lessons} / {dashboardData.total_lessons}
+                                        </p>
+                                    </div>
+                                </div>
 
-                                        {isUnlocked && (
-                                            <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-tighter text-neutral-400 group-hover:text-primary-500 transition-colors">
-                                                {isCompleted ? 'Volver a ver' : 'Comenzar ahora'} <ArrowRight size={14} className="text-primary-500" />
-                                            </div>
-                                        )}
-                                    </Link>
+                                <div className="relative h-3 bg-primary-800 rounded-full overflow-hidden border border-white/5 shadow-inner">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(dashboardData.completed_lessons / dashboardData.total_lessons) * 100}%` }}
+                                        transition={{ duration: 1.5, ease: "circOut" }}
+                                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent-600 to-accent-400 shadow-[0_0_20px_var(--color-accent-500)]"
+                                    />
                                 </div>
                             </motion.div>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Bottom Invitation */}
-            <div className="text-center py-24 px-8 bg-white border border-neutral-200 rounded-[3rem] shadow-sm">
-                <div className="max-w-md mx-auto space-y-6">
-                    <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto border border-primary-500/10">
-                        <GraduationCap size={32} className="text-primary-500" />
+                        </div>
                     </div>
-                    <h3 className="text-3xl font-display font-bold text-foreground">Próximo Nivel</h3>
-                    <p className="text-neutral-500 font-medium">Continúa practicando para desbloquear ejercicios de armonía y entrenamiento auditivo avanzado.</p>
+
+                    {/* Level Selector Tabs */}
+                    <div className="flex flex-col items-center gap-8">
+                        <div className="bg-neutral-100 p-2 rounded-3xl border border-neutral-200 flex gap-2">
+                            {levels.map((level) => (
+                                <button
+                                    key={level.id}
+                                    onClick={() => setActiveLevel(level.id)}
+                                    className={`px-8 py-3 rounded-2xl font-bold text-sm transition-all duration-300 ${
+                                        activeLevel === level.id 
+                                        ? 'bg-white text-primary-500 shadow-lg' 
+                                        : 'text-neutral-500 hover:text-neutral-800'
+                                    }`}
+                                >
+                                    {level.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-4 text-neutral-500">
+                            <span className="text-[10px] font-black uppercase tracking-widest">Progreso {levels.find(l => l.id === activeLevel)?.label}</span>
+                            <div className="w-48 h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+                                <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${levelProgress}%` }}
+                                    className="h-full bg-primary-500"
+                                />
+                            </div>
+                            <span className="text-[10px] font-mono font-bold">{levelProgress}%</span>
+                        </div>
+                    </div>
+
+                    {/* The Map (Zig-Zag Path) */}
+                    <div className="relative max-w-4xl mx-auto py-12">
+                        <div className="relative space-y-24">
+                            {filteredLessons.length === 0 && (
+                                <div className="text-center py-20 bg-neutral-50 rounded-[3rem] border-2 border-dashed border-neutral-200">
+                                    <Lock size={48} className="mx-auto text-neutral-300 mb-4" />
+                                    <p className="text-neutral-500 font-medium">Completa el nivel anterior para desbloquear estas unidades.</p>
+                                </div>
+                            )}
+
+                            {filteredLessons.map((lesson: any, index: number) => {
+                                // Find global index to determine status correctly
+                                const globalIndex = dashboardData.lessons.findIndex((l: any) => l.id === lesson.id);
+                                const isCompleted = globalIndex < dashboardData.completed_lessons;
+                                const isUnlocked = globalIndex <= dashboardData.completed_lessons;
+                                const isLocked = !isUnlocked;
+                                const isCurrent = lesson.id === dashboardData.current_lesson_id;
+                                const isLeft = index % 2 === 0;
+
+                                return (
+                                    <motion.div
+                                        key={lesson.id}
+                                        initial={{ opacity: 0, y: 30 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: index * 0.05, duration: 0.5 }}
+                                        className={`flex items-center w-full ${isLeft ? 'justify-start lg:pl-20' : 'justify-end lg:pr-20'}`}
+                                    >
+                                        <div className={`flex items-center gap-12 ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}>
+                                            {/* The Node */}
+                                            <div className="relative group/node">
+                                                {isCurrent && (
+                                                    <motion.div
+                                                        animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+                                                        transition={{ duration: 2, repeat: Infinity }}
+                                                        className="absolute -inset-4 bg-primary-500/30 rounded-full blur-2xl"
+                                                    />
+                                                )}
+                                                <Link
+                                                    href={isUnlocked ? `/academy/${lesson.id}` : '#'}
+                                                    className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center border-4 transition-all duration-500 ${!isUnlocked ? 'bg-neutral-100 border-neutral-200 text-neutral-400 scale-90' :
+                                                        isCurrent ? 'bg-primary-500 border-white/30 text-white shadow-glow-primary scale-110 rotate-3' :
+                                                            isCompleted ? 'bg-accent-gold border-white/20 text-white shadow-lg -rotate-3 hover:rotate-0' :
+                                                                'bg-white border-neutral-200 text-neutral-400 hover:border-primary-500/50 hover:text-primary-500 shadow-sm'
+                                                        }`}
+                                                >
+                                                    {isCompleted ? <CheckCircle2 size={40} className="drop-shadow-md" /> :
+                                                        !isUnlocked ? <Lock size={32} /> :
+                                                            <Play size={40} className={isCurrent ? 'translate-x-1 outline-1' : ''} />}
+
+                                                    <div className="absolute -top-3 -right-3 w-9 h-9 bg-white rounded-2xl border-2 border-neutral-100 flex items-center justify-center text-[11px] font-black text-neutral-800 shadow-2xl group-hover/node:scale-110 transition-transform">
+                                                        {lesson.order}
+                                                    </div>
+                                                </Link>
+                                                
+                                                {/* Connecting Dot for visual path */}
+                                                {!isLeft && index < filteredLessons.length - 1 && (
+                                                    <div className="absolute top-full left-1/2 w-1 h-24 bg-gradient-to-b from-neutral-200 to-transparent -translate-x-1/2 z-0" />
+                                                )}
+                                            </div>
+
+                                            {/* Content Card */}
+                                            <Link
+                                                href={isUnlocked ? `/academy/${lesson.id}` : '#'}
+                                                className={`group relative flex flex-col items-center p-8 rounded-[2.5rem] transition-all duration-700 hover:scale-[1.03] ${isLocked
+                                                    ? 'bg-neutral-100/50 border border-neutral-200/50 opacity-40 grayscale blur-[1px]'
+                                                    : 'bg-white border border-neutral-200 hover:border-primary-500/30 hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15)] shadow-sm'
+                                                    } w-64 md:w-80`}
+                                            >
+                                                <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-inner transition-all duration-700 group-hover:scale-110 group-hover:-rotate-12 ${isLocked ? 'bg-neutral-200 text-neutral-400' : 'bg-primary-50/80 text-primary-500 group-hover:bg-primary-500 group-hover:text-white'
+                                                    }`}>
+                                                    {lesson.lesson_type === 'RHYTHM' ? <Music size={36} /> :
+                                                        lesson.lesson_type === 'THEORY' ? <BookOpen size={36} /> :
+                                                            <GraduationCap size={36} />}
+                                                </div>
+                                                <div className="space-y-3 text-center">
+                                                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-primary-400/80">
+                                                        {lesson.lesson_type === 'RHYTHM' ? 'Lectura Rítmica' : 'Teoría Musical'}
+                                                    </span>
+                                                    <h3 className="font-display font-bold text-neutral-900 leading-tight text-2xl group-hover:text-primary-600 transition-colors">{lesson.title}</h3>
+                                                    <p className="text-sm text-neutral-500 line-clamp-2 leading-relaxed font-ui">{lesson.description}</p>
+                                                </div>
+
+                                                {isUnlocked && (
+                                                    <div className="mt-8 flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-neutral-400 group-hover:text-primary-500 transition-all">
+                                                        <div className="h-px w-6 bg-neutral-200 group-hover:w-10 group-hover:bg-primary-500 transition-all" />
+                                                        {isCompleted ? 'Repasar' : 'Comenzar'} 
+                                                        <ArrowRight size={16} className="transition-transform group-hover:translate-x-2" />
+                                                    </div>
+                                                )}
+                                            </Link>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Bottom Features */}
+                    <div className="grid md:grid-cols-3 gap-8 pt-12">
+                        {[
+                            { icon: <Music />, title: 'Ejercicios Reales', desc: 'Practica con fragmentos de obras corales famosas.' },
+                            { icon: <Play />, title: 'Audio Guía', desc: 'Escucha cómo debe sonar antes de intentarlo.' },
+                            { icon: <CheckCircle2 />, title: 'Certificación', desc: 'Obtén tu diploma al completar los 3 niveles.' }
+                        ].map((feat, i) => (
+                            <div key={i} className="p-8 bg-white border border-neutral-200 rounded-[2.5rem] space-y-4 hover:shadow-xl transition-shadow">
+                                <div className="w-12 h-12 rounded-2xl bg-neutral-100 flex items-center justify-center text-primary-500">
+                                    {feat.icon}
+                                </div>
+                                <h4 className="text-xl font-display font-bold text-neutral-900">{feat.title}</h4>
+                                <p className="text-sm text-neutral-500 leading-relaxed font-ui">{feat.desc}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
+            )}
+        </QueryBoundary>
+    );
+}
+
+function AcademySkeleton() {
+    return (
+        <div className="max-w-5xl mx-auto space-y-12 pb-24 animate-pulse">
+            <div className="h-80 bg-neutral-200 rounded-[3rem]" />
+            <div className="flex justify-center gap-4">
+                <div className="h-12 w-32 bg-neutral-200 rounded-2xl" />
+                <div className="h-12 w-32 bg-neutral-200 rounded-2xl" />
+                <div className="h-12 w-32 bg-neutral-200 rounded-2xl" />
+            </div>
+            <div className="space-y-24 py-12">
+                {[1, 2, 3].map(i => (
+                    <div key={i} className={`flex gap-12 items-center ${i % 2 === 0 ? 'flex-row-reverse' : ''}`}>
+                        <div className="w-24 h-24 bg-neutral-200 rounded-[2rem]" />
+                        <div className="w-80 h-48 bg-neutral-200 rounded-[2.5rem]" />
+                    </div>
+                ))}
             </div>
         </div>
     );

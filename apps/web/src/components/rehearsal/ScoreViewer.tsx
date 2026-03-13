@@ -2,20 +2,26 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
-import { Loader2, AlertCircle, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { Loader2, AlertCircle, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface ScoreViewerProps {
     xmlUrl: string;
+    currentTime?: number; // seconds from Tone.Transport
+    isPlaying?: boolean;
+    scoreBpm?: number;    // BPM from the MIDI file for cursor conversion
     onLoad?: () => void;
     onError?: (error: string) => void;
 }
 
-export function ScoreViewer({ xmlUrl, onLoad, onError }: ScoreViewerProps) {
+export function ScoreViewer({ xmlUrl, currentTime = 0, isPlaying = false, scoreBpm = 120, onLoad, onError }: ScoreViewerProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [zoom, setZoom] = useState(1.0);
+    // Ref so the rAF loop always reads the latest time without being a dependency
+    const currentTimeRef = useRef(0);
+    currentTimeRef.current = currentTime;
 
     const handleZoom = (delta: number) => {
         const newZoom = Math.min(Math.max(zoom + delta, 0.5), 3.0);
@@ -25,6 +31,39 @@ export function ScoreViewer({ xmlUrl, onLoad, onError }: ScoreViewerProps) {
             osmdRef.current.render();
         }
     };
+
+    // Cursor synchronization — single rAF loop per play session
+    useEffect(() => {
+        const osmd = osmdRef.current;
+        if (!osmd?.cursor || !isPlaying) return;
+
+        // Reset to beginning whenever playback (re)starts
+        osmd.cursor.reset();
+        osmd.cursor.show();
+
+        let animationId: number;
+
+        const tick = () => {
+            const o = osmdRef.current;
+            if (!o?.cursor || o.cursor.iterator.EndReached) return;
+
+            // Convert Transport seconds → OSMD whole-note position
+            // OSMD RealValue is in whole notes: 1 whole note = 4 quarter notes
+            // At BPM b: 1 quarter note = 60/b seconds → 1 whole note = 240/b seconds
+            // → wholeNotes = seconds * b / 240
+            const targetWN = currentTimeRef.current * scoreBpm / 240;
+
+            while (!o.cursor.iterator.EndReached &&
+                   o.cursor.iterator.currentTimeStamp.RealValue < targetWN) {
+                o.cursor.next();
+            }
+
+            animationId = requestAnimationFrame(tick);
+        };
+
+        animationId = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(animationId);
+    }, [isPlaying, scoreBpm]); // scoreBpm rarely changes; currentTime is read via ref
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -44,7 +83,7 @@ export function ScoreViewer({ xmlUrl, onLoad, onError }: ScoreViewerProps) {
                         drawCredits: false,
                         drawPartNames: true,
                         backend: 'svg',
-                        coloringMode: 1, // 1 = Simple coloring
+                        coloringMode: 1, 
                         defaultColorMusic: '#0D1B2A',
                     });
                 }
@@ -52,6 +91,7 @@ export function ScoreViewer({ xmlUrl, onLoad, onError }: ScoreViewerProps) {
                 if (osmdRef.current) {
                     await osmdRef.current.load(xmlUrl);
                     osmdRef.current.zoom = zoom;
+                    osmdRef.current.cursor.show();
                     osmdRef.current.render();
                 }
 

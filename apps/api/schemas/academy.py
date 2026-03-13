@@ -21,6 +21,7 @@ class AcademyLessonBase(BaseModel):
     order: int
     lesson_type: str
     goal: Optional[str] = None
+    level: Optional[str] = None
 
 class AcademyLessonSchema(AcademyLessonBase):
     id: str
