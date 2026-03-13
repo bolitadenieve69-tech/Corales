@@ -9,6 +9,7 @@ import { useDirectorNotes } from '@/hooks/useDirectorNotes';
 import { VoiceMixer } from './VoiceMixer';
 import { ScoreViewer } from './ScoreViewer';
 import Metronome from './Metronome';
+import { MidiVoicePlayer } from './MidiVoicePlayer';
 
 interface RehearsalPanelProps {
     work: any;
@@ -126,6 +127,11 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                         <div>
                             <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Metrónomo</h3>
                             <Metronome playing={isPlaying} initialBpm={work.bpm || 80} />
+                        </div>
+
+                        <div>
+                            <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">MIDIs por Voz</h3>
+                            <MidiVoicePlayer assets={work.editions?.[0]?.assets || []} />
                         </div>
 
                         <div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Music, FileText, FileAudio, PlayCircle, Download, BookOpen, Clock, Settings2, Loader2, Upload, X, Maximize2 } from 'lucide-react';
+import { ArrowLeft, Music, FileText, FileAudio, PlayCircle, Download, BookOpen, Clock, Settings2, Loader2, Upload, X, Maximize2, Headphones } from 'lucide-react';
 import ProgressControls from './progress-controls';
 import PipelineStatus from './pipeline-status';
 import Metronome from '@/components/rehearsal/Metronome';
@@ -122,10 +122,18 @@ export default function WorkDetailPage() {
                 </Link>
                 <div className="flex gap-3">
                     <button
+                        type="button"
+                        onClick={() => { setSelectedAsset(null); setStudyMode(true); }}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-primary-900 bg-accent-500 hover:bg-accent-400 transition-all shadow-lg shadow-glow-accent rounded-xl"
+                    >
+                        <Headphones size={16} /> Ensayar
+                    </button>
+                    <button
+                        type="button"
                         onClick={() => setUploadModalEdition(work.editions?.[0]?.id)}
                         className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-500 hover:bg-primary-800 transition-all shadow-lg shadow-glow-primary rounded-xl"
                     >
-                        <Plus size={16} /> Gestionar Archivos
+                        <Upload size={16} /> Gestionar Archivos
                     </button>
                 </div>
             </div>
@@ -333,7 +341,7 @@ export default function WorkDetailPage() {
             </div>
 
             {/* Study Mode Overlay (Rehearsal Panel) */}
-            {studyMode && selectedAsset && (
+            {studyMode && (
                 <RehearsalPanel
                     work={work}
                     selectedAsset={selectedAsset}
