@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from models import User
 from core.database import get_db
 from core.config import settings
+from services.supabase_auth import get_user_id_from_any_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/login/access-token")
 
@@ -14,12 +15,8 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
         detail="No se pudieron validar las credenciales",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
+    user_id = get_user_id_from_any_token(token)
+    if not user_id:
         raise credentials_exception
     
     user = db.query(User).filter(User.id == user_id).first()

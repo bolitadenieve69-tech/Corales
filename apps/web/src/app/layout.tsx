@@ -29,9 +29,9 @@ export const metadata: Metadata = {
   description: "Estudio coral simplificado",
 };
 
-import { ToastContainer } from "@/components/ui/ToastContainer";
-
 import { Providers } from "@/components/layout/Providers";
+import { ToastContainer } from "@/components/ui/ToastContainer";
+import { RealtimeToastListener } from "@/components/layout/RealtimeToastListener";
 
 export default function RootLayout({
   children,
@@ -45,6 +45,7 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <ToastContainer />
+            <RealtimeToastListener />
           </AuthProvider>
         </Providers>
       </body>

@@ -54,6 +54,8 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
+    const progressPercent = Math.min((currentTime / (work.duration || 300)) * 100, 100);
+
     return (
         <div className={`fixed inset-0 z-[100] bg-primary-900 flex flex-col items-stretch overflow-hidden animate-in slide-in-from-bottom-4 duration-300 ${isFullscreen ? 'p-0' : ''}`}>
 
@@ -92,6 +94,8 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                     <button
                         onClick={() => setIsFullscreen(!isFullscreen)}
                         className="p-2 hover:bg-white/10 rounded-full text-neutral-300 transition-colors"
+                        aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+                        title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
                     >
                         <Maximize2 size={20} />
                     </button>
@@ -144,6 +148,8 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                     <button
                         onClick={togglePlay}
                         className="w-14 h-14 flex items-center justify-center rounded-full bg-accent-500 hover:bg-accent-400 text-primary-900 transition-all shadow-glow-accent active:scale-95"
+                        aria-label={isPlaying ? "Pausar" : "Reproducir"}
+                        title={isPlaying ? "Pausar" : "Reproducir"}
                     >
                         {isPlaying ? <PauseCircle size={32} /> : <PlayCircle size={32} className="ml-1" />}
                     </button>
@@ -157,7 +163,7 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                     <div className="h-1.5 w-full bg-primary-800 rounded-full overflow-hidden border border-white/5 cursor-pointer relative group">
                         <div 
                             className="absolute top-0 left-0 h-full bg-primary-500 transition-all duration-300" 
-                            style={{ width: `${Math.min((currentTime / (work.duration || 300)) * 100, 100)}%` }} 
+                            style={{ width: `${progressPercent}%` }} 
                         />
                     </div>
                 </div>

@@ -36,7 +36,11 @@ def login_access_token(
 
 @router.get("/health")
 def health_check():
-    return {"status": "ok", "version": "1.0.0"}
+    return {
+        "status": "ok", 
+        "version": settings.VERSION,
+        "supabase_configured": bool(settings.SUPABASE_URL and settings.SUPABASE_JWT_SECRET)
+    }
 
 @router.get("/auth-check")
 def auth_check(db: Session = Depends(get_db)):

@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     # Redis (for RQ job queue and pipeline locks)
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
+    # Supabase (Integration)
+    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
+    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "") # Anon key
+    SUPABASE_JWT_SECRET: str = os.getenv("SUPABASE_JWT_SECRET", "") # For verifying JWTs locally
+
     # Pipeline
     PIPELINE_VERSION: str = "1.0.0"
     

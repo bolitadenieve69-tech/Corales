@@ -3,6 +3,7 @@ import boto3
 from botocore.exceptions import ClientError
 from core.config import settings
 import shutil
+from lib.supabase_client import SupabaseStorage
 
 class StorageService:
     def __init__(self):
@@ -24,6 +25,9 @@ class StorageService:
                 config=s3_config
             )
             self.bucket = settings.S3_BUCKET
+        elif self.mode == "supabase":
+            self.supabase = SupabaseStorage()
+            self.bucket = settings.S3_BUCKET # We reuse this env var for the main bucket name
 
     def upload_file(self, local_path: str, remote_path: str) -> str:
         """Uploads a local file to storage and returns the URL or path."""
@@ -33,6 +37,13 @@ class StorageService:
                 return remote_path # We store the key/path in the DB
             except ClientError as e:
                 print(f"Error uploading to S3: {e}")
+                raise e
+        elif self.mode == "supabase":
+            try:
+                # We expect remote_path to be the full relative path inside the bucket
+                return self.supabase.upload_file(self.bucket, remote_path, local_path)
+            except Exception as e:
+                print(f"Error uploading to Supabase: {e}")
                 raise e
         else:
             # Local mode: ensure target dir exists
@@ -74,6 +85,18 @@ class StorageService:
             except ClientError as e:
                 print(f"Error generating presigned URL: {e}")
                 return ""
+        elif self.mode == "supabase":
+            try:
+                # Use bucket name from settings and extract path from the key we stored
+                # We store "bucket/path" in DB usually, but let's be robust
+                path = file_path
+                if file_path.startswith(f"{self.bucket}/"):
+                    path = file_path[len(self.bucket)+1:]
+                
+                return self.supabase.get_signed_url(self.bucket, path, expires_in)
+            except Exception as e:
+                print(f"Error generating Supabase signed URL: {e}")
+                return ""
         else:
             # Local mode: returns the path relative to API or full path
             # The API will handle streaming via FileResponse
@@ -82,6 +105,11 @@ class StorageService:
     def delete_file(self, file_path: str):
         if self.mode == "s3":
             self.s3_client.delete_object(Bucket=self.bucket, Key=file_path)
+        elif self.mode == "supabase":
+            path = file_path
+            if file_path.startswith(f"{self.bucket}/"):
+                path = file_path[len(self.bucket)+1:]
+            self.supabase.delete_file(self.bucket, path)
         else:
             if os.path.exists(file_path):
                 os.remove(file_path)
