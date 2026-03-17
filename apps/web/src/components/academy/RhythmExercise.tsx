@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Loader2, Music, CheckCircle2, XCircle } from 'lucide-react';
 import { useRhythmEngine } from '@/hooks/useRhythmEngine';
 import { fetchApi } from '@/lib/api';
+import { MusicalFigure } from './MusicalFigure';
 
 interface RhythmExerciseProps {
     exercise: any;
@@ -76,17 +77,28 @@ export function RhythmExercise({ exercise, onCompleted }: RhythmExerciseProps) {
                         <p className="text-neutral-400 text-sm leading-relaxed">
                             Escucharás **4 pulsos de cuenta** iniciales. Empieza a tocar justo después del cuarto pulso.
                         </p>
-                        <div className="p-4 bg-black/40 rounded-2xl border border-white/5 space-y-2">
-                            <div className="flex items-center justify-between text-xs font-mono text-neutral-500 uppercase tracking-widest">
-                                <span>Configuración</span>
+                        <div className="p-6 bg-black/40 rounded-[2rem] border border-white/5 space-y-4">
+                            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500">
+                                <span>Secuencia Rítmica</span>
                                 <span className="text-accent-500">{exercise.content.bpm || 60} BPM</span>
                             </div>
-                            <div className="flex gap-2">
-                                {exercise.content.notes?.map((n: string, i: number) => (
-                                    <div key={i} className="px-2 py-1 bg-white/5 rounded text-white font-mono text-xs border border-white/10 uppercase">
-                                        {n === 'q' ? 'Negra' : n === '8' ? 'Corchea' : 'Silencio'}
-                                    </div>
-                                ))}
+                            <div className="flex flex-wrap gap-4 items-end">
+                                {exercise.content.notes?.map((n: string, i: number) => {
+                                    const label = n === 'q' ? 'Negra' : n === '8' ? 'Corchea' : n === 'h' ? 'Blanca' : n === 'w' ? 'Redonda' : 'Silencio';
+                                    const isRest = n.startsWith('r') || (!['q', '8', 'h', 'w'].includes(n) && n !== 'q');
+                                    const figureType = isRest ? (n.startsWith('r') ? n : 'rq') : n;
+                                    
+                                    return (
+                                        <div key={i} className="flex flex-col items-center gap-2 group">
+                                            <div className="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:border-accent-500/50 transition-all shadow-inner">
+                                                <MusicalFigure type={figureType} size={32} color="white" />
+                                            </div>
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-neutral-600 group-hover:text-accent-500 transition-colors">
+                                                {label}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

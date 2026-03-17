@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Lock, ArrowRight, Play, GraduationCap, BookOpen, Music } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,8 @@ export default function AcademyPage() {
     const { t } = useTranslation('academy');
     const { data: dashboardData, isLoading, error, refetch } = useAcademyDashboard();
     const [activeLevel, setActiveLevel] = useState('INICIACION');
+    const [currentPage, setCurrentPage] = useState(0);
+    const pageSize = 10;
 
     const levels = [
         { id: 'INICIACION', label: 'Iniciación', color: 'primary' },
@@ -99,7 +101,10 @@ export default function AcademyPage() {
                             {levels.map((level) => (
                                 <button
                                     key={level.id}
-                                    onClick={() => setActiveLevel(level.id)}
+                                    onClick={() => {
+                                        setActiveLevel(level.id);
+                                        setCurrentPage(0);
+                                    }}
                                     className={`px-8 py-3 rounded-2xl font-bold text-sm transition-all duration-300 ${
                                         activeLevel === level.id 
                                         ? 'bg-white text-primary-500 shadow-lg' 
@@ -134,91 +139,151 @@ export default function AcademyPage() {
                                 </div>
                             )}
 
-                            {filteredLessons.map((lesson: any, index: number) => {
-                                // Find global index to determine status correctly
-                                const globalIndex = dashboardData.lessons.findIndex((l: any) => l.id === lesson.id);
-                                const isCompleted = globalIndex < dashboardData.completed_lessons;
-                                const isUnlocked = globalIndex <= dashboardData.completed_lessons;
-                                const isLocked = !isUnlocked;
-                                const isCurrent = lesson.id === dashboardData.current_lesson_id;
-                                const isLeft = index % 2 === 0;
+                            {(() => {
+                                const paginatedLessons = filteredLessons.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+                                const totalPages = Math.ceil(filteredLessons.length / pageSize);
 
                                 return (
-                                    <motion.div
-                                        key={lesson.id}
-                                        initial={{ opacity: 0, y: 30 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ delay: index * 0.05, duration: 0.5 }}
-                                        className={`flex items-center w-full ${isLeft ? 'justify-start lg:pl-20' : 'justify-end lg:pr-20'}`}
-                                    >
-                                        <div className={`flex items-center gap-12 ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}>
-                                            {/* The Node */}
-                                            <div className="relative group/node">
-                                                {isCurrent && (
-                                                    <motion.div
-                                                        animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
-                                                        transition={{ duration: 2, repeat: Infinity }}
-                                                        className="absolute -inset-4 bg-primary-500/30 rounded-full blur-2xl"
-                                                    />
-                                                )}
-                                                <Link
-                                                    href={isUnlocked ? `/academy/${lesson.id}` : '#'}
-                                                    className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center border-4 transition-all duration-500 ${!isUnlocked ? 'bg-neutral-100 border-neutral-200 text-neutral-400 scale-90' :
-                                                        isCurrent ? 'bg-primary-500 border-white/30 text-white shadow-glow-primary scale-110 rotate-3' :
-                                                            isCompleted ? 'bg-accent-gold border-white/20 text-white shadow-lg -rotate-3 hover:rotate-0' :
-                                                                'bg-white border-neutral-200 text-neutral-400 hover:border-primary-500/50 hover:text-primary-500 shadow-sm'
-                                                        }`}
-                                                >
-                                                    {isCompleted ? <CheckCircle2 size={40} className="drop-shadow-md" /> :
-                                                        !isUnlocked ? <Lock size={32} /> :
-                                                            <Play size={40} className={isCurrent ? 'translate-x-1 outline-1' : ''} />}
-
-                                                    <div className="absolute -top-3 -right-3 w-9 h-9 bg-white rounded-2xl border-2 border-neutral-100 flex items-center justify-center text-[11px] font-black text-neutral-800 shadow-2xl group-hover/node:scale-110 transition-transform">
-                                                        {lesson.order}
-                                                    </div>
-                                                </Link>
-                                                
-                                                {/* Connecting Dot for visual path */}
-                                                {!isLeft && index < filteredLessons.length - 1 && (
-                                                    <div className="absolute top-full left-1/2 w-1 h-24 bg-gradient-to-b from-neutral-200 to-transparent -translate-x-1/2 z-0" />
-                                                )}
-                                            </div>
-
-                                            {/* Content Card */}
-                                            <Link
-                                                href={isUnlocked ? `/academy/${lesson.id}` : '#'}
-                                                className={`group relative flex flex-col items-center p-8 rounded-[2.5rem] transition-all duration-700 hover:scale-[1.03] ${isLocked
-                                                    ? 'bg-neutral-100/50 border border-neutral-200/50 opacity-40 grayscale blur-[1px]'
-                                                    : 'bg-white border border-neutral-200 hover:border-primary-500/30 hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15)] shadow-sm'
-                                                    } w-64 md:w-80`}
+                                    <>
+                                        <AnimatePresence mode="wait">
+                                            <motion.div
+                                                key={`${activeLevel}-${currentPage}`}
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -20 }}
+                                                transition={{ duration: 0.4, ease: "circOut" }}
+                                                className="space-y-24"
                                             >
-                                                <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-inner transition-all duration-700 group-hover:scale-110 group-hover:-rotate-12 ${isLocked ? 'bg-neutral-200 text-neutral-400' : 'bg-primary-50/80 text-primary-500 group-hover:bg-primary-500 group-hover:text-white'
-                                                    }`}>
-                                                    {lesson.lesson_type === 'RHYTHM' ? <Music size={36} /> :
-                                                        lesson.lesson_type === 'THEORY' ? <BookOpen size={36} /> :
-                                                            <GraduationCap size={36} />}
-                                                </div>
-                                                <div className="space-y-3 text-center">
-                                                    <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-primary-400/80">
-                                                        {lesson.lesson_type === 'RHYTHM' ? 'Lectura Rítmica' : 'Teoría Musical'}
-                                                    </span>
-                                                    <h3 className="font-display font-bold text-neutral-900 leading-tight text-2xl group-hover:text-primary-600 transition-colors">{lesson.title}</h3>
-                                                    <p className="text-sm text-neutral-500 line-clamp-2 leading-relaxed font-ui">{lesson.description}</p>
+                                                {paginatedLessons.map((lesson: any, index: number) => {
+                                                    // Find global index to determine status correctly
+                                                    const globalIndex = dashboardData.lessons.findIndex((l: any) => l.id === lesson.id);
+                                                    const isCompleted = globalIndex < dashboardData.completed_lessons;
+                                                    const isUnlocked = globalIndex <= dashboardData.completed_lessons;
+                                                    const isLocked = !isUnlocked;
+                                                    const isCurrent = lesson.id === dashboardData.current_lesson_id;
+                                                    const isLeft = index % 2 === 0;
+
+                                                    return (
+                                                        <motion.div
+                                                            key={lesson.id}
+                                                            initial={{ opacity: 0, y: 30 }}
+                                                            whileInView={{ opacity: 1, y: 0 }}
+                                                            viewport={{ once: true }}
+                                                            transition={{ delay: index * 0.05, duration: 0.5 }}
+                                                            className={`flex items-center w-full ${isLeft ? 'justify-start lg:pl-20' : 'justify-end lg:pr-20'}`}
+                                                        >
+                                                            <div className={`flex items-center gap-12 ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}>
+                                                                {/* The Node */}
+                                                                <div className="relative group/node">
+                                                                    {isCurrent && (
+                                                                        <motion.div
+                                                                            animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+                                                                            transition={{ duration: 2, repeat: Infinity }}
+                                                                            className="absolute -inset-4 bg-primary-500/30 rounded-full blur-2xl"
+                                                                        />
+                                                                    )}
+                                                                    <Link
+                                                                        href={isUnlocked ? `/academy/${lesson.id}` : '#'}
+                                                                        className={`relative z-10 w-24 h-24 rounded-[2rem] flex items-center justify-center border-4 transition-all duration-500 ${!isUnlocked ? 'bg-neutral-100 border-neutral-200 text-neutral-400 scale-90' :
+                                                                            isCurrent ? 'bg-primary-500 border-white/30 text-white shadow-glow-primary scale-110 rotate-3' :
+                                                                                isCompleted ? 'bg-accent-gold border-white/20 text-white shadow-lg -rotate-3 hover:rotate-0' :
+                                                                                    'bg-white border-neutral-200 text-neutral-400 hover:border-primary-500/50 hover:text-primary-500 shadow-sm'
+                                                                            }`}
+                                                                    >
+                                                                        {isCompleted ? <CheckCircle2 size={40} className="drop-shadow-md" /> :
+                                                                            !isUnlocked ? <Lock size={32} /> :
+                                                                                <Play size={40} className={isCurrent ? 'translate-x-1 outline-1' : ''} />}
+
+                                                                        <div className="absolute -top-3 -right-3 w-9 h-9 bg-white rounded-2xl border-2 border-neutral-100 flex items-center justify-center text-[11px] font-black text-neutral-800 shadow-2xl group-hover/node:scale-110 transition-transform">
+                                                                            {lesson.order}
+                                                                        </div>
+                                                                    </Link>
+                                                                    
+                                                                    {/* Connecting Dot for visual path */}
+                                                                    {!isLeft && index < paginatedLessons.length - 1 && (
+                                                                        <div className="absolute top-full left-1/2 w-1 h-24 bg-gradient-to-b from-neutral-200 to-transparent -translate-x-1/2 z-0" />
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Content Card */}
+                                                                <Link
+                                                                    href={isUnlocked ? `/academy/${lesson.id}` : '#'}
+                                                                    className={`group relative flex flex-col items-center p-8 rounded-[2.5rem] transition-all duration-700 hover:scale-[1.03] ${isLocked
+                                                                        ? 'bg-neutral-100/50 border border-neutral-200/50 opacity-40 grayscale blur-[1px]'
+                                                                        : 'bg-white border border-neutral-200 hover:border-primary-500/30 hover:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15)] shadow-sm'
+                                                                        } w-64 md:w-80`}
+                                                                >
+                                                                    <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-inner transition-all duration-700 group-hover:scale-110 group-hover:-rotate-12 ${isLocked ? 'bg-neutral-200 text-neutral-400' : 'bg-primary-50/80 text-primary-500 group-hover:bg-primary-500 group-hover:text-white'
+                                                                        }`}>
+                                                                        {lesson.lesson_type === 'RHYTHM' ? <Music size={36} /> :
+                                                                            lesson.lesson_type === 'THEORY' ? <BookOpen size={36} /> :
+                                                                                <GraduationCap size={36} />}
+                                                                    </div>
+                                                                    <div className="space-y-3 text-center">
+                                                                        <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-primary-400/80">
+                                                                            {lesson.lesson_type === 'RHYTHM' ? 'Lectura Rítmica' : 'Teoría Musical'}
+                                                                        </span>
+                                                                        <h3 className="font-display font-bold text-neutral-900 leading-tight text-2xl group-hover:text-primary-600 transition-colors">{lesson.title}</h3>
+                                                                        <p className="text-sm text-neutral-500 line-clamp-2 leading-relaxed font-ui">{lesson.description}</p>
+                                                                    </div>
+
+                                                                    {isUnlocked && (
+                                                                        <div className="mt-8 flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-neutral-400 group-hover:text-primary-500 transition-all">
+                                                                            <div className="h-px w-6 bg-neutral-200 group-hover:w-10 group-hover:bg-primary-500 transition-all" />
+                                                                            {isCompleted ? 'Repasar' : 'Comenzar'} 
+                                                                            <ArrowRight size={16} className="transition-transform group-hover:translate-x-2" />
+                                                                        </div>
+                                                                    )}
+                                                                </Link>
+                                                            </div>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </motion.div>
+                                        </AnimatePresence>
+
+                                        {/* Pagination Controls */}
+                                        {totalPages > 1 && (
+                                            <div className="flex justify-center items-center gap-6 mt-16 pt-8 border-t border-neutral-100">
+                                                <button 
+                                                    onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                                                    disabled={currentPage === 0}
+                                                    className="p-4 rounded-2xl bg-neutral-100 text-neutral-500 hover:bg-primary-500 hover:text-white disabled:opacity-30 disabled:hover:bg-neutral-100 disabled:hover:text-neutral-500 transition-all shadow-sm"
+                                                    aria-label="Página anterior"
+                                                >
+                                                    <ArrowRight size={20} className="rotate-180" />
+                                                </button>
+                                                
+                                                <div className="flex gap-2">
+                                                    {Array.from({ length: totalPages }).map((_, i) => (
+                                                        <button 
+                                                            key={i}
+                                                            onClick={() => setCurrentPage(i)}
+                                                            className={`w-12 h-12 rounded-2xl font-black text-[11px] transition-all flex flex-col items-center justify-center gap-0.5 ${
+                                                                currentPage === i 
+                                                                ? 'bg-primary-500 text-white shadow-glow-primary scale-110' 
+                                                                : 'bg-white text-neutral-400 border border-neutral-100 hover:border-primary-300'
+                                                            }`}
+                                                        >
+                                                            <span className="opacity-40 text-[8px] leading-none">PAG</span>
+                                                            <span className="leading-none">{i + 1}</span>
+                                                        </button>
+                                                    ))}
                                                 </div>
 
-                                                {isUnlocked && (
-                                                    <div className="mt-8 flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-neutral-400 group-hover:text-primary-500 transition-all">
-                                                        <div className="h-px w-6 bg-neutral-200 group-hover:w-10 group-hover:bg-primary-500 transition-all" />
-                                                        {isCompleted ? 'Repasar' : 'Comenzar'} 
-                                                        <ArrowRight size={16} className="transition-transform group-hover:translate-x-2" />
-                                                    </div>
-                                                )}
-                                            </Link>
-                                        </div>
-                                    </motion.div>
+                                                <button 
+                                                    onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                                    disabled={currentPage === totalPages - 1}
+                                                    className="p-4 rounded-2xl bg-neutral-100 text-neutral-500 hover:bg-primary-500 hover:text-white disabled:opacity-30 disabled:hover:bg-neutral-100 disabled:hover:text-neutral-500 transition-all shadow-sm"
+                                                    aria-label="Siguiente página"
+                                                >
+                                                    <ArrowRight size={20} />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
                                 );
-                            })}
+                            })()}
                         </div>
                     </div>
 

@@ -140,6 +140,7 @@ def upload_asset(
 def upload_musicxml(
     file: UploadFile = File(...),
     edition_id: str = Form(...),
+    rights_confirmed: bool = Form(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -153,6 +154,8 @@ def upload_musicxml(
     Returns the asset with processing_status='PENDING'.
     Poll GET /pipeline/status/{asset_id} to check progress.
     """
+    if not rights_confirmed:
+        raise HTTPException(status_code=400, detail="Debe confirmar que tiene los derechos para subir este archivo.")
     # Validate file extension
     if file.filename:
         ext = os.path.splitext(file.filename)[1].lower()

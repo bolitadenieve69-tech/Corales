@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
 import { RhythmExercise } from '@/components/academy/RhythmExercise';
+import { MusicalFigure } from '@/components/academy/MusicalFigure';
+import { MusicalStaff } from '@/components/academy/MusicalStaff';
+import { Music } from 'lucide-react';
 
 export default function LessonDetailPage() {
     const { lessonId } = useParams();
@@ -109,7 +112,7 @@ export default function LessonDetailPage() {
                             <div className="p-3 bg-primary-500/20 text-primary-300 rounded-xl h-fit">
                                 <Info size={24} />
                             </div>
-                            <div>
+                            <div className="flex-1">
                                 <h3 className="text-lg font-semibold text-white mb-2">Fundamento Teórico</h3>
                                 <div className="text-neutral-300 leading-relaxed whitespace-pre-wrap">
                                     {content.theory || content.text}
@@ -123,12 +126,58 @@ export default function LessonDetailPage() {
                             <div className="p-3 bg-primary-500/20 text-primary-300 rounded-xl h-fit">
                                 <Info size={24} />
                             </div>
-                            <div>
+                            <div className="flex-1">
                                 <h3 className="text-lg font-semibold text-white mb-2">Teoría</h3>
                                 <div className="text-neutral-300 leading-relaxed whitespace-pre-wrap">
                                     {content.text}
                                 </div>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Glosario Visual / Pentagrama */}
+                    {content?.notations && content.notations.length > 0 && (
+                        <div className="bg-accent-500/5 border border-accent-500/10 rounded-3xl p-8 space-y-8">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3 text-accent-500 font-black uppercase tracking-widest text-[10px]">
+                                    <div className="w-8 h-8 rounded-full bg-accent-500/10 flex items-center justify-center border border-accent-500/20">
+                                        <Music size={14} />
+                                    </div>
+                                    {lesson.lesson_type === 'THEORY' ? 'Lectura en el Pentagrama' : 'Simbología de la Unidad'}
+                                </div>
+                            </div>
+                            
+                            {lesson.lesson_type === 'THEORY' || lesson.title.includes('Claves') ? (
+                                <MusicalStaff 
+                                    notes={content.notations.map((n: string) => ({
+                                        duration: 'q',
+                                        pitch: n.length > 1 ? n : (n === 'q' ? 'G4' : n === '8' ? 'A4' : 'B4'), // Default pitches for glossary if not specified
+                                        label: n
+                                    }))}
+                                    showNoteNames={true}
+                                />
+                            ) : (
+                                <div className="flex flex-wrap gap-10">
+                                    {content.notations.map((note: string, idx: number) => {
+                                        const labels: Record<string, string> = {
+                                            'q': 'Negra', 'h': 'Blanca', 'w': 'Redonda', '8': 'Corchea', '16': 'Semicorchea',
+                                            'rq': 'Silencio de Negra', 'rh': 'Silencio de Blanca', 'rw': 'Silencio de Redonda', 'r8': 'Silencio de Corchea'
+                                        };
+                                        const label = labels[note] || (note.startsWith('r') ? 'Silencio' : 'Nota');
+                                        
+                                        return (
+                                            <div key={idx} className="flex flex-col items-center gap-4 group">
+                                                <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-2xl group-hover:scale-110 group-hover:border-accent-500/40 transition-all duration-500">
+                                                    <MusicalFigure type={note} size={56} color="white" />
+                                                </div>
+                                                <div className="text-center space-y-1">
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 group-hover:text-accent-500 transition-colors">{label}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     )}
 

@@ -36,6 +36,19 @@ def create_work(
         
     db_work = Work(**work.model_dump())
     db.add(db_work)
+    db.flush() # Get work ID
+
+    # Create a default edition automatically (as required by the frontend upload flow)
+    from models.edition import Edition
+    import uuid
+    default_edition = Edition(
+        id=uuid.uuid4().hex,
+        work_id=db_work.id,
+        publisher="Director Upload",
+        source="LOCAL"
+    )
+    db.add(default_edition)
+    
     db.commit()
     db.refresh(db_work)
     return db_work
