@@ -73,7 +73,7 @@ export default function AcademyPage() {
         .sort((a, b) => a.order - b.order);
     
     return (
-        <QueryBoundary isLoading={isDashboardLoading || isLessonsLoading} error={dashboardError} onRetry={() => refetchDashboard()}>
+        <QueryBoundary isLoading={isDashboardLoading || isLessonsLoading} error={null} onRetry={() => refetchDashboard()}>
             {dashboardData && (() => {
                 const levelCompletedCount = dashboardData.lessons.filter((l: any) => l.level === activeLevel && dashboardData.lessons.indexOf(l) < dashboardData.completed_lessons).length || 0;
                 const levelTotalCount = filteredLessons.length || 1;
