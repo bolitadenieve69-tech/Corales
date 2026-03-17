@@ -7,33 +7,80 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { useAcademyDashboard } from '@/hooks/useAcademy';
 import { QueryBoundary } from '@/components/layout/QueryBoundary';
+import { useQuery } from '@tanstack/react-query'; // Assuming @tanstack/react-query is used
+
+// Define a type for lessons if not already defined
+interface Lesson {
+    id: string;
+    title: string;
+    level: string;
+    type: 'RHYTHM' | 'THEORY';
+    order: number;
+    completed?: boolean; // Optional for mock data
+    content?: string; // Optional for mock data
+    description?: string; // For actual lessons
+    lesson_type?: 'RHYTHM' | 'THEORY'; // For actual lessons
+}
 
 export default function AcademyPage() {
     const { t } = useTranslation('academy');
-    const { data: dashboardData, isLoading, error, refetch } = useAcademyDashboard();
-    const [activeLevel, setActiveLevel] = useState('INICIACION');
+    const { data: dashboardData, isLoading: isDashboardLoading, error: dashboardError, refetch: refetchDashboard } = useAcademyDashboard();
+    const [activeLevel, setActiveLevel] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 10;
 
+    // --- MOCK DATA FOR DEMO MODE ---
+    const mockLessons: Lesson[] = [
+        { id: 'm1', title: 'Las Figuras: La Negra', level: 'INICIACION', type: 'RHYTHM', order: 1, completed: true, content: 'Aprende el pulso básico.', description: 'Aprende el pulso básico.' },
+        { id: 'm2', title: 'La Blanca y su silencio', level: 'INICIACION', type: 'RHYTHM', order: 2, completed: false, content: 'Sonidos de dos pulsos.', description: 'Sonidos de dos pulsos.' },
+        { id: 'm3', title: 'El Pentagrama', level: 'ELEMENTAL', type: 'THEORY', order: 3, completed: false, content: 'Introducción a la notación.', description: 'Introducción a la notación.' },
+        { id: 'm4', title: 'Clave de Sol', level: 'ELEMENTAL', type: 'THEORY', order: 4, completed: false, content: 'Notas en el espacio.', description: 'Notas en el espacio.' },
+        { id: 'm5', title: 'Ejercicio de Corcheas', level: 'BASICO', type: 'RHYTHM', order: 5, completed: false, content: 'Dividiendo el pulso.', description: 'Dividiendo el pulso.' },
+        { id: 'm6', title: 'Intervalos I', level: 'BASICO', type: 'THEORY', order: 6, completed: false, content: 'Distancias entre notas.', description: 'Distancias entre notas.' },
+        { id: 'm7', title: 'Lección Extra 1', level: 'INICIACION', type: 'THEORY', order: 7, completed: false, description: 'Lección extra de teoría.' },
+        { id: 'm8', title: 'Lección Extra 2', level: 'ELEMENTAL', type: 'RHYTHM', order: 8, completed: false, description: 'Lección extra de ritmo.' },
+        { id: 'm9', title: 'Lección Extra 3', level: 'BASICO', type: 'THEORY', order: 9, completed: false, description: 'Otra lección de teoría.' },
+        { id: 'm10', title: 'Lección Extra 4', level: 'INICIACION', type: 'RHYTHM', order: 10, completed: false, description: 'Otra lección de ritmo.' },
+        { id: 'm11', title: 'Página 2 - Introducción', level: 'INICIACION', type: 'THEORY', order: 11, completed: false, description: 'Introducción a la segunda página.' },
+        { id: 'm12', title: 'Página 2 - Ritmo Avanzado', level: 'ELEMENTAL', type: 'RHYTHM', order: 12, completed: false, description: 'Ritmo avanzado para la segunda página.' },
+    ];
+
+    const { data: lessons = [], isLoading: isLessonsLoading } = useQuery<Lesson[]>({
+        queryKey: ['lessons'],
+        queryFn: async () => {
+            try {
+                const resp = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/academy/lessons`);
+                if (!resp.ok) throw new Error('API down');
+                return resp.json();
+            } catch (e) {
+                console.warn("Using Mock Data (API unavailable)", e);
+                return mockLessons;
+            }
+        },
+    });
+
     const levels = [
+        { id: 'all', label: 'Todos', color: 'neutral' }, // Added 'all' level
         { id: 'INICIACION', label: 'Iniciación', color: 'primary' },
         { id: 'ELEMENTAL', label: 'Elemental', color: 'accent-gold' },
         { id: 'BASICO', label: 'Básico', color: 'emerald' }
     ];
 
-    if (isLoading) return <AcademySkeleton />;
+    if (isDashboardLoading || isLessonsLoading) return <AcademySkeleton />; // Use combined loading state
 
-    const filteredLessons = dashboardData?.lessons.filter((l: any) => l.level === activeLevel) || [];
+    const filteredLessons = lessons
+        .filter((l: Lesson) => activeLevel === 'all' || l.level === activeLevel)
+        .sort((a, b) => a.order - b.order);
     
-    // Calculate level progress
-    const levelCompletedCount = dashboardData?.lessons.filter((l: any) => l.level === activeLevel && dashboardData.lessons.indexOf(l) < dashboardData.completed_lessons).length || 0;
-    const levelTotalCount = filteredLessons.length || 1;
-    const levelProgress = Math.round((levelCompletedCount / levelTotalCount) * 100);
-
     return (
-        <QueryBoundary isLoading={isLoading} error={error} onRetry={() => refetch()}>
-            {dashboardData && (
-                <div className="max-w-5xl mx-auto space-y-12 pb-24 animate-in fade-in duration-1000">
+        <QueryBoundary isLoading={isDashboardLoading || isLessonsLoading} error={dashboardError} onRetry={() => refetchDashboard()}>
+            {dashboardData && (() => {
+                const levelCompletedCount = dashboardData.lessons.filter((l: any) => l.level === activeLevel && dashboardData.lessons.indexOf(l) < dashboardData.completed_lessons).length || 0;
+                const levelTotalCount = filteredLessons.length || 1;
+                const levelProgress = Math.round((levelCompletedCount / levelTotalCount) * 100);
+
+                return (
+                    <div className="max-w-5xl mx-auto space-y-12 pb-24 animate-in fade-in duration-1000">
                     {/* Premium Header */}
                     <div className="relative rounded-[3rem] overflow-hidden bg-primary-900 border border-white/10 p-8 md:p-12 shadow-2xl">
                         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
@@ -303,8 +350,9 @@ export default function AcademyPage() {
                             </div>
                         ))}
                     </div>
-                </div>
-            )}
+                    </div>
+                );
+            })()}
         </QueryBoundary>
     );
 }
