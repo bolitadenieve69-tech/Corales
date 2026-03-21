@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Calendar, Save, X, Loader2 } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
+import { useUIStore } from '@/store/uiStore';
+import { useCreateSeason } from '@/hooks/useManagement';
 
 interface SeasonFormProps {
     choirId: string;
@@ -14,29 +15,18 @@ export const SeasonForm = ({ choirId, onSuccess, onCancel }: SeasonFormProps) =>
     const [name, setName] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [loading, setLoading] = useState(false);
+    const addToast = useUIStore(s => s.addToast);
+    const createSeason = useCreateSeason(choirId);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            await fetchApi(`/management/choir/${choirId}/seasons`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    name,
-                    start_date: startDate || null,
-                    end_date: endDate || null,
-                    choir_id: choirId
-                })
-            });
-            onSuccess();
-        } catch (err: any) {
-            console.error("Error creating season", err);
-            // We use standard vanilla alert as a quick fallback if we don't have useUIStore here, or we can use it.
-            alert(`Error al crear la temporada: ${err.message}`);
-        } finally {
-            setLoading(false);
-        }
+        createSeason.mutate(
+            { name, start_date: startDate || null, end_date: endDate || null },
+            {
+                onSuccess: () => onSuccess(),
+                onError: (err: any) => addToast(`Error al crear la temporada: ${err.message}`, 'error'),
+            }
+        );
     };
 
     return (
@@ -104,10 +94,10 @@ export const SeasonForm = ({ choirId, onSuccess, onCancel }: SeasonFormProps) =>
                     </button>
                     <button
                         type="submit"
-                        disabled={loading || !name}
+                        disabled={createSeason.isPending || !name}
                         className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-accent-500 text-primary-900 font-bold hover:bg-accent-400 disabled:opacity-50 transition-all shadow-glow-accent font-ui"
                     >
-                        {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                        {createSeason.isPending ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                         Crear Temporada
                     </button>
                 </div>

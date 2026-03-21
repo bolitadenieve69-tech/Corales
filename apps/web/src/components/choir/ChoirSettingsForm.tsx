@@ -4,6 +4,7 @@ import { fetchApi, API_URL } from '@/lib/api';
 import { useUIStore } from '@/store/uiStore';
 import Image from 'next/image';
 import { useAuth } from '@/lib/auth-context';
+import { useMyChoir } from '@/hooks/useManagement';
 
 interface ChoirSettingsFormProps {
     choirId: string;
@@ -15,7 +16,6 @@ export function ChoirSettingsForm({ choirId, onUpdate, onIdDiscovered }: ChoirSe
     const addToast = useUIStore(state => state.addToast);
     const { refreshUser } = useAuth();
 
-    const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const [uploadingCover, setUploadingCover] = useState(false);
@@ -45,26 +45,17 @@ export function ChoirSettingsForm({ choirId, onUpdate, onIdDiscovered }: ChoirSe
         cover_photo_url: ''
     });
 
+    const { data: choirData, isLoading } = useMyChoir();
+
     useEffect(() => {
-        // Obtenemos los datos del coro a nivel me (current user choir)
-        fetchApi('/choirs/me')
-            .then(data => {
-                if (data) {
-                    setFormData({
-                        ...formData,
-                        ...data
-                    });
-                    setHasChoir(true);
-                    if (onIdDiscovered) onIdDiscovered(data.id);
-                } else {
-                    setHasChoir(false);
-                }
-            })
-            .catch(() => {
-                setHasChoir(false);
-            })
-            .finally(() => setLoading(false));
-    }, [choirId]);
+        if (choirData) {
+            setFormData((prev: any) => ({ ...prev, ...choirData }));
+            setHasChoir(true);
+            if (onIdDiscovered) onIdDiscovered(choirData.id);
+        } else if (choirData === null) {
+            setHasChoir(false);
+        }
+    }, [choirData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, type, value } = e.target;
@@ -168,7 +159,7 @@ export function ChoirSettingsForm({ choirId, onUpdate, onIdDiscovered }: ChoirSe
         }
     };
 
-    if (loading) return <div className="py-20 flex justify-center"><Loader2 size={32} className="animate-spin text-accent-500" /></div>;
+    if (isLoading) return <div className="py-20 flex justify-center"><Loader2 size={32} className="animate-spin text-accent-500" /></div>;
 
     const renderContactBlock = (title: string, prefix: string) => (
         <div className="bg-white/5 border border-white/10 p-6 rounded-3xl space-y-4">

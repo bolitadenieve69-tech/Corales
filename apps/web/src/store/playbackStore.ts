@@ -1,3 +1,5 @@
+'use client';
+
 import { create } from 'zustand';
 import * as Tone from 'tone';
 
@@ -42,7 +44,9 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
     setScoreBpm: (scoreBpm) => set({ scoreBpm }),
     setTempo: (tempo) => {
         set({ tempo });
-        Tone.getTransport().bpm.value = tempo;
+        if (typeof window !== 'undefined') {
+            Tone.getTransport().bpm.value = tempo;
+        }
     },
     setVolume: (voice, volume) => set((state) => ({
         volumes: { ...state.volumes, [voice]: volume }
@@ -52,10 +56,12 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
     })),
     togglePlay: () => {
         const { isPlaying } = get();
-        if (isPlaying) {
-            Tone.getTransport().pause();
-        } else {
-            Tone.getTransport().start();
+        if (typeof window !== 'undefined') {
+            if (isPlaying) {
+                Tone.getTransport().pause();
+            } else {
+                Tone.getTransport().start();
+            }
         }
         set({ isPlaying: !isPlaying });
     },

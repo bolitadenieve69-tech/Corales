@@ -1,10 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, CheckCircle, Music, Clock, Bell } from 'lucide-react';
+import { MessageSquare, CheckCircle, Music, Clock, Bell, AlertCircle, RefreshCw } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchApi } from '@/lib/api';
 import { useUIStore } from '@/store/uiStore';
+
+interface FeedbackMessage {
+    id: string;
+    content: string;
+    created_at: string;
+    read_at: string | null;
+    work_id?: string | null;
+}
 
 function timeAgo(dateString: string) {
     const date = new Date(dateString);
@@ -19,36 +28,82 @@ function timeAgo(dateString: string) {
     return `hace ${days} días`;
 }
 
-export function DirectorMessages() {
-    const [messages, setMessages] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+function MessageSkeleton() {
+    return (
+        <div
+            className="w-full max-w-4xl mx-auto mt-16 bg-white border border-neutral-100 rounded-[2.5rem] shadow-2xl overflow-hidden"
+            aria-busy="true"
+            aria-label="Cargando indicaciones del director"
+        >
+            <div className="p-10 border-b border-neutral-100 bg-neutral-50/50 flex items-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-neutral-100 animate-pulse shrink-0" />
+                <div className="space-y-2 flex-1">
+                    <div className="h-7 w-48 bg-neutral-100 rounded-lg animate-pulse" />
+                    <div className="h-4 w-64 bg-neutral-100 rounded-lg animate-pulse" />
+                </div>
+            </div>
+            {[1, 2].map(i => (
+                <div key={i} className="p-10 space-y-4 border-b border-neutral-100 last:border-0">
+                    <div className="flex gap-3">
+                        <div className="h-5 w-20 bg-neutral-100 rounded-full animate-pulse" />
+                        <div className="h-5 w-28 bg-neutral-100 rounded-full animate-pulse" />
+                    </div>
+                    <div className="h-6 w-full bg-neutral-100 rounded-lg animate-pulse" />
+                    <div className="h-6 w-3/4 bg-neutral-100 rounded-lg animate-pulse" />
+                </div>
+            ))}
+        </div>
+    );
+}
 
-    useEffect(() => {
-        const loadMessages = async () => {
-            try {
-                const data = await fetchApi('/users/me/feedback');
-                setMessages(data || []);
-            } catch (err) {
-                console.error("Error loading messages", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadMessages();
-    }, []);
+export function DirectorMessages() {
+    const queryClient = useQueryClient();
+
+    const { data: messages = [], isLoading, isError, refetch } = useQuery<FeedbackMessage[]>({
+        queryKey: ['director-messages'],
+        queryFn: async () => {
+            const data = await fetchApi('/users/me/feedback');
+            return (data ?? []) as FeedbackMessage[];
+        },
+        staleTime: 30_000,
+    });
 
     const markAsRead = async (id: string) => {
         try {
             await fetchApi(`/users/me/feedback/${id}/read`, { method: 'PUT' });
-            setMessages(prev => prev.map(m => m.id === id ? { ...m, read_at: new Date().toISOString() } : m));
+            queryClient.setQueryData<FeedbackMessage[]>(['director-messages'], old =>
+                (old ?? []).map(m => m.id === id ? { ...m, read_at: new Date().toISOString() } : m)
+            );
             useUIStore.getState().addToast('Mensaje marcado como leído', 'success');
-        } catch (err) {
-            console.error("Error marking as read", err);
+        } catch {
+            useUIStore.getState().addToast('Error al marcar como leído', 'error');
         }
     };
 
-    if (loading) return null;
-    if (messages.length === 0) return null;
+    if (isLoading) return <MessageSkeleton />;
+
+    if (isError) return (
+        <div className="w-full max-w-4xl mx-auto mt-16 bg-white border border-red-100 rounded-[2.5rem] shadow-2xl overflow-hidden p-12 flex flex-col items-center text-center gap-4">
+            <AlertCircle className="text-red-400" size={40} />
+            <p className="text-neutral-500">No se pudieron cargar las indicaciones del director.</p>
+            <button
+                onClick={() => refetch()}
+                className="flex items-center gap-2 px-5 py-2 bg-primary-500 text-white rounded-full font-bold text-sm hover:bg-primary-800 transition-all active:scale-95"
+            >
+                <RefreshCw size={15} /> Reintentar
+            </button>
+        </div>
+    );
+
+    if (messages.length === 0) return (
+        <div className="w-full max-w-4xl mx-auto mt-16 bg-white border border-neutral-100 rounded-[2.5rem] shadow-sm overflow-hidden px-10 py-12 flex flex-col items-center gap-4 text-center">
+            <CheckCircle className="text-emerald-400" size={44} />
+            <div>
+                <h3 className="font-display font-bold text-foreground text-xl">Sin indicaciones pendientes</h3>
+                <p className="text-neutral-400 text-sm mt-1">El director no ha dejado notas recientes. ¡Todo va genial, a ensayar!</p>
+            </div>
+        </div>
+    );
 
     const unreadCount = messages.filter(m => !m.read_at).length;
 
@@ -109,7 +164,7 @@ export function DirectorMessages() {
                                     </div>
 
                                     <p className="text-lg text-foreground leading-relaxed font-display font-medium border-l-4 border-primary-500/20 pl-6 py-2">
-                                        "{msg.content}"
+                                        &ldquo;{msg.content}&rdquo;
                                     </p>
 
                                     {msg.work_id && (

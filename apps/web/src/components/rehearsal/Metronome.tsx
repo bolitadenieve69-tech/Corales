@@ -1,35 +1,47 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Timer, Volume2, VolumeX, Minus, Plus } from 'lucide-react';
 import * as Tone from 'tone';
+import { usePlaybackStore } from '@/store/playbackStore';
 
 interface MetronomeProps {
     playing: boolean;
     initialBpm?: number;
+    timeSignature?: number; // numerator: 2, 3, 4, 6…
     onBpmChange?: (bpm: number) => void;
 }
 
-export default function Metronome({ playing, initialBpm = 100, onBpmChange }: MetronomeProps) {
-    const [bpm, setBpm] = useState(initialBpm);
+export default function Metronome({ playing, initialBpm = 100, timeSignature = 4, onBpmChange }: MetronomeProps) {
+    // Single source of truth: tempo lives in the global store so ScoreViewer
+    // and other consumers always read the user-adjusted value.
+    const bpm = usePlaybackStore(s => s.tempo);
+    const setStoreTempo = usePlaybackStore(s => s.setTempo);
     const [isMuted, setIsMuted] = useState(false);
     const [beat, setBeat] = useState(0);
 
-    // Tone.js Synth for the click
+    // Seed the store with the work's BPM when the panel opens
+    useEffect(() => {
+        setStoreTempo(initialBpm);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialBpm]);
+
     const synthRef = useRef<Tone.Synth | null>(null);
     const loopRef = useRef<Tone.Loop | null>(null);
 
-    // Initialize Tone.js objects
+    // Refs so the loop callback always reads the latest values without recreating the loop
+    const isMutedRef = useRef(isMuted);
+    const timeSignatureRef = useRef(timeSignature);
+
+    useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+    useEffect(() => { timeSignatureRef.current = timeSignature; }, [timeSignature]);
+
+    // Initialize synth once
     useEffect(() => {
         synthRef.current = new Tone.Synth({
             oscillator: { type: 'sine' },
-            envelope: {
-                attack: 0.001,
-                decay: 0.1,
-                sustain: 0,
-                release: 0.1
-            }
+            envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 },
         }).toDestination();
 
         return () => {
@@ -38,36 +50,39 @@ export default function Metronome({ playing, initialBpm = 100, onBpmChange }: Me
         };
     }, []);
 
-    // Sync BPM with Tone.Transport
+    // Sync time signature with Transport
     useEffect(() => {
-        Tone.getTransport().bpm.value = bpm;
-    }, [bpm]);
+        Tone.getTransport().timeSignature = timeSignature;
+    }, [timeSignature]);
 
-    // Handle play/stop through Tone.Transport or local Loop
+    // Play / pause — fix: always recreate loop on play to avoid stale-stop state
     useEffect(() => {
         if (playing) {
-            if (!loopRef.current) {
-                loopRef.current = new Tone.Loop((time) => {
-                    const currentBeat = (Tone.getTransport().position as string).split(':')[1];
-                    const beatNum = parseInt(currentBeat);
+            // Dispose previous loop so we never accumulate scheduled events
+            loopRef.current?.dispose();
+            loopRef.current = new Tone.Loop((time) => {
+                const pos = Tone.getTransport().position as string;
+                const beatNum = parseInt(pos.split(':')[1] ?? '0');
+                setBeat(beatNum % timeSignatureRef.current);
+                if (!isMutedRef.current && synthRef.current) {
+                    // Beat 0 = strong accent (higher pitch), rest = weak (lower)
+                    const frequency = beatNum === 0 ? 'C6' : 'C5';
+                    synthRef.current.triggerAttackRelease(frequency, '32n', time);
+                }
+            }, '4n').start(0);
 
-                    setBeat(beatNum % 2); // Visual toggle
-
-                    if (!isMuted && synthRef.current) {
-                        // First beat differentiation (higher pitch)
-                        const frequency = (beatNum === 0) ? "C6" : "C5";
-                        synthRef.current.triggerAttackRelease(frequency, "32n", time);
-                    }
-                }, "4n").start(0);
+            if (Tone.getTransport().state !== 'started') {
+                Tone.getTransport().start();
             }
         } else {
+            // Stop only this loop — do not stop the shared Transport
             loopRef.current?.stop();
         }
-    }, [playing, isMuted]);
+    }, [playing]);
 
     const adjustBpm = (delta: number) => {
-        const newBpm = Math.min(Math.max(bpm + delta, 40), 220); // Range 40-220 as per Rules
-        setBpm(newBpm);
+        const newBpm = Math.min(Math.max(bpm + delta, 40), 220);
+        setStoreTempo(newBpm);
         onBpmChange?.(newBpm);
     };
 
@@ -75,17 +90,21 @@ export default function Metronome({ playing, initialBpm = 100, onBpmChange }: Me
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col gap-4 backdrop-blur-sm">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <Timer size={18} className={playing ? "text-accent-500 animate-pulse" : "text-neutral-600"} />
+                    <Timer size={18} className={playing ? 'text-accent-500 animate-pulse' : 'text-neutral-600'} />
                     <span className="text-xs font-bold text-neutral-300 uppercase tracking-widest">Metrónomo</span>
                 </div>
-                <button
-                    onClick={() => setIsMuted(!isMuted)}
-                    title={isMuted ? "Activar sonido" : "Silenciar"}
-                    aria-label={isMuted ? "Activar sonido" : "Silenciar"}
-                    className={`p-2 rounded-lg transition-colors focus-ring ${isMuted ? 'text-red-400 bg-red-400/10' : 'text-neutral-300 hover:bg-white/5'}`}
-                >
-                    {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                </button>
+                <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-neutral-600 tabular-nums">{timeSignature}/4</span>
+                    <button
+                        type="button"
+                        onClick={() => setIsMuted(!isMuted)}
+                        title={isMuted ? 'Activar sonido' : 'Silenciar'}
+                        aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+                        className={`p-2 rounded-lg transition-colors focus-ring ${isMuted ? 'text-red-400 bg-red-400/10' : 'text-neutral-300 hover:bg-white/5'}`}
+                    >
+                        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                    </button>
+                </div>
             </div>
 
             <div className="flex items-center justify-center gap-6 py-4">
@@ -102,7 +121,6 @@ export default function Metronome({ playing, initialBpm = 100, onBpmChange }: Me
                     <div className="text-5xl font-black text-white tabular-nums drop-shadow-glow">{bpm}</div>
                     <div className="text-[10px] text-accent-500 font-bold tracking-widest uppercase mt-1">BPM</div>
 
-                    {/* Visual Beat Indicator */}
                     <AnimatePresence>
                         {playing && (
                             <motion.div
@@ -136,19 +154,28 @@ export default function Metronome({ playing, initialBpm = 100, onBpmChange }: Me
                     aria-label="Ajustar pulsaciones por minuto"
                     onChange={(e) => {
                         const newBpm = parseInt(e.target.value);
-                        setBpm(newBpm);
+                        setStoreTempo(newBpm);
                         onBpmChange?.(newBpm);
                     }}
                     className="w-full h-1.5 bg-primary-700 rounded-lg appearance-none cursor-pointer accent-accent-500 focus-ring"
                 />
             </div>
 
+            {/* Dynamic beat LEDs — one per beat in the time signature */}
             {playing && (
-                <div className="flex justify-center gap-4">
-                    {[0, 1].map((i) => (
+                <div className="flex justify-center gap-3">
+                    {Array.from({ length: timeSignature }).map((_, i) => (
                         <div
                             key={i}
-                            className={`w-2.5 h-2.5 rounded-full transition-all duration-75 ${beat === i ? 'bg-accent-500 shadow-glow-accent scale-150' : 'bg-primary-900 border border-white/10'}`}
+                            className={`rounded-full transition-all duration-75 ${
+                                beat === i
+                                    ? i === 0
+                                        // Strong beat: accent color, bigger
+                                        ? 'w-4 h-4 bg-accent-500 shadow-glow-accent scale-150'
+                                        // Weak beat: primary color, medium
+                                        : 'w-2.5 h-2.5 bg-primary-400 scale-125'
+                                    : 'w-2.5 h-2.5 bg-primary-900 border border-white/10'
+                            }`}
                         />
                     ))}
                 </div>

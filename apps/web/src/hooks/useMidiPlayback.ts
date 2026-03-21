@@ -16,6 +16,7 @@ const VOICE_ASSET_TYPES: Record<MidiVoice, string> = {
 
 export interface MidiVoiceInfo {
     assetId: string | null;
+    fileUrl: string | null;
     isLoading: boolean;
     isPlaying: boolean;
 }
@@ -24,10 +25,10 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
     const { volumes, isMuted, setScoreBpm, isPlaying: transportPlaying, togglePlay } = usePlaybackStore();
     
     const [voiceInfo, setVoiceInfo] = useState<Record<MidiVoice, MidiVoiceInfo>>({
-        soprano: { assetId: null, isLoading: false, isPlaying: false },
-        alto:    { assetId: null, isLoading: false, isPlaying: false },
-        tenor:   { assetId: null, isLoading: false, isPlaying: false },
-        bajo:    { assetId: null, isLoading: false, isPlaying: false },
+        soprano: { assetId: null, fileUrl: null, isLoading: false, isPlaying: false },
+        alto:    { assetId: null, fileUrl: null, isLoading: false, isPlaying: false },
+        tenor:   { assetId: null, fileUrl: null, isLoading: false, isPlaying: false },
+        bajo:    { assetId: null, fileUrl: null, isLoading: false, isPlaying: false },
     });
 
     const synthsRef = useRef<Record<MidiVoice, Tone.PolySynth | null>>({
@@ -54,7 +55,7 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
             const updated = { ...prev };
             (Object.keys(VOICE_ASSET_TYPES) as MidiVoice[]).forEach(voice => {
                 const asset = assets.find((a: any) => a.asset_type === VOICE_ASSET_TYPES[voice]);
-                updated[voice] = { ...updated[voice], assetId: asset?.id ?? null };
+                updated[voice] = { ...updated[voice], assetId: asset?.id ?? null, fileUrl: asset?.file_url ?? null };
             });
             return updated;
         });
@@ -78,8 +79,8 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
     }, []);
 
     const playVoice = useCallback(async (voice: MidiVoice) => {
-        const assetId = voiceInfo[voice].assetId;
-        if (!assetId) return;
+        const { assetId, fileUrl } = voiceInfo[voice];
+        if (!assetId && !fileUrl) return;
 
         if (voiceInfo[voice].isPlaying) {
             stopVoice(voice);
@@ -91,7 +92,10 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
         try {
             await Tone.start();
             const { Midi } = await import('@tonejs/midi');
-            const midi = await Midi.fromUrl(`${API_URL}/assets/${assetId}/stream`);
+            
+            // Priorizamos la URL directa (Supabase Storage), y de fallback la API antigua
+            const midiUrl = fileUrl || `${API_URL}/assets/${assetId}/stream`;
+            const midi = await Midi.fromUrl(midiUrl);
 
             // Expose score BPM so ScoreViewer can sync cursor correctly
             const midiFileBpm = midi.header.tempos[0]?.bpm ?? 120;
@@ -144,8 +148,8 @@ export function useMidiPlayback({ assets = [] }: { assets?: any[] }) {
     }, [stopVoice]);
 
     const getStreamUrl = useCallback((voice: MidiVoice): string | null => {
-        const { assetId } = voiceInfo[voice];
-        return assetId ? `${API_URL}/assets/${assetId}/stream` : null;
+        const { assetId, fileUrl } = voiceInfo[voice];
+        return fileUrl || (assetId ? `${API_URL}/assets/${assetId}/stream` : null);
     }, [voiceInfo]);
 
     return { voiceInfo, playVoice, stopVoice, stopAll, getStreamUrl };

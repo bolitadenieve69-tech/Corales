@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { X, Maximize2, Settings2, PlayCircle, PauseCircle, MessageSquare, Headphones } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePlayback } from '@/hooks/usePlayback';
+import { API_URL } from '@/lib/api';
 import { usePlaybackStore } from '@/store/playbackStore';
 import { usePracticeTracking } from '@/hooks/usePracticeTracking';
 import { useDirectorNotes } from '@/hooks/useDirectorNotes';
@@ -46,7 +47,7 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
 
     // Find the MusicXML asset if any
     const xmlAsset = work.editions?.[0]?.assets?.find((a: any) => a.asset_type?.toUpperCase() === 'MUSICXML');
-    const pdfAsset = work.editions?.[0]?.assets?.find((a: any) => ['PDF', 'SHEET_MUSIC'].includes(a.asset_type?.toUpperCase()));
+    const pdfAsset = work.editions?.[0]?.assets?.find((a: any) => ['PDF', 'SHEET_MUSIC', 'SCORE_PDF'].includes(a.asset_type?.toUpperCase()));
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -107,7 +108,7 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                 <div className="flex-1 p-4 md:p-8 flex justify-center items-start overflow-y-auto">
                     {xmlAsset ? (
                         <ScoreViewer
-                            xmlUrl={`/api/v1/assets/${xmlAsset.id}/stream`}
+                            xmlUrl={`${API_URL}/assets/${xmlAsset.id}/stream`}
                             currentTime={currentTime}
                             isPlaying={isPlaying}
                             scoreBpm={scoreBpm}
@@ -115,7 +116,7 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                     ) : pdfAsset ? (
                         <div className="w-full max-w-5xl h-full bg-neutral-100 rounded-xl shadow-2xl overflow-hidden">
                             <iframe
-                                src={`/api/v1/assets/${pdfAsset.id}/stream#toolbar=0`}
+                                src={`${API_URL}/assets/${pdfAsset.id}/stream#toolbar=0`}
                                 title="Partitura PDF"
                                 className="w-full h-full border-none"
                             />
@@ -131,7 +132,7 @@ export function RehearsalPanel({ work, selectedAsset, onClose }: RehearsalPanelP
                     <div className="space-y-8">
                         <div>
                             <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4 font-ui">Metrónomo</h3>
-                            <Metronome playing={isPlaying} initialBpm={work.bpm || 80} />
+                            <Metronome playing={isPlaying} initialBpm={work.bpm || 80} timeSignature={work.time_signature || 4} />
                         </div>
 
                         <div>

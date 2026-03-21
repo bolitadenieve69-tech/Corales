@@ -31,6 +31,7 @@ export default function UploadPrivateWorkPage() {
     const [progress, setProgress] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [rightsConfirmed, setRightsConfirmed] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
 
     useEffect(() => {
         const loadChoirs = async () => {
@@ -54,13 +55,12 @@ export default function UploadPrivateWorkPage() {
         return 'UNKNOWN';
     };
 
-    const handleFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selected = Array.from(e.target.files || []);
+    const processFiles = (selected: File[]) => {
         if (selected.length === 0) return;
 
         // The first file that looks like a score is primary.
         const pdfOrXml = selected.find(f => f.name.toLowerCase().endsWith('.pdf') || f.name.toLowerCase().endsWith('.xml') || f.name.toLowerCase().endsWith('.musicxml') || f.name.toLowerCase().endsWith('.mxl'));
-        
+
         if (pdfOrXml && !primaryFile) {
             setPrimaryFile(pdfOrXml);
             const rest = selected.filter(f => f !== pdfOrXml);
@@ -71,6 +71,25 @@ export default function UploadPrivateWorkPage() {
         } else {
             addStudyFiles(selected);
         }
+    };
+
+    const handleFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+        processFiles(Array.from(e.target.files || []));
+    };
+
+    const handleDropZoneDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragActive(false);
+        processFiles(Array.from(e.dataTransfer.files));
+    };
+
+    const handleDropZoneDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragActive(true);
+    };
+
+    const handleDropZoneDragLeave = (e: React.DragEvent) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragActive(false);
     };
 
     const addStudyFiles = (files: File[]) => {
@@ -286,19 +305,30 @@ export default function UploadPrivateWorkPage() {
 
                     <div className="space-y-6">
                         {!primaryFile ? (
-                            <label className="flex flex-col items-center justify-center w-full min-h-[220px] border-2 border-dashed border-white/10 hover:border-accent-500/50 rounded-[2rem] bg-black/20 cursor-pointer transition-all group p-10 text-center">
-                                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shadow-xl">
+                            <label
+                                onDrop={handleDropZoneDrop}
+                                onDragOver={handleDropZoneDragOver}
+                                onDragLeave={handleDropZoneDragLeave}
+                                className={`flex flex-col items-center justify-center w-full min-h-[220px] border-2 border-dashed rounded-[2rem] cursor-pointer transition-all group p-10 text-center ${
+                                    dragActive
+                                        ? 'border-accent-500 bg-accent-500/5 scale-[1.01]'
+                                        : 'border-white/10 hover:border-accent-500/50 bg-black/20'
+                                }`}
+                            >
+                                <div className={`w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6 transition-transform duration-500 shadow-xl ${dragActive ? 'scale-110 rotate-3' : 'group-hover:scale-110 group-hover:rotate-3'}`}>
                                     <Upload className="text-accent-500" size={32} />
                                 </div>
-                                <p className="text-xl font-bold text-white mb-2">Selecciona tus archivos</p>
-                                <p className="text-sm text-neutral-500 max-w-sm leading-relaxed">
-                                    Sube la **partitura (PDF/MusicXML)** y los **MIDIs** de estudio. Puedes seleccionarlos todos de una vez.
+                                <p className="text-xl font-bold text-white mb-2">
+                                    {dragActive ? 'Suelta los archivos aquí' : 'Arrastra o haz clic para seleccionar'}
                                 </p>
-                                <input 
-                                    type="file" 
+                                <p className="text-sm text-neutral-500 max-w-sm leading-relaxed">
+                                    Sube la partitura (PDF/MusicXML) y los MIDIs de estudio. Puedes seleccionarlos todos de una vez.
+                                </p>
+                                <input
+                                    type="file"
                                     multiple
                                     onChange={handleFileSelection}
-                                    className="hidden" 
+                                    className="hidden"
                                     accept=".pdf,.xml,.musicxml,.mxl,.mid,.midi"
                                 />
                             </label>

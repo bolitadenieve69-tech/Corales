@@ -1,12 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Users, Calendar, Settings, Shield, UserPlus, FileText, Search, Filter, Loader2, MessageSquare, Trash } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useUIStore } from '@/store/uiStore';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+    useChoirs,
+    useChoirMembers,
+    useChoirSeasons,
+    useChoirStats,
+    useUpdateMemberVoice,
+    useRemoveMember,
+} from '@/hooks/useManagement';
 import { SeasonForm } from '@/components/choir/SeasonForm';
 import { SendFeedbackModal } from '@/components/choir/SendFeedbackModal';
 import { ChoirSettingsForm } from '@/components/choir/ChoirSettingsForm';
@@ -15,44 +23,24 @@ import { InvitationManager } from '@/components/choir/InvitationManager';
 
 export default function ChoirManagementPage() {
     const { user: currentUser } = useAuth();
+    const addToast = useUIStore(s => s.addToast);
+    const queryClient = useQueryClient();
+
     const [activeTab, setActiveTab] = useState<'info' | 'members' | 'seasons' | 'invites' | 'analytics'>('members');
-    const [members, setMembers] = useState<any[]>([]);
-    const [seasons, setSeasons] = useState<any[]>([]);
-    const [stats, setStats] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
     const [showSeasonForm, setShowSeasonForm] = useState(false);
-    const [choirId, setChoirId] = useState<string>('');
     const [selectedMember, setSelectedMember] = useState<any | null>(null);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 
-    useEffect(() => {
-        // En una app real, obtendríamos el choir_id del usuario actual (director)
-        // Por ahora, listamos los coros y cogemos el primero para el demo
-        async function loadData() {
-            setLoading(true);
-            try {
-                const choirs = await fetchApi('/choirs/');
-                if (choirs && choirs.length > 0) {
-                    const cid = choirs[0].id;
-                    setChoirId(cid);
-                    const [membersData, seasonsData, statsData] = await Promise.all([
-                        fetchApi(`/management/choir/${cid}/members`),
-                        fetchApi(`/management/choir/${cid}/seasons`),
-                        fetchApi(`/management/choir/${cid}/stats`)
-                    ]);
-                    setMembers(membersData || []);
-                    setSeasons(seasonsData || []);
-                    setStats(statsData || null);
-                }
-            } catch (err) {
-                console.error("Error loading management data", err);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadData();
-    }, []);
+    const { data: choirs, isLoading } = useChoirs();
+    const choirId = choirs?.[0]?.id || '';
+
+    const { data: members = [] } = useChoirMembers(choirId);
+    const { data: seasons = [] } = useChoirSeasons(choirId);
+    const { data: stats } = useChoirStats(choirId);
+
+    const updateVoice = useUpdateMemberVoice(choirId);
+    const removeMember = useRemoveMember(choirId);
 
     const voiceColorMap: Record<string, string> = {
         'SOPRANO': 'var(--color-voice-soprano)',
@@ -61,7 +49,7 @@ export default function ChoirManagementPage() {
         'BASS': 'var(--color-voice-bajo)'
     };
 
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
                 <Loader2 className="animate-spin text-accent-500" size={48} />
@@ -117,13 +105,7 @@ export default function ChoirManagementPage() {
                     <div className="max-w-4xl mx-auto">
                         <ChoirSettingsForm
                             choirId={choirId}
-                            onIdDiscovered={(id) => {
-                                if (!choirId) setChoirId(id);
-                            }}
-                            onUpdate={(choir) => {
-                                // Potentially update choir name in local state if we started displaying it
-                                if (choir && choir.id) setChoirId(choir.id);
-                            }}
+                            onUpdate={() => {}}
                         />
                     </div>
                 )}
@@ -186,19 +168,14 @@ export default function ChoirManagementPage() {
                                                     <select
                                                         aria-label={`Cambiar voz de ${member.full_name}`}
                                                         value={member.voice_part}
-                                                        onChange={async (e) => {
-                                                            const newVoice = e.target.value;
-                                                            try {
-                                                                const updated = await fetchApi(`/management/choir/${choirId}/members/${member.id}/voice?voice_part=${newVoice}`, {
-                                                                    method: 'PUT'
-                                                                });
-                                                                if (updated) {
-                                                                    setMembers(prev => prev.map(m => m.id === member.id ? { ...m, voice_part: newVoice } : m));
-                                                                    useUIStore.getState().addToast('Voz actualizada', 'success');
+                                                        onChange={(e) => {
+                                                            updateVoice.mutate(
+                                                                { memberId: member.id, voicePart: e.target.value },
+                                                                {
+                                                                    onSuccess: () => addToast('Voz actualizada', 'success'),
+                                                                    onError: () => addToast('Error al cambiar voz', 'error'),
                                                                 }
-                                                            } catch (err) {
-                                                                useUIStore.getState().addToast('Error al cambiar voz', 'error');
-                                                            }
+                                                            );
                                                         }}
                                                         className="text-[10px] bg-white/10 px-2 py-0.5 rounded text-neutral-300 uppercase font-black tracking-widest border-none cursor-pointer focus:ring-1 focus:ring-accent-500"
                                                     >
@@ -231,17 +208,12 @@ export default function ChoirManagementPage() {
                                                     <button
                                                         title="Expulsar miembro"
                                                         aria-label={`Expulsar a ${member.full_name}`}
-                                                        onClick={async () => {
+                                                        onClick={() => {
                                                             if (confirm(`¿Estás seguro de que quieres eliminar a ${member.full_name} del coro?`)) {
-                                                                try {
-                                                                    await fetchApi(`/management/choir/${choirId}/members/${member.id}`, {
-                                                                        method: 'DELETE'
-                                                                    });
-                                                                    setMembers(prev => prev.filter(m => m.id !== member.id));
-                                                                    useUIStore.getState().addToast('Miembro eliminado correctamente', 'success');
-                                                                } catch (err: any) {
-                                                                    useUIStore.getState().addToast(err.message || 'Error al eliminar miembro', 'error');
-                                                                }
+                                                                removeMember.mutate(member.id, {
+                                                                    onSuccess: () => addToast('Miembro eliminado correctamente', 'success'),
+                                                                    onError: (err: any) => addToast(err.message || 'Error al eliminar miembro', 'error'),
+                                                                });
                                                             }
                                                         }}
                                                         className="p-2 hover:bg-red-500/10 rounded-xl text-neutral-400 hover:text-red-500 transition-all focus-ring"
@@ -426,9 +398,9 @@ export default function ChoirManagementPage() {
                     >
                         <AddMemberModal
                             choirId={choirId}
-                            onSuccess={(newMember) => {
+                            onSuccess={() => {
                                 setShowAddMemberModal(false);
-                                setMembers(prev => [...prev, newMember]);
+                                queryClient.invalidateQueries({ queryKey: ['choir', choirId, 'members'] });
                             }}
                             onCancel={() => setShowAddMemberModal(false)}
                         />
@@ -446,11 +418,7 @@ export default function ChoirManagementPage() {
                     >
                         <SeasonForm
                             choirId={choirId}
-                            onSuccess={() => {
-                                setShowSeasonForm(false);
-                                // Refresh seasons list
-                                fetchApi(`/management/choir/${choirId}/seasons`).then(setSeasons);
-                            }}
+                            onSuccess={() => setShowSeasonForm(false)}
                             onCancel={() => setShowSeasonForm(false)}
                         />
                     </motion.div>

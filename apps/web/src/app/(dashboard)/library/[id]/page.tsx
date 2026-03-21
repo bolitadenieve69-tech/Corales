@@ -23,6 +23,14 @@ export default function WorkDetailPage() {
     const [isMetronomeActive, setIsMetronomeActive] = useState(false);
     const [uploadModalEdition, setUploadModalEdition] = useState<string | null>(null);
 
+    const MOCK_WORK_MAP: Record<string, any> = {
+        'mock-1': { id: 'mock-1', title: 'Ave Verum Corpus', composer: 'W.A. Mozart', era: 'Clasicismo', genre: 'Motete', difficulty: 'Media', voice_format: 'SATB', editions: [] },
+        'mock-2': { id: 'mock-2', title: 'O Magnum Mysterium', composer: 'Tomás Luis de Victoria', era: 'Renacimiento', genre: 'Motete', difficulty: 'Media', voice_format: 'SATB', editions: [] },
+        'mock-3': { id: 'mock-3', title: 'Cantique de Jean Racine', composer: 'Gabriel Fauré', era: 'Romanticismo', genre: 'Cantata', difficulty: 'Media-Alta', voice_format: 'SATB', editions: [] },
+        'mock-4': { id: 'mock-4', title: 'Lux Aeterna', composer: 'Morten Lauridsen', era: 'Contemporánea', genre: 'Motete', difficulty: 'Alta', voice_format: 'SATB', editions: [] },
+        'mock-5': { id: 'mock-5', title: 'Gloria', composer: 'Antonio Vivaldi', era: 'Barroco', genre: 'Gloria', difficulty: 'Media', voice_format: 'SATB', editions: [] },
+    };
+
     const loadWork = () => {
         if (!id) return;
         fetchApi(`/works/${id}`)
@@ -34,6 +42,9 @@ export default function WorkDetailPage() {
             })
             .catch(err => {
                 console.error("Error fetching work details", err);
+                // Fall back to mock data for demo mode
+                const mockWork = MOCK_WORK_MAP[id];
+                if (mockWork) setWork(mockWork);
                 setLoading(false);
             });
     };
@@ -103,7 +114,7 @@ export default function WorkDetailPage() {
         if (!assets) return { musicxml: [], pdfs: [], audios: [], midis: [] };
         return {
             musicxml: assets.filter((a: any) => a.asset_type?.toUpperCase() === 'MUSICXML'),
-            pdfs: assets.filter((a: any) => ['PDF', 'SHEET_MUSIC'].includes(a.asset_type?.toUpperCase())),
+            pdfs: assets.filter((a: any) => ['PDF', 'SHEET_MUSIC', 'SCORE_PDF'].includes(a.asset_type?.toUpperCase())),
             audios: assets.filter((a: any) => a.asset_type?.toUpperCase().startsWith('AUDIO') || ['LEARNING_TRACK', 'REFERENCE_RECORDING'].includes(a.asset_type?.toUpperCase())),
             midis: assets.filter((a: any) => a.asset_type?.toUpperCase().startsWith('MIDI')),
         };
@@ -212,7 +223,7 @@ export default function WorkDetailPage() {
                                     <div className="space-y-3 flex-1 overflow-y-auto">
                                         {categories.pdfs.map((asset: any) => (
                                             <a
-                                                href={`${API_URL.replace('/api/v1', '')}/api/v1/assets/download/${asset.storage_path.split('/').pop()}`}
+                                                href={`${API_URL}/assets/${asset.id}/stream`}
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 key={asset.id}

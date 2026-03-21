@@ -1,30 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Music, Calendar, ChevronRight, PlayCircle, Loader2, Sparkles } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
 import Link from 'next/link';
+import { useRepertoire } from '@/hooks/useManagement';
 
 export default function RepertoirePage() {
-    const [seasons, setSeasons] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { data: seasons = [], isLoading } = useRepertoire();
 
-    useEffect(() => {
-        async function loadRepertoire() {
-            try {
-                const data = await fetchApi('/management/choir/my-repertoire');
-                setSeasons(data || []);
-            } catch (err) {
-                console.error("Error loading repertoire", err);
-            } finally {
-                setLoading(false);
-            }
-        }
-        loadRepertoire();
-    }, []);
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
                 <Loader2 className="animate-spin text-accent-500" size={48} />

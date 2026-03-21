@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Send, Music, MessageSquare, Loader2 } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
 import { useUIStore } from '@/store/uiStore';
+import { useChoirWorks, useSendFeedback } from '@/hooks/useManagement';
 
 interface SendFeedbackModalProps {
     choirId: string;
@@ -17,49 +17,24 @@ interface SendFeedbackModalProps {
 export function SendFeedbackModal({ choirId, recipientId, recipientName, onSuccess, onCancel }: SendFeedbackModalProps) {
     const [content, setContent] = useState('');
     const [workId, setWorkId] = useState<string>('');
-    const [works, setWorks] = useState<any[]>([]);
-    const [loadingWorks, setLoadingWorks] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
+    const addToast = useUIStore(s => s.addToast);
 
-    useEffect(() => {
-        const loadWorks = async () => {
-            try {
-                const data = await fetchApi(`/works/choir/${choirId}`);
-                setWorks(data || []);
-            } catch (err) {
-                console.error("Error loading works", err);
-            } finally {
-                setLoadingWorks(false);
-            }
-        };
-        loadWorks();
-    }, [choirId]);
+    const { data: works = [] } = useChoirWorks(choirId);
+    const sendFeedback = useSendFeedback(choirId);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!content.trim()) return;
-
-        setSubmitting(true);
-        try {
-            const result = await fetchApi(`/management/${choirId}/feedback`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    recipient_id: recipientId,
-                    work_id: workId || null,
-                    content: content
-                })
-            });
-
-            if (result) {
-                useUIStore.getState().addToast('Mensaje enviado correctamente', 'success');
-                onSuccess();
+        sendFeedback.mutate(
+            { recipient_id: recipientId, work_id: workId || null, content },
+            {
+                onSuccess: () => {
+                    addToast('Mensaje enviado correctamente', 'success');
+                    onSuccess();
+                },
+                onError: () => addToast('Error al enviar el mensaje', 'error'),
             }
-        } catch (err) {
-            console.error("Error sending feedback", err);
-            useUIStore.getState().addToast('Error al enviar el mensaje', 'error');
-        } finally {
-            setSubmitting(false);
-        }
+        );
     };
 
     return (
@@ -128,10 +103,10 @@ export function SendFeedbackModal({ choirId, recipientId, recipientName, onSucce
                     </button>
                     <button
                         type="submit"
-                        disabled={submitting || !content.trim()}
+                        disabled={sendFeedback.isPending || !content.trim()}
                         className="flex-[2] py-4 px-6 rounded-2xl bg-accent-500 text-primary-900 font-bold hover:bg-accent-400 transition-all shadow-glow-accent disabled:opacity-50 flex items-center justify-center gap-2 focus-ring"
                     >
-                        {submitting ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
+                        {sendFeedback.isPending ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
                         Enviar Nota
                     </button>
                 </div>

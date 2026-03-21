@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { UserPlus, Copy, Trash2, Calendar, Users, Loader2, CheckCircle, ExternalLink } from 'lucide-react';
-import { fetchApi } from '@/lib/api';
+import React, { useState } from 'react';
+import { UserPlus, Copy, Trash2, Calendar, Users, Loader2, ExternalLink } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useInvites, useCreateInvite, useDeleteInvite } from '@/hooks/useManagement';
 
 interface Invite {
     id: string;
@@ -19,62 +19,35 @@ interface InvitationManagerProps {
 }
 
 export function InvitationManager({ choirId }: InvitationManagerProps) {
-    const [invites, setInvites] = useState<Invite[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [creating, setCreating] = useState(false);
     const [maxUses, setMaxUses] = useState('1');
     const [expiresAt, setExpiresAt] = useState('');
     const addToast = useUIStore(state => state.addToast);
 
-    const loadInvites = async () => {
-        setLoading(true);
-        try {
-            const data = await fetchApi('/invites/me');
-            setInvites(data || []);
-        } catch (err) {
-            console.error("Error loading invites", err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const { data: invites = [] as Invite[], isLoading } = useInvites();
+    const createInvite = useCreateInvite();
+    const deleteInvite = useDeleteInvite();
 
-    useEffect(() => {
-        loadInvites();
-    }, [choirId]);
-
-    const handleCreateInvite = async (e: React.FormEvent) => {
+    const handleCreateInvite = (e: React.FormEvent) => {
         e.preventDefault();
-        setCreating(true);
-        try {
-            await fetchApi('/invites/', {
-                method: 'POST',
-                body: JSON.stringify({
-                    choir_id: choirId,
-                    max_uses: maxUses ? parseInt(maxUses) : null,
-                    expires_at: expiresAt || null
-                })
-            });
-            addToast('Invitación creada correctamente', 'success');
-            loadInvites();
-            // Reset form
-            setMaxUses('1');
-            setExpiresAt('');
-        } catch (err: any) {
-            addToast(err.message || 'Error al crear invitación', 'error');
-        } finally {
-            setCreating(false);
-        }
+        createInvite.mutate(
+            { choir_id: choirId, max_uses: maxUses ? parseInt(maxUses) : null, expires_at: expiresAt || null },
+            {
+                onSuccess: () => {
+                    addToast('Invitación creada correctamente', 'success');
+                    setMaxUses('1');
+                    setExpiresAt('');
+                },
+                onError: (err: any) => addToast(err.message || 'Error al crear invitación', 'error'),
+            }
+        );
     };
 
-    const handleDeleteInvite = async (id: string) => {
+    const handleDeleteInvite = (id: string) => {
         if (!confirm('¿Estás seguro de que quieres eliminar esta invitación?')) return;
-        try {
-            await fetchApi(`/invites/${id}`, { method: 'DELETE' });
-            setInvites(prev => prev.filter(inv => inv.id !== id));
-            addToast('Invitación eliminada', 'success');
-        } catch (err: any) {
-            addToast(err.message || 'Error al eliminar', 'error');
-        }
+        deleteInvite.mutate(id, {
+            onSuccess: () => addToast('Invitación eliminada', 'success'),
+            onError: (err: any) => addToast(err.message || 'Error al eliminar', 'error'),
+        });
     };
 
     const copyToClipboard = (code: string) => {
@@ -119,16 +92,16 @@ export function InvitationManager({ choirId }: InvitationManagerProps) {
                     </div>
                     <button
                         type="submit"
-                        disabled={creating}
+                        disabled={createInvite.isPending}
                         className="bg-accent-500 text-primary-900 px-5 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-accent-400 transition-all disabled:opacity-50 h-[38px] shadow-glow-accent"
                     >
-                        {creating ? <Loader2 className="animate-spin" size={18} /> : <UserPlus size={18} />}
+                        {createInvite.isPending ? <Loader2 className="animate-spin" size={18} /> : <UserPlus size={18} />}
                         Generar
                     </button>
                 </form>
             </div>
 
-            {loading ? (
+            {isLoading ? (
                 <div className="flex justify-center py-20">
                     <Loader2 className="animate-spin text-accent-500" size={40} />
                 </div>
